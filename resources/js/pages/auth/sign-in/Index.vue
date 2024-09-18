@@ -15,7 +15,7 @@
             Welcome!
             </h1>
             <div class="text-primary" style="font-size: 25px;">
-            <strong>AON Cashier</strong>
+            <strong>AON ashier</strong>
             </div>
             <!--end::Title-->
         </div>
