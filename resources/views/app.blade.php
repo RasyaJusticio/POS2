@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700">
   {{-- <link rel="stylesheet" href="/splash-screen.css"> --}}
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TPAIS APP</title>
+  <title>AON Cashier</title>
 
   <style>
     /* Style to hide the spinner arrows */
@@ -46,12 +46,12 @@
   <div id="app"></div>
 
   <!--begin::Loading markup-->
-  {{-- <div id="splash-screen" class="splash-screen">
+  <!--<div id="splash-screen" class="splash-screen">
     <img src="/media/logos/default-dark.svg" class="dark-logo" alt="Metronic dark logo" />
     <img src="/media/logos/default.svg" class="light-logo" alt="Metronic light logo" />
     <span>Loading ...</span>
-  </div> --}}
-  <!--end::Loading markup-->
+  </div> --
+  end::Loading markup-->
 
 </body>
 
