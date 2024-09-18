@@ -90,10 +90,7 @@ const currentLangugeLocale = computed(() => {
                 <div class="symbol symbol-50px me-5">
                     <img
                         alt="Logo"
-                        :src="
-                            getAssetPath(
-                                store.user.photo ?? 'media/avatars/300-3.jpg'
-                            )
+                        :src="('media/avatars/y.png')
                         "
                     />
                 </div>
@@ -102,18 +99,16 @@ const currentLangugeLocale = computed(() => {
                 <!--begin::Username-->
                 <div class="d-flex flex-column">
                     <div class="fw-bold d-flex align-items-center fs-5">
-                        {{ store.user.name }}
+                        AON
                         <span
                             class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2"
-                        >
-                            {{ store.user.role.name }}
+                        > Admin
                         </span>
                     </div>
                     <a
-                        href="#"
-                        class="fw-semibold text-muted text-hover-primary fs-7"
-                    >
-                        {{ store.user.email }}
+                        href="#" 
+                        class="fw-semibold text-muted text-hover-primary fs-7" 
+                    >aoncashier@gmail.com
                     </a>
                 </div>
                 <!--end::Username-->

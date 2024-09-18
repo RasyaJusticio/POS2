@@ -17,13 +17,13 @@ class SettingSeeder extends Seeder
         DB::table('settings')->truncate();
 
         Setting::create([
-            'app' => 'e-SAKIP DLH',
-            'description' =>  'Aplikasi e-SAKIP Dinas Lingkungan Hidup',
-            'logo' =>  '/media/logo.png',
+            'app' => 'DANO Cashier',
+            'description' =>  'Aplikasi Cashier By DANO',
+            'logo' =>  '/media/y.png',
             'bg_auth' =>  '/media/misc/bg-auth.jpg',
             'banner' =>  '/media/misc/banner.jpg',
-            'pemerintah' =>  'Pemerintah Provinsi Jawa Timur',
-            'dinas' =>  'Dinas Lingkungan Hidup',
+            'pemerintah' =>  'Cashier Indonesia',
+            'dinas' =>  'Bank Indonesia',
             'alamat' =>  '',
             'telepon' =>  '',
             'email' =>  '',

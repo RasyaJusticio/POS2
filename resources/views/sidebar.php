@@ -3,7 +3,7 @@
     <!-- Brand -->
     <div class="sidebar-logo">
       <a href="/" class="sidebar-brand">
-        <img src="/media/logos/metronic.svg" alt="Metronic Logo" />
+        <img src="/public/media/y.png" alt="DANO Logo" />
       </a>
     </div>
 
