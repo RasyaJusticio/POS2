@@ -46,12 +46,12 @@
   <div id="app"></div>
 
   <!--begin::Loading markup-->
-  {{-- <div id="splash-screen" class="splash-screen">
+  <!--<div id="splash-screen" class="splash-screen">
     <img src="/media/logos/default-dark.svg" class="dark-logo" alt="Metronic dark logo" />
     <img src="/media/logos/default.svg" class="light-logo" alt="Metronic light logo" />
     <span>Loading ...</span>
-  </div> --}}
-  <!--end::Loading markup-->
+  </div> --
+  end::Loading markup-->
 
 </body>
 

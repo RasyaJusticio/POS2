@@ -11,9 +11,12 @@
                 />
             </router-link>
             <!--begin::Title-->
-            <h1 class="mb-3">
-                Masuk ke <span class="text-primary">{{ setting?.app }}</span>
+            <h1 class="mb-3" style="font-size: 36px; line-height: 30%;">
+            Welcome!
             </h1>
+            <div class="text-primary" style="font-size: 25px;">
+            <strong>AON Cashier</strong>
+            </div>
             <!--end::Title-->
         </div>
         <!--begin::Heading-->
