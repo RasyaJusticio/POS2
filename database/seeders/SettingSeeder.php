@@ -17,15 +17,6 @@ class SettingSeeder extends Seeder
         DB::table('settings')->truncate();
 
         Setting::create([
-<<<<<<< HEAD
-            'app' => 'DANO Cashier',
-            'description' =>  'Aplikasi Cashier By DANO',
-            'logo' =>  '/media/y.png',
-            'bg_auth' =>  '/media/misc/bg-auth.jpg',
-            'banner' =>  '/media/misc/banner.jpg',
-            'pemerintah' =>  'Cashier Indonesia',
-            'dinas' =>  'Bank Indonesia',
-=======
             'app' => 'AON Cashier',
             'description' =>  'Aplikasi AON Cashier',
             'logo' =>  '/LOGO.png',
@@ -33,7 +24,6 @@ class SettingSeeder extends Seeder
             'banner' =>  '/media/misc/banner.jpg',
             'pemerintah' =>  'Pemerintah Provinsi Jawa Timur',
             //'dinas' =>  'Dinas Lingkungan Hidup',
->>>>>>> c909b217ee088fbc93ecd4519461e4e092ff605d
             'alamat' =>  '',
             'telepon' =>  '',
             'email' =>  '',

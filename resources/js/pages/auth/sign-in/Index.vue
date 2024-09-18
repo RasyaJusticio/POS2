@@ -2,12 +2,12 @@
     <!--begin::Form-->
     <div class="w-100">
         <!--begin::Heading-->
-        <div class="text-center mb-10">
+        <div class="text-center mb-5">
             <router-link to="/">
                 <img
                     :src="setting?.logo"
                     :alt="setting?.app"
-                    class="w-200px mb-8"
+                    class="w-300px mb-8"
                 />
             </router-link>
             <!--begin::Title-->
@@ -15,7 +15,7 @@
             Welcome!
             </h1>
             <div class="text-primary" style="font-size: 25px;">
-            <strong>AON ashier</strong>
+            <strong>AON Cashier</strong>
             </div>
             <!--end::Title-->
         </div>
@@ -95,7 +95,7 @@ export default defineComponent({
                 .label("Email"),
             password: Yup.string()
                 .min(8, "Password minimal terdiri dari 8 karakter")
-                .required("Harap masukkan password")
+                .required("Harap Masukkan Password")
                 .label("Password"),
         });
 

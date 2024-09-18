@@ -26,11 +26,7 @@
                 <label class="form-label fw-bold fs-6 mb-0">Password</label>
                 <!--end::Label-->
 
-                <!--begin::Link-->
-                <!-- <router-link to="/password-reset" class="link-primary fs-6 fw-bold">
-              Forgot Password ?
-            </router-link> -->
-                <!--end::Link-->
+                
             </div>
             <!--end::Wrapper-->
 
@@ -39,6 +35,11 @@
                 <!--begin::Input-->
                 <Field tabindex="2" class="form-control form-control-lg form-control-solid" type="password" name="password"
                     v-model="data.password" autocomplete="off" />
+                <!--begin::Link-->
+                <router-link to="/password-reset" class="link-primary fs-6 fw-bold">
+                Register ?
+                </router-link>
+                <!--end::Link-->
                 <!--end::Input-->
 
                 <!--begin::Visibility toggle-->
