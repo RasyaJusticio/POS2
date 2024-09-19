@@ -1,13 +1,13 @@
 <template>
 	<!--begin::Authentication Layout -->
 	<div class="d-flex flex-column flex-column-fluid flex-lg-row justify-content-center"
-		:style="`background-image: url('${setting?.bg_auth}'); background-size: cover`">
+		:style="`background-image: url('${setting?.bg_auth}'); background-size: cover; background-position: center; background-repeat: no-repeat; height: 100vh;`">
 		<!--begin::Body-->
-		<div class="d-flex flex-column-fluid flex-lg-row-left-content-left-content-lg-end p-12 p-lg-20">
+		<div class="d-flex flex-column-fluid flex-lg-row-left-content-left-content-lg-end p-12 p-lg-20" style="height: 100%">
 			<!--begin::Card-->
-			<div class="bg-body-black d-flex flex-column align-items-stretch flex-center rounded-4 w-md-600px p-md-20 w-100">
+			<div class="bg-body-black d-flex flex-column align-items-stretch flex-center rounded-4 w-md-600px p-md-20 w-100" style="max-height: 100%; margin-top: 20px;">
 				<!--begin::Wrapper-->
-				<div class="d-flex flex-center flex-column flex-column-fluid px-10 py-20 py-md-0">
+				<div class="d-flex flex-center flex-column flex-column-fluid px-10 py-10 py-md-0">
 					<router-view></router-view>
 				</div>
 				<!--end::Wrapper-->
@@ -18,6 +18,7 @@
 	</div>
 	<!--end::Authentication Layout -->
 </template>
+
 
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";

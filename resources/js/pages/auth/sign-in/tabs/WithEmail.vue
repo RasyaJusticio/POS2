@@ -36,9 +36,10 @@
                 <Field tabindex="2" class="form-control form-control-lg form-control-solid" type="password" name="password"
                     v-model="data.password" autocomplete="off" />
                 <!--begin::Link-->
-                <router-link to="/password-reset" class="link-primary fs-6 fw-bold">
-                Register ?
-                </router-link>
+                <router-link to="/auth/sign-up" class="link-primary fs-6 fw-bold">
+    Register?
+</router-link>
+
                 <!--end::Link-->
                 <!--end::Input-->
 
