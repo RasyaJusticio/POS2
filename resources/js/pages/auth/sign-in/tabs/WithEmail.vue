@@ -21,24 +21,12 @@
             <div class="position-relative mb-3">
                 <Field tabindex="2" class="form-control form-control-lg form-control-solid" type="password" name="password"
                     v-model="data.password" autocomplete="off" />
-<<<<<<< HEAD
                 
                 <!-- Tautan ke halaman pendaftaran -->
                 <router-link to="/register" class="link-primary fs-6 fw-bold">
                     Register?
                 </router-link>
                 
-=======
-                <!--begin::Link-->
-                <router-link to="/auth/sign-up" class="link-primary fs-6 fw-bold">
-    Register?
-</router-link>
-
-                <!--end::Link-->
-                <!--end::Input-->
-
-                <!--begin::Visibility toggle-->
->>>>>>> 0e658f0d8d18849a42009c01a80b32cbeca01f51
                 <span class="btn btn-sm btn-icon position-absolute translate-middle top-50 end-0 me-n2">
                     <i class="bi bi-eye-slash fs-2" @click="togglePassword"></i>
                 </span>
