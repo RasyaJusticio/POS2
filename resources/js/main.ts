@@ -29,6 +29,12 @@ import "vue3-toastify/dist/index.css";
 import "@/core/plugins/prismjs";
 const app = createApp(App);
 
+app.config.globalProperties.$filters = {
+    currency(value: number) {
+      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(value);
+    }
+  };
+
 app.use(createPinia());
 app.use(router);
 app.use(ElementPlus);

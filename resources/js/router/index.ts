@@ -73,6 +73,33 @@ const routes: Array<RouteRecordRaw> = [
                     breadcrumbs: ["Master", "Users"],
                 },
             },
+              {
+                path: "/dashboard/pos/pos-layout",
+                name: "dashboard.poslayout",
+                component: () => import("@/pages/dashboard/pos/pos-layout/index.vue"),
+                meta: {
+                  pageTitle: "POS Layout",
+                  breadcrumbs: ["POS", "Layout"],
+                },
+              },
+              {
+                path: "/dashboard/pos/pos-items",
+                name: "dashboard.positems",
+                component: () => import("@/pages/dashboard/pos/pos-items/index.vue"),
+                meta: {
+                  pageTitle: "POS Items",
+                  breadcrumbs: ["POS", "Items"],
+                },
+              },
+              {
+                path: "/dashboard/pos/pos-cart",
+                name: "dashboard.poscart",
+                component: () => import("@/pages/dashboard/pos/pos-cart/index.vue"),
+                meta: {
+                  pageTitle: "POS Cart",
+                  breadcrumbs: ["POS", "Cart"],
+                },
+              },              
         ],
     },
     {

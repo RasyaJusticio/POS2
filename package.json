@@ -19,7 +19,7 @@
         "@splidejs/vue-splide": "^0.6.12",
         "@tanstack/vue-query": "^4.37.1",
         "@tanstack/vue-table": "^8.11.2",
-        "@tinymce/tinymce-vue": "^5.1.0",
+        "@tinymce/tinymce-vue": "^6.0.1",
         "@vueform/multiselect": "^1.2.5",
         "animate.css": "^4.1.1",
         "apexcharts": "^3.41.1",
