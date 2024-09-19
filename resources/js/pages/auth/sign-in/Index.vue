@@ -1,61 +1,35 @@
 <template>
     <!--begin::Form-->
-    <div class="w-100">
+    <div class="w-100" style="height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
         <!--begin::Heading-->
         <div class="text-center mb-5">
             <router-link to="/">
                 <img
-                    :src="setting?.logo"
-                    :alt="setting?.app"
-                    class="w-300px mb-8"
+                :src="setting?.logo"
+                :alt="setting?.app"
+                class="w-300px mb-0" 
+                style="max-width: 100%; height: auto;"
                 />
+>
             </router-link>
-            <!--begin::Title-->
-            <h1 class="mb-3" style="font-size: 36px; line-height: 30%;">
-            Welcome!
+            <h1 style="font-size: 36px; line-height: 1; margin-top: 0; margin-bottom: 0;">
+                Welcome!
             </h1>
+
             <div class="text-primary" style="font-size: 25px;">
-            <strong>AON Cashier</strong>
+                <strong>AON Cashier</strong>
             </div>
-            <!--end::Title-->
         </div>
-        <!--begin::Heading-->
+        <!--end::Heading-->
 
-        <ul class="nav nav-tabs nav-line-tabs mb-5 fs-6">
-            <li class="nav-item">
-                <a
-                    class="nav-link active"
-                    data-bs-toggle="tab"
-                    href="#with-email"
-                    >Email</a
-                >
-            </li>
-            <!-- <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#with-phone">{{ $t('login.telepon') }}</a>
-            </li> -->
-        </ul>
 
-        <div class="tab-content" id="myTabContent">
-            <div
-                class="tab-pane fade show active"
-                id="with-email"
-                role="tabpanel"
-            >
+        <div class="tab-content w-100">
+            <div class="tab-pane fade show active" id="with-email" role="tabpanel">
                 <WithEmail />
             </div>
         </div>
 
         <div class="border-bottom border-gray-300 w-100 mt-5 mb-10"></div>
-
-        <!--begin::Link-->
-        <!-- <div class="text-gray-400 fw-semobold fs-4 text-center">
-            {{ $t('login.daftar_label') }}
-
-            <router-link to="/auth/sign-up" class="link-primary fw-bold">
-                {{ $t('login.daftar') }}
-            </router-link>
-        </div> -->
-        <!--end::Link-->
     </div>
     <!--end::Form-->
 </template>
@@ -87,7 +61,6 @@ export default defineComponent({
 
         const submitButton = ref(null);
 
-        //Create form validation object
         const login = Yup.object().shape({
             identifier: Yup.string()
                 .email("Email/No. Telepon tidak valid")
@@ -152,3 +125,15 @@ export default defineComponent({
     },
 });
 </script>
+
+<style scoped>
+/* Tambahkan gaya CSS sesuai kebutuhan */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    overflow: hidden; /* Mencegah scrolling */
+}
+</style>
