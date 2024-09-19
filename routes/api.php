@@ -26,6 +26,13 @@ Route::middleware(['auth', 'json'])->prefix('auth')->group(function () {
     Route::get('me', [AuthController::class, 'me']);
 });
 
+Route::middleware(['json'])->prefix('auth')->group(function () {
+    Route::post('login', [AuthController::class, 'login'])->withoutMiddleware('auth');
+    Route::post('register', [AuthController::class, 'register']); // Rute baru untuk registrasi
+    Route::delete('logout', [AuthController::class, 'logout']);
+    Route::get('me', [AuthController::class, 'me']);
+});
+
 Route::prefix('setting')->group(function () {
     Route::get('', [SettingController::class, 'index']);
 });

@@ -88,6 +88,15 @@ const routes: Array<RouteRecordRaw> = [
                     middleware: "guest",
                 },
             },
+            {
+                path: "/register", // Rute baru untuk pendaftaran
+                name: "register",
+                component: () => import("@/pages/auth/sign-up/Index.vue"), // Pastikan jalur ini sesuai dengan lokasi file
+                meta: {
+                    pageTitle: "Register",
+                    middleware: "guest",
+                },
+            },
         ],
     },
     {
@@ -95,7 +104,6 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/layouts/SystemLayout.vue"),
         children: [
             {
-                // the 404 route, when none of the above matches
                 path: "/404",
                 name: "404",
                 component: () => import("@/pages/errors/Error404.vue"),
@@ -123,7 +131,6 @@ const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes,
     scrollBehavior(to) {
-        // If the route has a hash, scroll to the section with the specified ID; otherwise, scroll to the top of the page.
         if (to.hash) {
             return {
                 el: to.hash,
@@ -142,40 +149,29 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
     if (to.name) {
-        // Start the route progress bar.
         NProgress.start();
     }
 
     const authStore = useAuthStore();
     const configStore = useConfigStore();
 
-    // current page view title
     if (to.meta.pageTitle) {
-        document.title = `${to.meta.pageTitle} - ${import.meta.env.VITE_APP_NAME
-            }`;
+        document.title = `${to.meta.pageTitle} - ${import.meta.env.VITE_APP_NAME}`;
     } else {
         document.title = import.meta.env.VITE_APP_NAME as string;
     }
 
-    // reset config to initial state
     configStore.resetLayoutConfig();
 
-    // verify auth token before each page change
     if (!authStore.isAuthenticated) await authStore.verifyAuth();
 
-    // before page access check if page requires authentication
     if (to.meta.middleware == "auth") {
         if (authStore.isAuthenticated) {
-            if (
-                to.meta.permission &&
-                !authStore.user.permission.includes(to.meta.permission)
-            ) {
+            if (to.meta.permission && !authStore.user.permission.includes(to.meta.permission)) {
                 next({ name: "404" });
-            } else if (to.meta.checkDetail == false) {
+            } else {
                 next();
             }
-
-            next();
         } else {
             next({ name: "sign-in" });
         }
@@ -187,7 +183,6 @@ router.beforeEach(async (to, from, next) => {
 });
 
 router.afterEach(() => {
-    // Complete the animation of the route progress bar.
     NProgress.done();
 });
 
