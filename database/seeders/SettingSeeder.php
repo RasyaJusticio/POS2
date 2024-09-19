@@ -23,7 +23,7 @@ class SettingSeeder extends Seeder
             'bg_auth' =>  '/media/misc/bg-auth.jpg',
             'banner' =>  '/media/misc/banner.jpg',
             'pemerintah' =>  'Pemerintah Provinsi Jawa Timur',
-            //'dinas' =>  'Dinas Lingkungan Hidup',
+            'dinas' =>  'Dinas Lingkungan Hidup',
             'alamat' =>  '',
             'telepon' =>  '',
             'email' =>  '',
