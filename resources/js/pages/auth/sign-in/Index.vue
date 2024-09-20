@@ -2,12 +2,12 @@
     <!--begin::Form-->
     <div class="w-100" style="height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
         <!--begin::Heading-->
-        <div class="text-center mb-5">
+        <div class="text-center mb-4">
             <router-link to="/">
                 <img
                 :src="setting?.logo"
                 :alt="setting?.app"
-                class="w-300px mb-0" 
+                class="w-200px mb-0" 
                 style="max-width: 100%; height: auto;"
                 />
 >
