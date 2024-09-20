@@ -57,23 +57,26 @@ class AuthController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
+            'phone' => 'required|string|max:15', // Menambahkan validasi untuk nomor telepon
             'password' => 'required|string|min:8|confirmed',
         ]);
-
+    
         // Buat pengguna baru
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
+            'phone' => $data['phone'], // Menyimpan nomor telepon
             'password' => Hash::make($data['password']),
         ]);
 
+    
         // Buat token untuk pengguna yang baru terdaftar
         $token = auth()->login($user);
-
+    
         return response()->json([
             'message' => 'Pengguna berhasil terdaftar.',
             'user' => $user,
             'token' => $token,
         ], 201);
     }
-}
+}    

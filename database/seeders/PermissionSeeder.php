@@ -22,10 +22,13 @@ class PermissionSeeder extends Seeder
         $menuMaster = ['master', 'master-user', 'master-role'];
         $menuWebsite = ['website', 'setting'];
 
+        // Definisikan permissions berdasarkan role
         $permissionsByRole = [
             'admin' => ['dashboard', ...$menuMaster, ...$menuWebsite],
+            'user' => ['dashboard', 'view-posts', 'comment'], // Menambahkan permission untuk user
         ];
 
+        // Fungsi untuk memasukkan permissions
         $insertPermissions = fn ($role) => collect($permissionsByRole[$role])
             ->map(function ($name) {
                 $check = Permission::whereName($name)->first();
@@ -41,10 +44,13 @@ class PermissionSeeder extends Seeder
             })
             ->toArray();
 
+        // Ambil permission IDs berdasarkan role
         $permissionIdsByRole = [
-            'admin' => $insertPermissions('admin')
+            'admin' => $insertPermissions('admin'),
+            'user' => $insertPermissions('user'), // Mengambil permission untuk user
         ];
 
+        // Menyimpan permissions ke dalam tabel role_has_permissions
         foreach ($permissionIdsByRole as $role => $permissionIds) {
             $role = Role::whereName($role)->first();
 

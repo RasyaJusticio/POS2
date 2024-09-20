@@ -18,5 +18,12 @@ class RoleSeeder extends Seeder
             'guard_name' => 'api',
             'full_name' => 'Administrator',
         ]);
+
+         // Role untuk pengguna biasa
+         Role::create([
+            'name' => 'user',
+            'guard_name' => 'api',
+            'full_name' => 'User Biasa',
+         ]);
     }
 }
