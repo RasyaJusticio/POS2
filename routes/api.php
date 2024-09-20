@@ -6,29 +6,21 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SettingController;
 use Illuminate\Support\Facades\Route;
 
-
-
 /*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
+|-------------------------------------------------------------------------- 
+| API Routes 
+|-------------------------------------------------------------------------- 
+| 
+| Here is where you can register API routes for your application. These 
+| routes are loaded by the RouteServiceProvider and all of them will 
+| be assigned to the "api" middleware group. Make something great! 
+| 
 */
 
 // Authentication Route
-Route::middleware(['auth', 'json'])->prefix('auth')->group(function () {
-    Route::post('login', [AuthController::class, 'login'])->withoutMiddleware('auth');
-    Route::delete('logout', [AuthController::class, 'logout']);
-    Route::get('me', [AuthController::class, 'me']);
-});
-
 Route::middleware(['json'])->prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->withoutMiddleware('auth');
-    Route::post('register', [AuthController::class, 'register']); // Rute baru untuk registrasi
+    Route::post('register', [AuthController::class, 'register'])->withoutMiddleware('auth'); // Rute untuk registrasi
     Route::delete('logout', [AuthController::class, 'logout']);
     Route::get('me', [AuthController::class, 'me']);
 });

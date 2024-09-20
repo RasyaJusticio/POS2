@@ -34,7 +34,7 @@ class AuthController extends Controller
         if (!$token = auth()->attempt($validator->validated())) {
             return response()->json([
                 'status' => false,
-                'message' => 'Email / Password salah!'
+                'message' => 'Email atau Password salah!'
             ], 401);
         }
 
@@ -53,20 +53,27 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+        // Validasi input
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
+        // Buat pengguna baru
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
 
-        // Anda bisa menambahkan logika untuk mengirim email verifikasi atau lainnya
+        // Buat token untuk pengguna yang baru terdaftar
+        $token = auth()->login($user);
 
-        return response()->json(['message' => 'User registered successfully.'], 201);
+        return response()->json([
+            'message' => 'Pengguna berhasil terdaftar.',
+            'user' => $user,
+            'token' => $token,
+        ], 201);
     }
 }
