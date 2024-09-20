@@ -4,17 +4,21 @@
         <!--begin::Form-->
         <main class="form w-100 fv-plugins-bootstrap5 fv-plugins-framework">
             <!--begin::Heading-->
-            <div class="mb-10 text-center">
-                <router-link to="/">
-                    <img src="/LOGO.png" alt="Logo AON Cashier" class="w-100px mb-8"
-                    />
-                </router-link>
-                <!--begin::Title-->
-                <h1 class="text-dark mb-3">
-                    Daftar Akun <span class="text-primary">AON Cashier</span>
-                </h1>
-                <!--end::Title-->
-            </div>
+            <div class="mb-0 text-center" style="margin-top: 60px;"> <!-- Adjust the value as needed -->
+    <router-link to="/">
+        <img 
+            src="/LOGO.png" 
+            alt="Logo AON Cashier" 
+            class="w-150px mb-0"
+            style="max-width: 100%; height: auto;"
+        />
+    </router-link>
+    <h1 style="font-size: 30px; line-height: 1; margin-top: 0; margin-bottom: 0;">
+        Register 
+    </h1>
+    <div class="text-primary" style="font-size: 20px;"><strong>AON Cashier</strong></div>
+</div>
+
             <!--end::Heading-->
 
             <div
