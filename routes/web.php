@@ -1,6 +1,6 @@
 <?php
 
-use AmrShawky\LaravelCurrency\Facade\Currency;
+use App\Http\Controllers\ItemController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,10 +14,25 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::get('/', function () {
-//     return view('app');
-// });
+// Halaman awal (bisa dikosongkan atau diarahkan ke dashboard)
+Route::get('/', function () {
+    return view('app');
+});
 
+// Resource untuk Item
+Route::resource('items', ItemController::class);
+
+// Prefix untuk rute master
+Route::prefix('master')->group(function () {
+    Route::resource('items', ItemController::class);
+});
+
+// Rute khusus POS System
+Route::prefix('dashboard/pos/pos-sistem')->group(function () {
+    Route::resource('items', ItemController::class);
+});
+
+// Menangani rute wildcard
 Route::get('/{any}', function () {
     return view('app');
 })->where('any', '^(?!api\/)[\/\w\.-]*');

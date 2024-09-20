@@ -214,3 +214,5 @@ router.afterEach(() => {
 });
 
 export default router;
+
+// resources/js/types/index.ts
