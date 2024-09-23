@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { h, ref, watch } from "vue";
 import { useDelete } from "@/libs/hooks";
-import Form from "./form.vue"; // Rename your form component
+import Form from "./form.vue"; // Correct path to your form component
 import { createColumnHelper } from "@tanstack/vue-table";
-import type { Item } from "@/types"; // Adjust type accordingly
-import { link } f
+import type { Item } from "@/types/pos"; // Adjust the type as per your model
+
 
 const column = createColumnHelper<Item>();
 const paginateRef = ref<any>(null);
-const selected = ref<number | null>(null); // Allow null if no item is selected
+const selected = ref<number | undefined>(undefined);  // Replace null with undefined
 const openForm = ref<boolean>(false);
 
 const { delete: deleteItem } = useDelete({
-    onSuccess: () => paginateRef.value.refetch(),
+    onSuccess: () => paginateRef.value?.refetch(), // Refetch after deletion
 });
 
 const columns = [
@@ -30,7 +30,8 @@ const columns = [
     }),
     column.accessor("image_url", {
         header: "Image",
-        cell: (cell) => h("img", { src: cell.getValue(), alt: "Item Image", width: 100 }),
+        cell: (cell) =>
+            h("img", { src: cell.getValue(), alt: "Item Image", width: 100 }),
     }),
     column.accessor("id", {
         header: "Actions",
@@ -41,8 +42,8 @@ const columns = [
                     {
                         class: "btn btn-sm btn-icon btn-info",
                         onClick: () => {
-                            selected.value = cell.getValue();
-                            openForm.value = true;
+                            selected.value = cell.getValue(); // Set selected item id
+                            openForm.value = true; // Open form for edit
                         },
                     },
                     h("i", { class: "la la-pencil fs-2" })
@@ -52,7 +53,7 @@ const columns = [
                     {
                         class: "btn btn-sm btn-icon btn-danger",
                         onClick: () =>
-                            deleteItem(`/master/items/${cell.getValue()}`),
+                            deleteItem(`/master/items/${cell.getValue()}`), // Delete item
                     },
                     h("i", { class: "la la-trash fs-2" })
                 ),
@@ -60,13 +61,13 @@ const columns = [
     }),
 ];
 
-const refresh = () => paginateRef.value.refetch();
+const refresh = () => paginateRef.value?.refetch(); // Refetch the table when needed
 
 watch(openForm, (val) => {
     if (!val) {
-        selected.value = null;
+        selected.value = undefined; // Reset selection when the form is closed
     }
-    window.scrollTo(0, 0);
+    window.scrollTo(0, 0); // Scroll to top when opening/closing form
 });
 </script>
 
