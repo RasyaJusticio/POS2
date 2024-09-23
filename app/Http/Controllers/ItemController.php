@@ -3,16 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Models\Item; // Assuming you have a model named Item
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ItemController extends Controller
 {
     // Display a listing of the items.
-    public function index()
+    public function index(Request $request)
     {
-        $items = Item::all();
-        return view('items.index', compact('items'));
+        $per = $request->per ?? 10;
+        $page = $request->page ? $request->page - 1 : 0;
+
+        DB::statement('set @no=0+' . $page * $per);
+        $data = Item::when($request->search, function (Builder $query, string $search) {
+            $query->where('name', 'like', "%$search%");
+        })->latest()->paginate($per, ['*', DB::raw('@no := @no + 1 AS no')]);
+
+        return response()->json($data);
     }
 
     // Show the form for creating a new item.

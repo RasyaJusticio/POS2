@@ -51,5 +51,21 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
             Route::apiResource('roles', RoleController::class)
                 ->except(['index', 'store']);
         });
+
+        // Rute untuk mendapatkan daftar item
+Route::post('pos-items', [ItemController::class, 'index']);
+
+// Rute untuk membuat item baru
+Route::post('pos-items/store', [ItemController::class, 'store']);
+
+// Rute untuk mendapatkan item berdasarkan ID
+Route::get('pos-items/{id}', [ItemController::class, 'show']);
+
+// Rute untuk memperbarui item
+Route::put('pos-items/{id}', [ItemController::class, 'update']);
+
+// Rute untuk menghapus item
+Route::delete('pos-items/{id}', [ItemController::class, 'destroy']);
+
     });
 });
