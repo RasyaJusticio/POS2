@@ -73,6 +73,8 @@ const routes: Array<RouteRecordRaw> = [
                     breadcrumbs: ["Master", "Users"],
                 },
             },
+
+            //POS
               {
                 path: "/dashboard/pos/pos-layout",
                 name: "dashboard.poslayout",
