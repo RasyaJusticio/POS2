@@ -4,11 +4,26 @@
         "vite.config.*",
         "vitest.config.*",
         "cypress.config.*",
-        "playwright.config.*"
+        "playwright.config.*",
+        "resources/**/*.ts",
+        "resources/**/*.vue"
     ],
-    "exclude": [],
+    "exclude": ["node_modules"],
     "compilerOptions": {
         "composite": true,
-        "types": ["node"]
+        "types": ["node", "vite/client"],
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["resources/js/*"]
+        },
+        "allowJs": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "moduleResolution": "node",
+        "target": "ESNext",
+        "module": "ESNext",
+        "strict": true,
+        "jsx": "preserve",
+        "skipLibCheck": true
     }
 }

@@ -113,6 +113,6 @@ export default defineComponent({
                 ev.target.classList.add("bi-eye-slash");
             }
         }
-    }
+    }
 })
 </script>

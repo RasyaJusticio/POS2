@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\ItemController;
 use Illuminate\Support\Facades\Route;
 
 /*

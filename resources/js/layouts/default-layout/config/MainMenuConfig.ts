@@ -44,6 +44,32 @@ const MainMenuConfig: Array<MenuItem> = [
                     },
                 ],
             },
+
+            //Menu POS
+            {
+                sectionTitle: "POS",
+                route: "/pos",
+                name: "pos",
+                keenthemesIcon: "setting-2",
+                sub: [
+                    {
+                        heading: "Shop",
+                        name: "pos-layout",
+                        route: "/dashboard/pos/pos-layout",
+                    },
+                    {
+                        heading: "Items",
+                        name: "pos-items",
+                        route: "/dashboard/pos/pos-items",
+                    },
+                    {
+                        heading: "Cart",
+                        name: "pos-cart",
+                        route: "/dashboard/pos/pos-cart",
+                    },  
+                ]
+            },
+            
             {
                 heading: "Setting",
                 route: "/dashboard/setting",

@@ -8,11 +8,17 @@ use Spatie\Permission\Models\Role;
 
 class RoleSeeder extends Seeder
 {
+    
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
+
+        if (!Role::where('name', 'admin')->exists()) {
+            Role::create(['name' => 'admin', 'guard_name' => 'api']);
+        }
+    
         Role::create([
             'name' => 'admin',
             'guard_name' => 'api',
@@ -26,4 +32,5 @@ class RoleSeeder extends Seeder
             'full_name' => 'User Biasa',
          ]);
     }
+    
 }
