@@ -18,10 +18,12 @@
   <style scoped>
   .chart-card {
     flex: 1;
-    background: #fff;
-    padding: 20px;
+    background: #ffffff;
+    padding: 5px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(15, 15, 15, 0.854);
+    box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.418);
+    margin-top: center;
+    margin-bottom: center;
   }
   .chart-container {
     position: relative;

@@ -4,10 +4,10 @@
       <h1 class="title">Graphic</h1>
       
       <div class="stats">
-        <StatCard title="Total Sales" :value="totalSales" icon="bi bi-cash large-icon" />
-        <StatCard title="Total Items" :value="totalItems" icon="bi bi-box large-icon" />
-        <StatCard title="Total Customers" :value="totalCustomers" icon="bi bi-person large-icon" />
-        <StatCard title="Profit" :value="profit" icon="bi bi-trophy large-icon" />
+        <StatCard title="Total Sales" :value="totalSales" iconClass="fas fa-dollar-sign" /> 
+        <StatCard title="Total Items" :value="totalItems" iconClass="fas fa-box" />
+        <StatCard title="Total Customers" :value="totalCustomers" iconClass="fas fa-users" />
+        <StatCard title="Profit" :value="profit" iconClass="fas fa-chart-line" />
       </div>
 
       <div class="charts">
@@ -21,6 +21,7 @@
     </div>
   </main>
 </template>
+
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
@@ -36,10 +37,10 @@ const profit = ref(0);
 onMounted(() => {
   // Fetch data from your API or state management
   // Simulated data for demonstration
-  totalSales.value = 15000;
-  totalItems.value = 120;
-  totalCustomers.value = 75;
-  profit.value = 5000;
+  totalSales.value = 178900;
+  totalItems.value = 30;
+  totalCustomers.value = 7500;
+  profit.value = 1900;
 
   initializeCharts();
 });
@@ -110,7 +111,7 @@ const initializeCharts = () => {
   gap: 20px;
 }
 .large-icon {
-  font-size: 100rem; /* Ukuran lebih besar untuk ikon */
+  font-size: 10rem; /* Ukuran lebih besar untuk ikon */
   color: #000000; /* Warna ikon yang lebih mencolok */
   margin-bottom: 10px; /* Jarak antara ikon dan teks */
 }
