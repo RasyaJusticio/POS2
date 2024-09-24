@@ -1,36 +1,33 @@
 <template>
     <div class="stat-card">
-      <div class="icon">
-        <i :class="icon"></i>
-      </div>
-      <div class="content">
-        <h3>{{ title }}</h3>
-        <p>{{ value }}</p>
-      </div>
+      <i :class="iconClass" class="large-icon"></i>
+      <h3>{{ title }}</h3>
+      <p>{{ value }}</p>
     </div>
   </template>
   
   <script setup lang="ts">
-  import { defineProps } from 'vue';
-  
-  const props = defineProps({
-    title: String,
-    value: Number,
-    icon: String,
-  });
-  </script>
+defineProps({
+  title: String,
+  value: [Number, String],
+  iconClass: String // Properti baru untuk kelas ikon
+});
+</script>
   
   <style scoped>
   .stat-card {
     flex: 1;
-    background: #fff;
+    background: #ffffff;
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgb(25, 25, 25);
+    box-shadow: 2px 4px 4px hsla(0, 0%, 10%, 0.461);
+    
   }
-  .icon {
-    font-size: 2rem;
-    margin-bottom: 10px;
+  .large-icon {
+    font-size: 5rem;
+    color: #000000; /* Warna ikon */
+    margin-bottom: middle;
+    margin-top: middle;
   }
   .content {
     text-align: center;
