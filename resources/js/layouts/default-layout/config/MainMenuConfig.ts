@@ -67,7 +67,32 @@ const MainMenuConfig: Array<MenuItem> = [
                         name: "pos-cart",
                         route: "/dashboard/pos/pos-cart",
                     },  
-                ]
+                ],
+            },
+
+            //Menu Inventori
+            {
+                sectionTitle: "Inventori",
+                route: "/inventori",
+                name: "inventori",
+                keenthemesIcon: "cube-2",
+                sub: [
+                    {
+                        heading: "Produk",
+                        route: "/dashboard/inventori/produk",
+                        name: "inventori-produk",
+                    },
+                    {
+                        heading: "Kategori",
+                        route: "/dashboard/inventori/kategori",
+                        name: "inventori-kategori",
+                    },
+                    {
+                        heading: "Stok",
+                        route: "/dashboard/inventori/stok",
+                        name: "inventori-stok",
+                    },
+                ],
             },
             
             {

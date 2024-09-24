@@ -4,7 +4,7 @@ import { onMounted, ref, watch } from "vue";
 import * as Yup from "yup";
 import axios from "@/libs/axios";
 import { toast } from "vue3-toastify";
-import type { Produk } from "@/types/pos";  // Sesuaikan tipe Produk
+import type { Product } from "@/types/pos";  // Sesuaikan tipe Produk
 
 const props = defineProps({
     selected: {

@@ -36,3 +36,4 @@ Route::prefix('dashboard/pos/pos-sistem')->group(function () {
 Route::get('/{any}', function () {
     return view('app');
 })->where('any', '^(?!api\/)[\/\w\.-]*');
+

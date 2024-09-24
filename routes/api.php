@@ -5,6 +5,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\ProductController;
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -53,28 +55,22 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
         });
 
         // Rute untuk mendapatkan daftar item
-Route::post('pos-items', [ItemController::class, 'index']);
+        Route::post('pos-items', [ItemController::class, 'index']);
 
-// Rute untuk membuat item baru
-Route::post('pos-items/store', [ItemController::class, 'store']);
+        // Rute untuk membuat item baru
+        Route::post('pos-items/store', [ItemController::class, 'store']);
 
-// Rute untuk mendapatkan item berdasarkan ID
-Route::get('pos-items/{id}', [ItemController::class, 'show']);
+        // Rute untuk mendapatkan item berdasarkan ID
+        Route::get('pos-items/{id}', [ItemController::class, 'show']);
 
-// Rute untuk memperbarui item
-Route::put('pos-items/{id}', [ItemController::class, 'update']);
+        // Rute untuk memperbarui item
+        Route::put('pos-items/{id}', [ItemController::class, 'update']);
 
-// Rute untuk menghapus item
-Route::delete('pos-items/{id}', [ItemController::class, 'destroy']);
+        // Rute untuk menghapus item
+        Route::delete('pos-items/{id}', [ItemController::class, 'destroy']);
 
+            });
 
-        Route::middleware('can:pos-item')->group(function () {
-            Route::get('items', [ItemController::class, 'index']);         // Ambil semua item
-            Route::get('items/{item}', [ItemController::class, 'show']);   // Ambil item berdasarkan ID
-            Route::post('items', [ItemController::class, 'store']);        // Tambah item baru
-            Route::put('items/{item}', [ItemController::class, 'update']); // Update item berdasarkan ID
-            Route::delete('items/{item}', [ItemController::class, 'destroy']); // Hapus item
         });
-    });
 
-});
+        Route::apiResource('produk', ProductController::class);
