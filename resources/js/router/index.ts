@@ -56,8 +56,7 @@ const routes: Array<RouteRecordRaw> = [
             {
                 path: "/dashboard/master/users/roles",
                 name: "dashboard.master.users.roles",
-                component: () =>
-                    import("@/pages/dashboard/master/users/roles/Index.vue"),
+                component: () => import("@/pages/dashboard/master/users/roles/Index.vue"),
                 meta: {
                     pageTitle: "User Roles",
                     breadcrumbs: ["Master", "Users", "Roles"],
@@ -66,42 +65,51 @@ const routes: Array<RouteRecordRaw> = [
             {
                 path: "/dashboard/master/users",
                 name: "dashboard.master.users",
-                component: () =>
-                    import("@/pages/dashboard/master/users/Index.vue"),
+                component: () => import("@/pages/dashboard/master/users/Index.vue"),
                 meta: {
                     pageTitle: "Users",
                     breadcrumbs: ["Master", "Users"],
                 },
             },
 
-            //POS
-              {
+            // POS
+            {
                 path: "/dashboard/pos/pos-layout",
                 name: "dashboard.poslayout",
                 component: () => import("@/pages/dashboard/pos/pos-layout/index.vue"),
                 meta: {
-                  pageTitle: "POS Layout",
-                  breadcrumbs: ["POS", "Layout"],
+                    pageTitle: "POS Layout",
+                    breadcrumbs: ["POS", "Layout"],
                 },
-              },
-              {
+            },
+            {
                 path: "/dashboard/pos/pos-items",
                 name: "dashboard.positems",
                 component: () => import("@/pages/dashboard/pos/pos-items/index.vue"),
                 meta: {
-                  pageTitle: "POS Items",
-                  breadcrumbs: ["POS", "Items"],
+                    pageTitle: "POS Items",
+                    breadcrumbs: ["POS", "Items"],
                 },
-              },
-              {
+            },
+            {
                 path: "/dashboard/pos/pos-cart",
                 name: "dashboard.poscart",
                 component: () => import("@/pages/dashboard/pos/pos-cart/index.vue"),
                 meta: {
-                  pageTitle: "POS Cart",
-                  breadcrumbs: ["POS", "Cart"],
+                    pageTitle: "POS Cart",
+                    breadcrumbs: ["POS", "Cart"],
                 },
-              },              
+            },
+            // Kasir route added here
+            {
+                path: "/dashboard/kasir",
+                name: "dashboard.kasir",
+                component: () => import("@/pages/dashboard/kasir/index.vue"),
+                meta: {
+                    pageTitle: "Kasir",
+                    breadcrumbs: ["Shop", "Kasir"], // Fixed the breadcrumb here
+                },
+            },
         ],
     },
     {
@@ -118,9 +126,9 @@ const routes: Array<RouteRecordRaw> = [
                 },
             },
             {
-                path: "/register", // Rute baru untuk pendaftaran
+                path: "/register",
                 name: "register",
-                component: () => import("@/pages/auth/sign-up/Index.vue"), // Pastikan jalur ini sesuai dengan lokasi file
+                component: () => import("@/pages/auth/sign-up/Index.vue"),
                 meta: {
                     pageTitle: "Register",
                     middleware: "guest",
@@ -175,6 +183,9 @@ const router = createRouter({
         }
     },
 });
+
+// Remaining router code...
+
 
 router.beforeEach(async (to, from, next) => {
     if (to.name) {
