@@ -1404,6 +1404,13 @@ const removeImage = () => {
                                 >
                                     (GMT+13:00) Nuku'alofa
                                 </option>
+                                <option 
+                                    data-bs-offset="25200" 
+                                    value="Jakarta"
+                                >
+                                    (GMT+07:00) Jakarta
+                                </option>
+
                             </Field>
                             <div class="fv-plugins-message-container">
                                 <div class="fv-help-block">
@@ -1452,6 +1459,9 @@ const removeImage = () => {
                                 </option>
                                 <option value="CHF">
                                     <b>CHF</b>&#160;-&#160;Swiss franc
+                                </option>
+                                <option value="IDR">
+                                    <b>IDR</b>&#160;-&#160;Rupiah
                                 </option>
                             </Field>
                             <div class="fv-plugins-message-container">
