@@ -4,7 +4,7 @@ import { onMounted, ref, watch } from "vue";
 import * as Yup from "yup";
 import axios from "@/libs/axios";
 import { toast } from "vue3-toastify";
-import type { Item } from "@/types";
+import type { Item } from "@/types/pos";  // Sesuaikan tipe Item
 
 const props = defineProps({
     selected: {
@@ -28,7 +28,7 @@ const formSchema = Yup.object().shape({
 
 function getEdit() {
     block(document.getElementById("form-item"));
-    axios.get(`/master/items/${props.selected}`)
+    axios.get(`/api/master/items/${props.selected}`)  // Ganti URL dengan API yang benar
         .then(({ data }) => {
             formData.value = data.item;
         })
@@ -61,8 +61,8 @@ function submit() {
     axios({
         method: props.selected ? "put" : "post",
         url: props.selected
-            ? `/master/items/${props.selected}`
-            : "/master/items/store",
+            ? `/api/pos/pos-items/${props.selected}`  // Ganti URL untuk update item
+            : "/api/pos/pos-items",  // Ganti URL untuk tambah item
         data: formDataToSubmit,
     })
         .then(() => {
@@ -73,7 +73,7 @@ function submit() {
         .catch((err: any) => {
             const errors = err.response?.data?.errors;
             if (errors) {
-                formRef.value.setErrors(errors);  // Only call setErrors if there are actual errors
+                formRef.value.setErrors(errors);  // Panggil setErrors hanya jika ada error
             }
             toast.error(err.response?.data?.message || "An error occurred");
         })
@@ -111,11 +111,11 @@ watch(
             <div class="row">
                 <div class="col-md-6">
                     <div class="fv-row mb-7">
-                        <label class="form-label fw-bold fs-6 required">
+                        <label class="form-label fw-bold fs-6 required" for="item-name">
                             Item Name
                         </label>
                         <Field class="form-control form-control-lg form-control-solid" type="text" name="name"
-                            autocomplete="off" v-model="formData.name" placeholder="Enter Item Name" />
+                            autocomplete="off" v-model="formData.name" id="item-name" placeholder="Enter Item Name" />
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">
                                 <ErrorMessage name="name" />
@@ -125,11 +125,11 @@ watch(
                 </div>
                 <div class="col-md-6">
                     <div class="fv-row mb-7">
-                        <label class="form-label fw-bold fs-6 required">
+                        <label class="form-label fw-bold fs-6 required" for="item-price">
                             Price
                         </label>
                         <Field class="form-control form-control-lg form-control-solid" type="number" name="price"
-                            autocomplete="off" v-model="formData.price" placeholder="Enter Price" />
+                            autocomplete="off" v-model="formData.price" id="item-price" placeholder="Enter Price" />
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">
                                 <ErrorMessage name="price" />
@@ -137,29 +137,13 @@ watch(
                         </div>
                     </div>
                 </div>
-
-                <!-- Tambahkan input gambar di sini, di bawah input harga -->
                 <div class="col-md-6">
                     <div class="fv-row mb-7">
-                        <label class="form-label fw-bold fs-6">
-                            Upload Image
-                        </label>
-                        <input type="file" class="form-control" @change="onImageChange" />
-                        <div class="fv-plugins-message-container">
-                            <div class="fv-help-block">
-                                <!-- Tempat untuk pesan error gambar jika diperlukan -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="fv-row mb-7">
-                        <label class="form-label fw-bold fs-6 required">
+                        <label class="form-label fw-bold fs-6 required" for="item-quantity">
                             Quantity
                         </label>
                         <Field class="form-control form-control-lg form-control-solid" type="number" name="quantity"
-                            autocomplete="off" v-model="formData.quantity" placeholder="Enter Quantity" />
+                            autocomplete="off" v-model="formData.quantity" id="item-quantity" placeholder="Enter Quantity" />
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">
                                 <ErrorMessage name="quantity" />
@@ -167,27 +151,23 @@ watch(
                         </div>
                     </div>
                 </div>
-                <div class="col-md-12">
+                <div class="col-md-6">
                     <div class="fv-row mb-7">
-                        <label class="form-label fw-bold fs-6">
-                            Description
-                        </label>
-                        <Field class="form-control form-control-lg form-control-solid" type="text" name="description"
-                            autocomplete="off" v-model="formData.description" placeholder="Enter Description" />
-                        <div class="fv-plugins-message-container">
-                            <div class="fv-help-block">
-                                <ErrorMessage name="description" />
-                            </div>
-                        </div>
+                        <label class="form-label fw-bold fs-6" for="item-description">Description</label>
+                        <Field class="form-control form-control-lg form-control-solid" as="textarea" name="description"
+                            autocomplete="off" v-model="formData.description" id="item-description" placeholder="Enter Description" />
                     </div>
                 </div>
-                
+                <div class="col-md-12">
+                    <div class="fv-row mb-7">
+                        <label class="form-label fw-bold fs-6" for="item-image">Image</label>
+                        <input type="file" id="item-image" class="form-control form-control-lg form-control-solid" @change="onImageChange" />
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="card-footer d-flex">
-            <button type="submit" class="btn btn-primary btn-sm ms-auto">
-                Save
-            </button>
+        <div class="card-footer d-flex justify-content-end">
+            <button type="submit" class="btn btn-primary">Save</button>
         </div>
     </VForm>
 </template>
