@@ -7,29 +7,21 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ItemController;
 use Illuminate\Support\Facades\Route;
 
-
-
 /*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
+|-------------------------------------------------------------------------- 
+| API Routes 
+|-------------------------------------------------------------------------- 
+| 
+| Here is where you can register API routes for your application. These 
+| routes are loaded by the RouteServiceProvider and all of them will 
+| be assigned to the "api" middleware group. Make something great! 
+| 
 */
 
 // Authentication Route
-Route::middleware(['auth', 'json'])->prefix('auth')->group(function () {
-    Route::post('login', [AuthController::class, 'login'])->withoutMiddleware('auth');
-    Route::delete('logout', [AuthController::class, 'logout']);
-    Route::get('me', [AuthController::class, 'me']);
-});
-
 Route::middleware(['json'])->prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->withoutMiddleware('auth');
-    Route::post('register', [AuthController::class, 'register']); // Rute baru untuk registrasi
+    Route::post('register', [AuthController::class, 'register'])->withoutMiddleware('auth'); // Rute untuk registrasi
     Route::delete('logout', [AuthController::class, 'logout']);
     Route::get('me', [AuthController::class, 'me']);
 });
@@ -59,6 +51,22 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
             Route::apiResource('roles', RoleController::class)
                 ->except(['index', 'store']);
         });
+
+        // Rute untuk mendapatkan daftar item
+Route::post('pos-items', [ItemController::class, 'index']);
+
+// Rute untuk membuat item baru
+Route::post('pos-items/store', [ItemController::class, 'store']);
+
+// Rute untuk mendapatkan item berdasarkan ID
+Route::get('pos-items/{id}', [ItemController::class, 'show']);
+
+// Rute untuk memperbarui item
+Route::put('pos-items/{id}', [ItemController::class, 'update']);
+
+// Rute untuk menghapus item
+Route::delete('pos-items/{id}', [ItemController::class, 'destroy']);
+
 
         Route::middleware('can:pos-item')->group(function () {
             Route::get('items', [ItemController::class, 'index']);         // Ambil semua item

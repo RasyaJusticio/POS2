@@ -95,7 +95,7 @@ watch(openForm, (val) => {
             <paginate
                 ref="paginateRef"
                 id="table-item"
-                url="api/pos/pos-items"  
+                url="/master/pos-items"
                 :columns="columns"
             ></paginate>
         </div>
