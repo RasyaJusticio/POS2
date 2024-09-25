@@ -73,4 +73,13 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
 
         });
 
-        Route::apiResource('produk', ProductController::class);
+        Route::prefix('inventori')->group(function () {
+            Route::middleware('can:inventori-produk')->group(function () {
+                Route::get('products', [ProductController::class, 'get']);
+                Route::post('products', [ProductController::class, 'index']);
+                Route::post('products/store', [ProductController::class, 'store']);
+                Route::apiResource('products', ProductController::class)
+                    ->except(['index', 'store'])->scoped(['product' => 'uuid']);
+            });
+    
+        });

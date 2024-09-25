@@ -10,7 +10,7 @@ const paginateRef = ref<any>(null);
 const selected = ref<number | undefined>(undefined);
 const openForm = ref<boolean>(false);
 
-const { delete: deleteProduk } = useDelete({
+const { delete: deleteProduct } = useDelete({
     onSuccess: () => paginateRef.value?.refetch(), // Refetch setelah delete
 });
 
@@ -55,7 +55,7 @@ const columns = [
                     {
                         class: "btn btn-sm btn-icon btn-danger",
                         onClick: () =>
-                            deleteProduk(`/api/pos/pos-produk/${cell.getValue()}`), // Ganti URL menjadi API yang benar
+                        deleteProduct(`/api/inventori/inventori-produk/${cell.getValue()}`), // Ganti URL menjadi API yang benar
                     },
                     h("i", { class: "la la-trash fs-2" })
                 ),
@@ -98,7 +98,7 @@ watch(openForm, (val) => {
             <paginate
                 ref="paginateRef"
                 id="table-produk"
-                url="/master/pos-produk"
+                url="/inventori/produk"
                 :columns="columns"
             ></paginate>
         </div>

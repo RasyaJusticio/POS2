@@ -29,7 +29,7 @@ const formSchema = Yup.object().shape({
 
 function getEdit() {
     block(document.getElementById("form-produk"));
-    axios.get(`/api/pos/pos-produk/${props.selected}`)  // Ganti URL dengan API yang benar
+    axios.get(`/api/inventori/inventori-produk/${props.selected}`)  // Ganti URL dengan API yang benar
         .then(({ data }) => {
             formData.value = data.produk;
         })
@@ -63,8 +63,8 @@ function submit() {
     axios({
         method: props.selected ? "put" : "post",
         url: props.selected
-            ? `/api/pos/pos-produk/${props.selected}`  // Ganti URL untuk update produk
-            : "/api/pos/pos-produk",  // Ganti URL untuk tambah produk
+            ? `/api/inventori/inventori-produk/${props.selected}`  // Ganti URL untuk update produk
+            : "/api/inventori/inventori-produk",  // Ganti URL untuk tambah produk
         data: formDataToSubmit,
     })
         .then(() => {
@@ -116,8 +116,9 @@ watch(
                         <label class="form-label fw-bold fs-6 required" for="produk-name">
                             Product Name
                         </label>
-                        <Field class="form-control form-control-lg form-control-solid" type="text" name="name"
-                            autocomplete="off" v-model="formData.name" id="produk-name" placeholder="Enter Product Name" />
+                        <Field class="form-control form-control-lg form-control-solid" type="text" 
+                            name="name" autocomplete="off" v-model="formData.name" 
+                            id="produk-name" placeholder="Enter Product Name" />
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">
                                 <ErrorMessage name="name" />
@@ -130,8 +131,9 @@ watch(
                         <label class="form-label fw-bold fs-6 required" for="produk-category">
                             Category
                         </label>
-                        <Field class="form-control form-control-lg form-control-solid" type="text" name="category"
-                            autocomplete="off" v-model="formData.category" id="produk-category" placeholder="Enter Category" />
+                        <Field class="form-control form-control-lg form-control-solid" 
+                            type="text" name="category" autocomplete="off" v-model="formData.category" 
+                            id="produk-category" placeholder="Enter Category" />
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">
                                 <ErrorMessage name="category" />
@@ -144,8 +146,9 @@ watch(
                         <label class="form-label fw-bold fs-6 required" for="produk-price">
                             Price
                         </label>
-                        <Field class="form-control form-control-lg form-control-solid" type="number" name="price"
-                            autocomplete="off" v-model="formData.price" id="produk-price" placeholder="Enter Price" />
+                        <Field class="form-control form-control-lg form-control-solid" 
+                            type="number" name="price" autocomplete="off" 
+                            v-model="formData.price" id="produk-price" placeholder="Enter Price" />
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">
                                 <ErrorMessage name="price" />
@@ -153,14 +156,14 @@ watch(
                         </div>
                     </div>
                 </div>
-                <!-- Kolom lainnya tetap -->
                 <div class="col-md-6">
                     <div class="fv-row mb-7">
                         <label class="form-label fw-bold fs-6 required" for="produk-quantity">
                             Quantity
                         </label>
-                        <Field class="form-control form-control-lg form-control-solid" type="number" name="quantity"
-                            autocomplete="off" v-model="formData.quantity" id="produk-quantity" placeholder="Enter Quantity" />
+                        <Field class="form-control form-control-lg form-control-solid" 
+                            type="number" name="quantity" autocomplete="off" 
+                            v-model="formData.quantity" id="produk-quantity" placeholder="Enter Quantity" />
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">
                                 <ErrorMessage name="quantity" />
@@ -168,14 +171,29 @@ watch(
                         </div>
                     </div>
                 </div>
-                <!-- Input Image -->
+                <!-- Tambahkan deskripsi setelah kuantitas -->
+                <div class="col-md-6">
+                    <div class="fv-row mb-7">
+                        <label class="form-label fw-bold fs-6" for="produk-description">
+                            Description
+                        </label>
+                        <Field class="form-control form-control-lg form-control-solid" 
+                            type="text" name="description" autocomplete="off" 
+                            v-model="formData.description" id="produk-description" placeholder="Enter Description" />
+                        <div class="fv-plugins-message-container">
+                            <div class="fv-help-block">
+                                <ErrorMessage name="description" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="col-md-6">
                     <div class="fv-row mb-7">
                         <label class="form-label fw-bold fs-6" for="produk-image">
                             Image
                         </label>
-                        <input class="form-control form-control-lg form-control-solid" type="file" @change="onImageChange"
-                            id="produk-image" />
+                        <input class="form-control form-control-lg form-control-solid" type="file" 
+                            name="image" @change="onImageChange" id="produk-image" />
                     </div>
                 </div>
             </div>

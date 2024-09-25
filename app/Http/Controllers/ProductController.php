@@ -34,9 +34,9 @@ class ProductController extends Controller
             $imagePath = $request->file('image')->store('images', 'public');
         }
 
-        $produk = Product::create(array_merge($validated, ['image_url' => $imagePath]));
+        $product = Product::create(array_merge($validated, ['image_url' => $imagePath]));
 
-        return response()->json(['message' => 'Produk berhasil disimpan!', 'produk' => $produk]);
+        return response()->json(['message' => 'Produk berhasil disimpan!', 'produk' => $product]);
     }
 
     public function update(Request $request, Product $product)

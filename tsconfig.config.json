@@ -6,7 +6,8 @@
         "cypress.config.*",
         "playwright.config.*",
         "resources/**/*.ts",
-        "resources/**/*.vue"
+        "resources/**/*.vue",
+        "resources/js/bootstrap.js"
     ],
     "exclude": ["node_modules"],
     "compilerOptions": {
