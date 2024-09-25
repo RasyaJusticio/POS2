@@ -9,7 +9,7 @@
           placeholder="Search Items..."
           class="search-input"
         />
-        <button @click="checkout" class="btn btn-success">Checkout</button>
+        <button @click="checkout" class="btn btn-success button-spacing">Checkout</button>
         <button @click="clearCart" class="btn btn-danger">Clear Cart</button>
       </div>
     </header>
@@ -155,6 +155,10 @@ const filterByCategory = (category) => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+}
+
+.button-spacing {
+  margin-right: 10px; /* Atur jarak sesuai kebutuhan */
 }
 
 .header-title {
@@ -306,7 +310,7 @@ const filterByCategory = (category) => {
 .cart-item {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 0px;
 }
 
 .discount {
