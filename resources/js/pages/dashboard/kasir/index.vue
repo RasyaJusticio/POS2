@@ -36,11 +36,15 @@
             <div class="card-inner">
               <img :src="item.image" alt="item.name" class="item-image" />
               <div class="item-details">
-                <h3 class="item-name">{{ item.name }}</h3>
-                <p class="item-description">{{ item.description }}</p>
-                <span class="item-price">{{ item.price | currency }}</span>
-                <button @click="addToCart(item)" class="btn btn-primary">Add to Cart</button>
+             <h3 class="item-name">{{ item.name }}</h3>
+              <p class="item-description">{{ item.description }}</p>
+              <span class="item-price">{{ formatCurrency(item.price) }}</span>
+             <div class="btn-container"> <!-- Tambahkan div ini -->
+              <button @click="addToCart(item)" class="btn btn-primary">
+              <i class="fas fa-shopping-cart"></i> <!-- Ikon keranjang -->
+             </button>
               </div>
+            </div>
             </div>
           </div>
         </div>
@@ -51,7 +55,7 @@
         <ul class="cart-list">
           <li v-for="cartItem in cart" :key="cartItem.id" class="cart-item">
             <span>{{ cartItem.name }}</span>
-            <span>{{ cartItem.quantity }} x {{ cartItem.price | currency }}</span>
+            <span>{{ cartItem.quantity }} x {{ formatCurrency(cartItem.price) }}</span>
             <button @click="removeFromCart(cartItem)" class="btn btn-secondary">Remove</button>
           </li>
         </ul>
@@ -64,13 +68,13 @@
           />
         </div>
         <div class="total">
-          <strong>Total: {{ total | currency }}</strong>
+          <strong>Total: {{ formatCurrency(total) }}</strong>
         </div>
       </aside>
     </main>
 
     <footer class="pos-footer">
-      <p>&copy; {{ new Date().getFullYear() }} Your Company Name</p>
+      <p>&copy; {{ new Date().getFullYear() }} AON Cashier</p>
     </footer>
   </div>
 </template>
@@ -78,15 +82,23 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 
+// Import images
+import somTamImage from '@/assets/images/somtam.jpeg';
+import padImage from '@/assets/images/pad.jpeg';
+import khaoImage from '@/assets/images/khao.jpeg';
+import soiImage from '@/assets/images/soi.jpeg';
+import thaiImage from '@/assets/images/thai.jpeg';
+
 // Sample data for items
 const items = ref([
-  { id: 1, name: 'SomTam', description: 'Spicy green papaya salad.', price: 70000, category: 'Food', image:'/assets/images.jpeg' },
-  { id: 2, name: 'T-Shirt', description: 'Stylish cotton t-shirt.', price: 200000, category: 'Clothing', image: '/images/tshirt.jpg' },
-  { id: 3, name: 'Laptop', description: 'High-performance laptop.', price: 1500000, category: 'Electronics', image: '/images/laptop.jpg' },
-  { id: 4, name: 'Groceries', description: 'Daily essentials.', price: 80000, category: 'Groceries', image: '/images/groceries.jpg' },
+  { id: 1, name: 'Som Tam', description: 'Spicy green papaya salad.', price: 70000, category: 'Food', image: somTamImage },
+  { id: 2, name: 'Pad Thai', description: 'Mie goreng dengan udang, tahu, dan kacang tanah.', price: 70000, category: 'Food', image: padImage },
+  { id: 3, name: 'Khao Pad', description: 'Nasi goreng dengan telur, daging, dan sayuran.', price: 70000, category: 'Food', image: khaoImage },
+  { id: 4, name: 'Khao Soi', description: 'Mie kari berbasis santan.', price: 80000, category: 'Food', image: soiImage },
+  { id: 5, name: 'Thai Iced Tea', description: 'Teh manis dengan susu.', price: 30000, category: 'Drink', image: thaiImage },
 ]);
 
-const categories = ref(['All', 'Food', 'Clothing', 'Electronics', 'Groceries']);
+const categories = ref(['All', 'Food', 'Drink', 'Dessert', 'Groceries']);
 const cart = ref([]);
 const searchQuery = ref('');
 const selectedCategory = ref('All');
@@ -105,6 +117,11 @@ const total = computed(() => {
   const subtotal = cart.value.reduce((acc, item) => acc + (item.price * item.quantity), 0);
   return subtotal - (subtotal * (discount.value / 100));
 });
+
+// Format currency to Rupiah
+const formatCurrency = (value) => {
+  return 'Rp ' + new Intl.NumberFormat('id-ID').format(value);
+};
 
 // Add item to cart
 const addToCart = (item) => {
@@ -128,7 +145,7 @@ const clearCart = () => {
 
 // Checkout function
 const checkout = () => {
-  alert(`Total after discount: ${total.value} - Proceeding to payment...`);
+  alert(`Total after discount: ${formatCurrency(total.value)} - Proceeding to payment...`);
   // Add payment processing logic here
 };
 
@@ -143,12 +160,11 @@ const filterByCategory = (category) => {
     max-width: 1200px;
     margin: auto;
     padding: 20px;
-    font-family: 'Poppins', sans-serif; /* Change to Poppins */
+    font-family: 'Poppins', sans-serif;
     background-color: #f5f5f5;
     border-radius: 10px;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
 }
-
 
 .pos-header {
   display: flex;
@@ -242,7 +258,7 @@ const filterByCategory = (category) => {
   background: #ffffff;
   border: 1px solid #ddd;
   border-radius: 10px;
-  padding: 15px;
+  padding: 20px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s, box-shadow 0.3s;
   position: relative;
@@ -271,18 +287,19 @@ const filterByCategory = (category) => {
 }
 
 .item-name {
-  font-size: 1.2rem;
+  font-size: 1.7rem;
   color: #333;
   margin-bottom: 5px;
 }
 
 .item-description {
-  font-size: 0.9rem;
+  font-size: 1.2rem;
   color: #666;
   margin: 10px 0;
 }
 
 .item-price {
+  font-size: 1.5rem;
   font-weight: bold;
   color: #28a745;
   margin-bottom: 10px;
@@ -293,7 +310,7 @@ const filterByCategory = (category) => {
   color: white;
   padding: 10px;
   border: none;
-  border-radius: 5px;
+  border-radius: 10px;
   cursor: pointer;
   transition: background-color 0.3s;
 }
