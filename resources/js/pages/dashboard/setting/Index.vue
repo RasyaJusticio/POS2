@@ -196,6 +196,6 @@ export default defineComponent({
             },
             deep: true
         }
-    }
+    }
 })
 </script>

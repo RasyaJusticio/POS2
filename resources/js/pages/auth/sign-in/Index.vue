@@ -7,17 +7,18 @@
                 <img
                 :src="setting?.logo"
                 :alt="setting?.app"
-                class="w-200px mb-0" 
+                class="w-500px mb-0" 
                 style="max-width: 100%; height: auto;"
                 />
 >
             </router-link>
-            <h1 style="font-size: 36px; line-height: 1; margin-top: 0; margin-bottom: 0;">
-                Welcome!
-            </h1>
+            <h1 style="font-size: 36px; line-height: 1; margin-top: 0; margin-bottom: 0; color: white;">
+    Welcome!
+</h1>
+
 
             <div class="text-primary" style="font-size: 25px;">
-                <strong>AON Cashier</strong>
+                <strong>Experience Thai Bliss!</strong>
             </div>
         </div>
         <!--end::Heading-->

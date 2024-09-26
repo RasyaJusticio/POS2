@@ -87,10 +87,10 @@ const currentLangugeLocale = computed(() => {
         <div class="menu-item px-3">
             <div class="menu-content d-flex align-items-center px-3">
                 <!--begin::Avatar-->
-                <div class="symbol symbol-50px me-5">
-                    <img
+                <div class="symbol symbol-90px me-5" style="width: 90px; height: 90px;">
+                        <img
                         alt="Logo"
-                        :src="('media/avatars/y.png')
+                        :src="('media/avatars/spice.png')
                         "
                     />
                 </div>
