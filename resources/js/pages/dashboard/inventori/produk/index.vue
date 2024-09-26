@@ -4,6 +4,7 @@ import { useDelete } from "@/libs/hooks";
 import Form from "./form.vue"; // Sesuaikan path ke komponen form
 import { createColumnHelper } from "@tanstack/vue-table";
 import type { Product } from "@/types/pos"; // Sesuaikan tipe Produk dengan model
+import { formatRupiah } from "@/libs/utilss"; // Import formatRupiah helper
 
 const column = createColumnHelper<Product>();
 const paginateRef = ref<any>(null);
@@ -23,6 +24,7 @@ const columns = [
     }),
     column.accessor("price", {
         header: "Price",
+        cell: (cell) => formatRupiah(cell.getValue()),
     }),
     column.accessor("quantity", {
         header: "Quantity",
@@ -55,7 +57,7 @@ const columns = [
                     {
                         class: "btn btn-sm btn-icon btn-danger",
                         onClick: () =>
-                        deleteProduct(`/api/inventori/inventori-produk/${cell.getValue()}`), // Ganti URL menjadi API yang benar
+                            deleteProduct(`/inventori/produk/${cell.getValue()}`), // Ganti URL menjadi API yang benar
                     },
                     h("i", { class: "la la-trash fs-2" })
                 ),

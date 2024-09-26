@@ -20,16 +20,16 @@ const imageFile = ref<File | null>(null);
 const formRef = ref();
 
 const formSchema = Yup.object().shape({
-    name: Yup.string().required("Product Name is required"),
-    price: Yup.number().required("Price is required").positive("Price must be positive"),
-    quantity: Yup.number().required("Quantity is required").integer("Quantity must be an integer").min(0, "Quantity must be at least 0"),
+    name: Yup.string().required("Nama Harus Diisi"),
+    price: Yup.number().required("Harga Harus Diisi").positive("Harga Harus Positif"),
+    quantity: Yup.number().required("Kuantitas harus diisi").integer("Jumlah Harus Diisi Angka").min(0, "Quantity must be at least 0"),
     description: Yup.string(),
-    category: Yup.string().required("Category is required"), // Validasi kategori
+    category: Yup.string().required("Kategori Diperlukan"), // Validasi kategori
 });
 
 function getEdit() {
     block(document.getElementById("form-produk"));
-    axios.get(`/api/inventori/inventori-produk/${props.selected}`)  // Ganti URL dengan API yang benar
+    axios.get(`/inventori/produk/${props.selected}`)  // Ganti URL dengan API yang benar
         .then(({ data }) => {
             formData.value = data.produk;
         })
@@ -52,19 +52,19 @@ function submit() {
     block(document.getElementById("form-produk"));
     const formDataToSubmit = new FormData();
     formDataToSubmit.append("name", formData.value.name);
+    formDataToSubmit.append("category", formData.value.category);
     formDataToSubmit.append("price", formData.value.price.toString());
     formDataToSubmit.append("quantity", formData.value.quantity.toString());
     formDataToSubmit.append("description", formData.value.description);
-    formDataToSubmit.append("category", formData.value.category); // Menambahkan kategori
     if (imageFile.value) {
-        formDataToSubmit.append("image", imageFile.value);
+        formDataToSubmit.append("image_url", imageFile.value);
     }
 
     axios({
         method: props.selected ? "put" : "post",
         url: props.selected
-            ? `/api/inventori/inventori-produk/${props.selected}`  // Ganti URL untuk update produk
-            : "/api/inventori/inventori-produk",  // Ganti URL untuk tambah produk
+            ? `/inventori/produk/${props.selected}`  // Ganti URL untuk update produk
+            : "/inventori/produk/store",  // Ganti URL untuk tambah produk
         data: formDataToSubmit,
     })
         .then(() => {
@@ -131,9 +131,13 @@ watch(
                         <label class="form-label fw-bold fs-6 required" for="produk-category">
                             Category
                         </label>
-                        <Field class="form-control form-control-lg form-control-solid" 
-                            type="text" name="category" autocomplete="off" v-model="formData.category" 
-                            id="produk-category" placeholder="Enter Category" />
+                        <Field as="select" class="form-control form-control-lg form-control-solid" 
+                            name="category" v-model="formData.category" id="produk-category">
+                            <option value="" disabled hidden>Select Category</option>
+                            <option value="makanan">Makanan</option>
+                            <option value="dessert">Dessert</option>
+                            <option value="minuman">Minuman</option>
+                        </Field>
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">
                                 <ErrorMessage name="category" />
@@ -193,7 +197,7 @@ watch(
                             Image
                         </label>
                         <input class="form-control form-control-lg form-control-solid" type="file" 
-                            name="image" @change="onImageChange" id="produk-image" />
+                            name="image_url" @change="onImageChange" id="produk-image" />
                     </div>
                 </div>
             </div>
