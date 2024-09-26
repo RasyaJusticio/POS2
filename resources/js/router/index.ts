@@ -18,7 +18,7 @@ declare module "vue-router" {
 const routes: Array<RouteRecordRaw> = [
     {
         path: "/",
-        redirect: "/dashboard",
+        redirect: "/landing",
         component: () => import("@/layouts/default-layout/DefaultLayout.vue"),
         meta: {
             middleware: "auth",
@@ -136,6 +136,35 @@ const routes: Array<RouteRecordRaw> = [
             },
         ],
     },
+
+    {
+        path: "/landing",
+        redirect:"/landing/PAGE",
+        component: () => import("@/layouts/kasir/DefaultLayout.vue"),
+        children: [
+            {
+                path: "/landing/PAGE", // untuk rute dasar "/landing"
+                name: "/landing.index",
+                component: () => import("@/pages/landing/Index.vue"), // Pastikan path ini sesuai
+                meta: {
+                    pageTitle: "Landing Index",
+                },
+            },
+
+            {
+                path: "/landing/thai", // untuk rute dasar "/landing"
+                name: "landingthai",
+                component: () => import("@/pages/landing/thai.vue"), // Pastikan path ini sesuai
+                meta: {
+                    pageTitle: "Landing Index",
+                },
+            },
+            
+            
+        ],
+    },
+    
+
     {
         path: "/",
         component: () => import("@/layouts/SystemLayout.vue"),

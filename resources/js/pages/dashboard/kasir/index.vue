@@ -355,4 +355,5 @@ const filterByCategory = (category) => {
   font-size: 12px;
   color: #888;
 }
+
 </style>
