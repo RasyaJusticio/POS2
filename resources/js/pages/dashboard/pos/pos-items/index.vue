@@ -1,18 +1,17 @@
 <script setup lang="ts">
 import { h, ref, watch } from "vue";
 import { useDelete } from "@/libs/hooks";
-import Form from "./form.vue"; // Correct path to your form component
+import Form from "./form.vue"; // Sesuaikan path ke komponen form
 import { createColumnHelper } from "@tanstack/vue-table";
-import type { Item } from "@/types/pos"; // Adjust the type as per your model
-
+import type { Item } from "@/types/pos"; // Sesuaikan tipe Item dengan model
 
 const column = createColumnHelper<Item>();
 const paginateRef = ref<any>(null);
-const selected = ref<number | undefined>(undefined);  // Replace null with undefined
+const selected = ref<number | undefined>(undefined);  // Sesuaikan null dengan undefined
 const openForm = ref<boolean>(false);
 
 const { delete: deleteItem } = useDelete({
-    onSuccess: () => paginateRef.value?.refetch(), // Refetch after deletion
+    onSuccess: () => paginateRef.value?.refetch(), // Refetch setelah delete
 });
 
 const columns = [
@@ -42,8 +41,8 @@ const columns = [
                     {
                         class: "btn btn-sm btn-icon btn-info",
                         onClick: () => {
-                            selected.value = cell.getValue(); // Set selected item id
-                            openForm.value = true; // Open form for edit
+                            selected.value = cell.getValue(); // Set item terpilih untuk edit
+                            openForm.value = true; // Buka form untuk edit
                         },
                     },
                     h("i", { class: "la la-pencil fs-2" })
@@ -53,7 +52,7 @@ const columns = [
                     {
                         class: "btn btn-sm btn-icon btn-danger",
                         onClick: () =>
-                            deleteItem(`/master/items/${cell.getValue()}`), // Delete item
+                            deleteItem(`/api/pos/pos-items/${cell.getValue()}`), // Ganti URL menjadi API yang benar
                     },
                     h("i", { class: "la la-trash fs-2" })
                 ),
@@ -61,13 +60,13 @@ const columns = [
     }),
 ];
 
-const refresh = () => paginateRef.value?.refetch(); // Refetch the table when needed
+const refresh = () => paginateRef.value?.refetch(); // Refetch table saat dibutuhkan
 
 watch(openForm, (val) => {
     if (!val) {
-        selected.value = undefined; // Reset selection when the form is closed
+        selected.value = undefined; // Reset selected saat form ditutup
     }
-    window.scrollTo(0, 0); // Scroll to top when opening/closing form
+    window.scrollTo(0, 0); // Scroll ke atas saat buka/tutup form
 });
 </script>
 
