@@ -24,7 +24,7 @@ class SettingController extends Controller
                  //'dinas' => 'required',
                  'telepon' => 'required',
                  'email' => 'required',
-                 'logo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+                 //'logo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
                  'bg_auth' => 'required|image|mimes:jpeg,png,jpg|max:8192',
                  //'banner' => 'required|image|mimes:jpeg,png,jpg|max:8192',
             ]);

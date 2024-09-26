@@ -72,34 +72,35 @@ const routes: Array<RouteRecordRaw> = [
                 },
             },
 
-            // POS
+            //Inventori
             {
-                path: "/dashboard/pos/pos-layout",
-                name: "dashboard.poslayout",
-                component: () => import("@/pages/dashboard/pos/pos-layout/index.vue"),
+                path: "/dashboard/inventori/produk",
+                name: "dashboard.inventoriproduk",
+                component: () => import("@/pages/dashboard/inventori/produk/index.vue"),
                 meta: {
-                    pageTitle: "POS Layout",
-                    breadcrumbs: ["POS", "Layout"],
+                  pageTitle: "Inventori Produk",
+                  breadcrumbs: ["Inventori", "Produk"],
                 },
-            },
-            {
-                path: "/dashboard/pos/pos-items",
-                name: "dashboard.positems",
-                component: () => import("@/pages/dashboard/pos/pos-items/index.vue"),
+              },
+              {
+                path: "/dashboard/inventori/kategori",
+                name: "dashboard.inventorikategori",
+                component: () => import("@/pages/dashboard/inventori/kategori/index.vue"),
                 meta: {
-                    pageTitle: "POS Items",
-                    breadcrumbs: ["POS", "Items"],
+                  pageTitle: "Inventori Kategori",
+                  breadcrumbs: ["Inventori", "Kategori"],
                 },
-            },
-            {
-                path: "/dashboard/pos/pos-cart",
-                name: "dashboard.poscart",
-                component: () => import("@/pages/dashboard/pos/pos-cart/index.vue"),
+              },
+              {
+                path: "/dashboard/inventori/stok",
+                name: "dashboard.inventoristok",
+                component: () => import("@/pages/dashboard/inventori/stok/index.vue"),
                 meta: {
-                    pageTitle: "POS Cart",
-                    breadcrumbs: ["POS", "Cart"],
+                  pageTitle: "POS Items",
+                  breadcrumbs: ["POS", "Items"],
                 },
-            },
+              },
+
             // Kasir route added here
             {
                 path: "/dashboard/kasir",

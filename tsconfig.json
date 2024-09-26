@@ -3,7 +3,8 @@
     "include": [
         "env.d.ts",
         "resources/js/*",
-        "resources/js/**/{*.js,*.ts,*.vue}"
+        "resources/js/**/{*.js,*.ts,*.vue}",
+        "resources/js/bootstrap.js"
     ],
     "compilerOptions": {
         "lib": ["ES2020", "DOM"],
@@ -12,12 +13,13 @@
         "paths": {
             "@/*": ["./resources/js/*"]
         },
-        "allowJs": true
+        "allowJs": true,
+        "verbatimModuleSyntax": true
     },
     "exclude": ["node_modules", "dist"],
     "references": [
         {
             "path": "./tsconfig.config.json"
         }
-    ]
+    ] 
 }

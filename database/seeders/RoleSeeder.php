@@ -16,14 +16,15 @@ class RoleSeeder extends Seeder
     {
 
         if (!Role::where('name', 'admin')->exists()) {
-            Role::create(['name' => 'admin', 'guard_name' => 'api']);
-        }
+           
     
         Role::create([
             'name' => 'admin',
             'guard_name' => 'api',
             'full_name' => 'Administrator',
         ]);
+
+    }
 
          // Role untuk pengguna biasa
          Role::create([
