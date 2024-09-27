@@ -1,20 +1,20 @@
 <template>
   <div class="default-layout">
     <header>
-      <nav class="navbar navbar-expand-lg p-4" style="background-color: black; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
-        <div class="container-fluid d-flex justify-content-between align-items-center">
+      <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid d-flex justify-content-between align-items-center ">
           <router-link class="navbar-brand" to="/">
-            <img src="@/assets/images/siam.png"  class="rounded-4" alt="Logo" style="width: auto; height: 100px;" /> <!-- Add your logo here -->
+            <img src="@/assets/images/siam2.png"  class="rounded-4" alt="Logo" style="width: auto; height: 100px;" /> <!-- Add your logo here -->
           </router-link>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
-          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="collapse navbar-collapse" id="navbarNav">
             <div class="navbar-nav ms-auto">
-              <router-link class="nav-link active p-3 mb-6 bg-success border border-black text-white fs-1" aria-current="page" to="/landing/PAGE">Home</router-link>
-              <router-link class="nav-link p-3 mb-6 bg-success border border-black text-white fs-1" to="/landing/PAGE">Features</router-link>
-              <router-link class="nav-link p-3 mb-6 bg-success border border-black text-white fs-1" to="/landing/PAGE">Pricing</router-link>
-              <a class="nav-link disabled text-white fs-1" aria-disabled="true">Siam Restaurant</a>
+              <router-link class="nav-link" to="/">Home</router-link>
+              <router-link class="nav-link" to="/menu">Menu</router-link>
+              <router-link class="nav-link" to="#pricing">Pricing</router-link>
+              <router-link class="nav-link" to="/about">About Us</router-link>
             </div>
           </div>
         </div>
@@ -26,7 +26,12 @@
     </main>
 
     <footer>
-      <p class="text-center">&copy; {{ new Date().getFullYear() }} Siam Spice</p>
+      <p>&copy; {{ new Date().getFullYear() }} Siam Spice. All Rights Reserved.</p>
+      <div class="social-icons">
+        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+      </div>
     </footer>
   </div>
 </template>
@@ -38,84 +43,70 @@ import { RouterView } from 'vue-router';
 const title = ref('Siam Spice'); // Change this to your desired title
 </script>
 
-
-<!-- <style scoped>
+<style scoped>
 .default-layout {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  font-family: 'Poppins', sans-serif; /* Font style for the entire layout */
+  font-family: 'Poppins', sans-serif; /* Clean font style */
+  background-color: #f8f9fa; /* Light background */
 }
 
 header {
-  background: #704b15;
-  color: #ff0000; /* Light color for better contrast */
-  padding: 20px;
-  text-align: center;
+  background-color: #343a40; /* Dark header */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-nav {
-  display: flex;
-  flex-direction: column; /* Stack items vertically for clarity */
-  font-size: 2rem; /* Increase font size for the title */
-}
-
-nav h1 {
-  font-size: 2rem; /* Increase font size for the title */
-  margin-bottom: 10px; /* Add space below title */
-}
-
-nav ul {
-  list-style-type: none;
-  padding: 0;
-  display: flex; /* Use flex for horizontal layout */
-  justify-content: center; /* Center align the links */
-}
-
-nav ul li {
-  margin: 0 20px; /* Add more space between links */
-  border: 2px solid transparent; /* Add transparent border for spacing */
-  border-radius: 5px; /* Rounded corners */
-  transition: border-color 0.3s; /* Smooth border color transition */
-}
-
-nav ul li:hover {
-  border-color: #000000; /* Change border color on hover */
-}
-
-.nav-link {
-  color: #000000; /* Change link color */
-  padding: 40px 20px; /* Add padding for clickable area */
-}
-
-.nav-link:hover {
-  color: #2225ba; /* Change hover color */
-}
-
-nav ul li a {
-  text-decoration: none; /* Remove underline from links */
-  color: #ff0000; /* Link color */
-  font-weight: bold; /* Make links bold */
-  padding: 10px 15px; /* Add padding for clickable area */
-}
-
-main {
-  flex: 1;
-  padding: 20px;
-}
-
-footer {
-  background:  #704b15;
-  color: #000000;
-  text-align: center;
-  padding: 30px;
+.navbar {
+  font-size: 1.2rem;
 }
 
 .logo {
-  width: 100px; /* Adjust size as needed */
-  height: auto;
-  margin-right: 10px; /* Space between logo and title */
+  height: 80px; /* Logo size */
+  transition: transform 0.3s; /* Logo scaling effect */
 }
 
+.logo:hover {
+  transform: scale(1.1); /* Scale logo on hover */
+}
 
-</style> -->
+.nav-link {
+  color: #ffffff; /* Link color */
+  margin: 0 15px; /* Space between links */
+  padding: 10px 15px; /* Add padding for clickable area */
+  transition: background-color 0.3s, color 0.3s; /* Smooth transitions */
+}
+
+.nav-link:hover {
+  background-color: #d9534f; /* Highlight color on hover */
+  color: #ffffff; /* Keep text color on hover */
+  border-radius: 5px; /* Rounded corners on hover */
+}
+
+footer {
+  background-color: #343a40; /* Dark footer */
+  color: #ffffff; /* Footer text color */
+  text-align: center;
+  padding: 20px;
+  margin-top: auto; /* Push footer to the bottom */
+}
+
+footer p {
+  margin: 0; /* Remove default margin */
+}
+
+.social-icons {
+  margin-top: 10px;
+}
+
+.social-icons a {
+  color: white;
+  margin: 0 10px;
+  font-size: 1.5rem; /* Adjust icon size */
+  transition: color 0.3s;
+}
+
+.social-icons a:hover {
+  color: #d9534f; /* Change icon color on hover */
+}
+</style>
