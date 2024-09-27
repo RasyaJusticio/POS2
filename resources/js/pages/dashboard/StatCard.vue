@@ -1,36 +1,53 @@
 <template>
-    <div class="stat-card">
+  <div class="stat-card">
+    <div class="icon-value">
       <i :class="iconClass" class="large-icon"></i>
-      <h3>{{ title }}</h3>
-      <p>{{ value }}</p>
+      <p class="value">{{ value }}</p>
     </div>
-  </template>
-  
-  <script setup lang="ts">
+    <h3>{{ title }}</h3>
+  </div>
+</template>
+
+<script setup lang="ts">
 defineProps({
   title: String,
   value: [Number, String],
-  iconClass: String // Properti baru untuk kelas ikon
+  iconClass: String,
 });
+
 </script>
-  
-  <style scoped>
-  .stat-card {
-    flex: 1;
-    background: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 2px 4px 4px hsla(0, 0%, 10%, 0.461);
-    
-  }
-  .large-icon {
-    font-size: 5rem;
-    color: #000000; /* Warna ikon */
-    margin-bottom: middle;
-    margin-top: middle;
-  }
-  .content {
-    text-align: center;
-  }
-  </style>
-  
+
+<style scoped>
+.stat-card {
+  flex: 1;
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 2px 4px 4px hsla(0, 0%, 10%, 0.461);
+  align-items: flex-start; /* Mengatur item ke atas */
+}
+
+.icon-value {
+  display: flex;
+  align-items: center; /* Align icon and value vertically */
+  justify-content: center; /* Center content horizontally */
+  margin-bottom: 10px; /* Space below the icon-value */
+}
+
+.large-icon {
+  font-size: 5rem; /* Ukuran ikon */
+  color: #000000; /* Warna ikon */
+  margin-right: 100px; /* Jarak antara ikon dan nilai */
+  margin-left: 10px; /* Jarak ke kiri untuk memberi ruang di pojok */
+}
+
+.value {
+  font-size: 2rem; /* Sesuaikan ukuran untuk nilai */
+  font-weight: bold;
+  margin-left: 5px; /* Jarak untuk nilai */
+}
+
+h3 {
+  margin-left: 10px; /* Jarak antara ikon-value dan judul */
+}
+</style>

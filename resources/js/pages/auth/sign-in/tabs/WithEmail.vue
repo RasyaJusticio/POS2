@@ -2,7 +2,7 @@
     <VForm class="form w-100" @submit="submit" :validation-schema="login">
         <!--begin::Input group-->
         <div class="fv-row mb-10">
-            <label class="form-label fs-6 fw-bold">Email</label>
+            <label class="form-label fs-6 fw-bold" style="color: white;">Email</label>
             <Field tabindex="1" class="form-control form-control-lg form-control-solid" type="text" name="email"
                 autocomplete="off" v-model="data.email" />
             <div class="fv-plugins-message-container">
@@ -16,8 +16,9 @@
         <!--begin::Input group-->
         <div class="fv-row mb-5">
             <div class="d-flex flex-stack mb-2">
-                <label class="form-label fw-bold fs-6 mb-0">Password</label>
+                <label class="form-label fw-bold fs-6 mb-0" style="color: white;">Password</label>
             </div>
+
             <div class="position-relative mb-3">
                 <Field tabindex="2" class="form-control form-control-lg form-control-solid" type="password" name="password"
                     v-model="data.password" autocomplete="off" />

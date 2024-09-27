@@ -4,10 +4,26 @@
       <h1 class="title">Graphic</h1>
       
       <div class="stats">
-        <StatCard title="Total Sales" :value="totalSales" iconClass="fas fa-dollar-sign" /> 
-        <StatCard title="Total Items" :value="totalItems" iconClass="fas fa-box" />
-        <StatCard title="Total Customers" :value="totalCustomers" iconClass="fas fa-users" />
-        <StatCard title="Profit" :value="profit" iconClass="fas fa-chart-line" />
+        <StatCard 
+          title="Total Sales" 
+          :value="formatCurrency(totalSales)" 
+          iconClass="fas fa-dollar-sign" 
+        /> 
+        <StatCard 
+          title="Total Items" 
+          :value="totalItems" 
+          iconClass="fas fa-box" 
+        />
+        <StatCard 
+          title="Total Customers" 
+          :value="totalCustomers" 
+          iconClass="fas fa-users" 
+        />
+        <StatCard 
+          title="Profit" 
+          :value="formatCurrency(profit)" 
+          iconClass="fas fa-chart-line" 
+        />
       </div>
 
       <div class="charts">
@@ -21,7 +37,6 @@
     </div>
   </main>
 </template>
-
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
@@ -37,13 +52,21 @@ const profit = ref(0);
 onMounted(() => {
   // Fetch data from your API or state management
   // Simulated data for demonstration
-  totalSales.value = 178900;
-  totalItems.value = 30;
-  totalCustomers.value = 7500;
-  profit.value = 1900;
+  totalSales.value = 0;
+  totalItems.value = 0;
+  totalCustomers.value = 0;
+  profit.value = 0;
 
   initializeCharts();
 });
+
+// Format currency to Rupiah
+const formatCurrency = (value) => {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+  }).format(value);
+};
 
 const initializeCharts = () => {
   const salesCtx = document.getElementById('salesChart').getContext('2d');
