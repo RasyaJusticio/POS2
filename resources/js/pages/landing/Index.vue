@@ -16,17 +16,17 @@
         <h2>Explore Our Menu</h2>
         <div class="row justify-content-center">
           <div class="col-md-3 category-card" @click="navigateToMenu('appetizers')">
-            <img src="@/assets/images/khao.jpeg" alt="Appetizers" class="img-fluid rounded" />
+            <img src="@/assets/images/Tom Kha Kai.jpg" alt="Appetizers" class="img-fluid rounded" />
             <h3>Appetizers</h3>
             <p>Start your meal with our delightful appetizers!</p>
           </div>
           <div class="col-md-3 category-card" @click="navigateToMenu('main-courses')">
-            <img src="@/assets/images/soi.jpeg" alt="Main Courses" class="img-fluid rounded" />
+            <img src="@/assets/images/P Aor.jpg" alt="Main Courses" class="img-fluid rounded" />  
             <h3>Main Courses</h3>
             <p>Indulge in our signature dishes!</p>
           </div>
           <div class="col-md-3 category-card" @click="navigateToMenu('desserts')">
-            <img src="@/assets/images/pad.jpeg" alt="Desserts" class="img-fluid rounded" />
+            <img src="@/assets/images/Mango Sticky Rice.jpg" alt="Desserts" class="img-fluid rounded" />
             <h3>Desserts</h3>
             <p>End your meal with our sweet treats!</p>
           </div>
@@ -89,7 +89,7 @@ const navigateToMenu = (category) => {
 }
 
 .menu-categories {
-  background-color: #faf9f8; /* Light background for the menu section */
+  background-color: #f8f9fa; /* Light background for the menu section */
   padding: 30px 0;
   border-radius: 10px;
 }

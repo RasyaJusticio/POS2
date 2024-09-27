@@ -4,7 +4,7 @@
       <nav class="navbar navbar-expand-lg p-4" style="background-color: black; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
         <div class="container-fluid d-flex justify-content-between align-items-center">
           <router-link class="navbar-brand" to="/">
-            <img src="@/assets/images/siam.png" alt="Logo" style="width: auto; height: 100px;" /> <!-- Add your logo here -->
+            <img src="@/assets/images/siam.png"  class="rounded-4" alt="Logo" style="width: auto; height: 100px;" /> <!-- Add your logo here -->
           </router-link>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
