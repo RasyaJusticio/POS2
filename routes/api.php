@@ -80,7 +80,7 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
                 Route::post('produk', [ProductController::class, 'index']);
                 Route::post('produk/store', [ProductController::class, 'store']);
                 Route::apiResource('produk', ProductController::class)
-                    ->except(['index', 'store'])->scoped(['product' => 'uuid']);
+                    ->except(['index', 'store'])->scoped(['product' => 'id']);
             });
     
         });

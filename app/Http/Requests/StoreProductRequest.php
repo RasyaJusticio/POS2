@@ -6,12 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreProductRequest extends FormRequest
 {
-    public function authorize()
-    {
-        return true; // Sesuaikan dengan kebijakan otorisasi Anda
-    }
-
-    public function rules()
+    public function rules(): array
     {
         return [
             'name' => 'required|string|max:255',
@@ -19,7 +14,7 @@ class StoreProductRequest extends FormRequest
             'price' => 'required|numeric|min:0',
             'quantity' => 'required|integer|min:0',
             'description' => 'nullable|string',
-            'image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+            'image_url' => 'nullable|image|mimes: jpg, png, jpeg, gif',
         ];
     }
 }

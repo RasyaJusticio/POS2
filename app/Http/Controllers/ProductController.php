@@ -63,8 +63,8 @@ class ProductController extends Controller
         $product->update($validated);
 
         return response()->json([
-            'message' => 'Produk berhasil diperbarui!',
-            'produk' => $product
+            'success' => true,
+            'produk' => $product,
         ]);
     }
 

@@ -57,7 +57,7 @@ const columns = [
                     {
                         class: "btn btn-sm btn-icon btn-danger",
                         onClick: () =>
-                            deleteProduct(`/inventori/produk/${cell.getValue()}`), // Ganti URL menjadi API yang benar
+                            deleteProduct(`/inventori/produkz/${cell.getValue()}`), // Ganti URL menjadi API yang benar
                     },
                     h("i", { class: "la la-trash fs-2" })
                 ),
