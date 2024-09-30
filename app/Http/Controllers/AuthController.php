@@ -57,6 +57,7 @@ class AuthController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
+            'address' => 'required|string',
             'phone' => 'required|string|max:15', // Menambahkan validasi untuk nomor telepon
             'password' => 'required|string|min:8|confirmed',
         ]);
@@ -64,6 +65,7 @@ class AuthController extends Controller
         // Buat pengguna baru
         $user = User::create([
             'name' => $data['name'],
+            'address' => $data['address'],
             'email' => $data['email'],
             'phone' => $data['phone'], // Menyimpan nomor telepon
             'password' => Hash::make($data['password']),

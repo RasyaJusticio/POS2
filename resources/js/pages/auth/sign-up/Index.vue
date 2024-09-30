@@ -27,6 +27,11 @@
             <label for="name" class="form-label">Name</label>
             <input v-model="formData.name" type="text" class="form-control" id="name" required />
           </div>
+          
+          <div class="mb-4">
+            <label for="name" class="form-label">Address</label>
+            <input v-model="formData.address" type="text" class="form-control" id="address" required />
+          </div>
   
           <div class="mb-4">
             <label for="email" class="form-label">Email</label>
@@ -89,6 +94,7 @@
     setup() {
       const formData = ref({
         name: "",
+        address: "",
         email: "",
         phone: "",
         password: "",
