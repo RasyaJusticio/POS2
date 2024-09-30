@@ -20,31 +20,6 @@
         </div>
       </section>
 
-<<<<<<< HEAD
-      <section class="menu-categories text-center">
-        <h2>Explore Our Menu</h2>
-        <div class="row justify-content-center">
-          <div class="col-md-3 category-card" @click="navigateToMenu('appetizers')">
-            <img src="@/assets/images/Tom Kha Kai.jpg" alt="Appetizers" class="img-fluid rounded" />
-            <h3>Appetizers</h3>
-            <p>Start your meal with our delightful appetizers!</p>
-          </div>
-          <div class="col-md-3 category-card" @click="navigateToMenu('main-courses')">
-            <img src="@/assets/images/P Aor.jpg" alt="Main Courses" class="img-fluid rounded" />  
-            <h3>Main Courses</h3>
-            <p>Indulge in our signature dishes!</p>
-          </div>
-          <div class="col-md-3 category-card" @click="navigateToMenu('desserts')">
-            <img src="@/assets/images/Mango Sticky Rice.jpg" alt="Desserts" class="img-fluid rounded" />
-            <h3>Desserts</h3>
-            <p>End your meal with our sweet treats!</p>
-          </div>
-          <div class="col-md-3 category-card" @click="navigateToMenu('beverages')">
-            <img src="@/assets/images/thai.jpeg" alt="Beverages" class="img-fluid rounded" />
-            <h3>Beverages</h3>
-            <p>Quench your thirst with our refreshing drinks!</p>
-          </div>
-=======
 <section class="menu-categories text-center">
   <h2>Most Popular</h2>
   <div class="row justify-content-center">
@@ -55,7 +30,6 @@
           <h3>Som Tam</h3>
           <h3>ส้มตำ</h3>
           <button class="btn btn-outline-primary" @click="showDescription('somtam')">View More</button>
->>>>>>> f13976d811f73ea849b10710113b2935595bf4d6
         </div>
       </div>
     </div>
@@ -224,13 +198,8 @@ const showDescription = (item: string) => {
 }
 
 .menu-categories {
-<<<<<<< HEAD
-  background-color: #f8f9fa; /* Light background for the menu section */
-  padding: 30px 0;
-=======
   padding: 50px 20px;
   background-color: #f8f9fa; /* Light background */
->>>>>>> f13976d811f73ea849b10710113b2935595bf4d6
   border-radius: 10px;
 }
 
