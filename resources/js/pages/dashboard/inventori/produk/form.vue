@@ -4,7 +4,7 @@ import { onMounted, ref, watch } from "vue";
 import * as Yup from "yup";
 import axios from "@/libs/axios";
 import { toast } from "vue3-toastify";
-import type { Product } from "@/types/pos";  // Sesuaikan tipe Produk
+import type { Product } from "@/types/pos";
 
 const props = defineProps({
     selected: {
@@ -22,14 +22,14 @@ const formRef = ref();
 const formSchema = Yup.object().shape({
     name: Yup.string().required("Nama Harus Diisi"),
     price: Yup.number().required("Harga Harus Diisi").positive("Harga Harus Positif"),
-    quantity: Yup.number().required("Kuantitas harus diisi").integer("Jumlah Harus Diisi Angka").min(0, "Quantity must be at least 0"),
+    quantity: Yup.number().required("Kuantitas harus diisi").integer("Jumlah Harus Diisi Angka").min(0, "Kuantitas minimal 0"),
     description: Yup.string(),
-    category: Yup.string().required("Kategori Diperlukan"), // Validasi kategori
+    category: Yup.string().required("Kategori Diperlukan"),
 });
 
 function getEdit() {
     block(document.getElementById("form-produk"));
-    axios.get(`/inventori/produk/${props.selected}`)  // Ganti URL dengan API yang benar
+    axios.get(`/inventori/produk/${props.selected}`)
         .then(({ data }) => {
             formData.value = data.produk;
         })
@@ -53,31 +53,37 @@ function submit() {
     const formDataToSubmit = new FormData();
     formDataToSubmit.append("name", formData.value.name);
     formDataToSubmit.append("category", formData.value.category);
-    formDataToSubmit.append("price", formData.value.price.toString());
+    formDataToSubmit.append("price", Math.floor(formData.value.price).toString());
     formDataToSubmit.append("quantity", formData.value.quantity.toString());
-    formDataToSubmit.append("description", formData.value.description);
+    formDataToSubmit.append("description", formData.value.description || '');
+
     if (imageFile.value) {
         formDataToSubmit.append("image_url", imageFile.value);
     }
 
+    const apiEndpoint = props.selected
+        ? `/inventori/produk/${props.selected}`
+        : "/inventori/produk/store";
+
+    const method = props.selected ? "put" : "post";
+
     axios({
-        method: props.selected ? "put" : "post",
-        url: props.selected
-            ? `/inventori/produk/${props.selected}`  // Ganti URL untuk update produk
-            : "/inventori/produk/store",  // Ganti URL untuk tambah produk
+        method: method,
+        url: apiEndpoint,
         data: formDataToSubmit,
     })
         .then(() => {
-            emit('refresh');
-            emit('close');
-            toast.success("Product saved successfully");
+            emit("refresh");
+            emit("close");
+            toast.success("Produk berhasil disimpan");
         })
         .catch((err: any) => {
+            console.log(err.response?.data);
             const errors = err.response?.data?.errors;
             if (errors) {
-                formRef.value.setErrors(errors);  // Panggil setErrors hanya jika ada error
+                formRef.value.setErrors(errors);
             }
-            toast.error(err.response?.data?.message || "An error occurred");
+            toast.error(err.response?.data?.message || "Terjadi kesalahan");
         })
         .finally(() => {
             unblock(document.getElementById("form-produk"));
@@ -99,6 +105,7 @@ watch(
     }
 );
 </script>
+
 
 <template>
     <VForm class="form card mb-10" @submit="submit" :validation-schema="formSchema" id="form-produk" ref="formRef">

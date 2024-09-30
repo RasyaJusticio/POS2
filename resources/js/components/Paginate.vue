@@ -2,10 +2,10 @@
     <div :id="id">
         <div class="d-flex justify-content-between gap-2 flex-wrap mb-4">
             <div class="d-flex gap-4 align-items-center">
-                <label htmlFor="limit" class="form-label">
+                <label for="limit" class="form-label">
                     Tampilkan
                 </label>
-                <select2 class="w-75px form-select-solid" v-model="per" placeholder="Per" :options="[5, 10, 25, 50, 100]">
+                <select2 id="limit" class="w-75px form-select-solid" v-model="per" placeholder="Per" :options="[5, 10, 25, 50, 100]">
                 </select2>
             </div>
             <form @submit.prevent="refetch" class="w-100 w-sm-auto">

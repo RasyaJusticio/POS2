@@ -24,59 +24,66 @@ class ProductController extends Controller
     {
         $validatedData = $request->validated();
 
-        // Periksa jika ada file gambar
+        // Cek jika ada file gambar dan simpan
         if ($request->hasFile('image_url')) {
-            $validatedData['image_url'] = $request->file('image_url')->store('produk', 'public');
+            $path = $request->file('image_url')->store('produk', 'public');
+            $validatedData['image_url'] = Storage::url($path);
         }
 
+        // Simpan produk
         $product = Product::create($validatedData);
 
         return response()->json([
-            'success' => true,
-            'product' => $product
-        ]);
+            'message' => 'Produk berhasil ditambahkan',
+            'product' => $product,
+        ], 201);
     }
 
-    public function show(Product $product)
+    public function show($id)
     {
-        return response()->json([
-            'success' => true,
-            'produk' => $product,
-        ]);
+        $product = Product::findOrFail($id);
+
+        return response()->json(['produk' => $product]);
     }
 
-
-    public function update(UpdateProductRequest $request, Product $product)
+    public function update(UpdateProductRequest $request, $id)
     {
-        $validated = $request->validated();
+        $product = Product::findOrFail($id);
+        $validatedData = $request->validated();
 
-        // Periksa jika ada file gambar baru
+        // Cek jika ada file gambar baru dan ganti
         if ($request->hasFile('image_url')) {
             // Hapus gambar lama jika ada
             if ($product->image_url) {
-                Storage::disk('public')->delete($product->image_url);
+                Storage::disk('public')->delete(str_replace('/storage/', '', $product->image_url));
             }
+
             // Simpan gambar baru
-            $validated['image_url'] = $request->file('image_url')->store('produk', 'public');
+            $path = $request->file('image_url')->store('produk', 'public');
+            $validatedData['image_url'] = Storage::url($path);
         }
 
-        $product->update($validated);
+        // Update produk
+        $product->update($validatedData);
 
         return response()->json([
-            'success' => true,
-            'produk' => $product,
+            'message' => 'Produk berhasil diperbarui',
+            'product' => $product,
         ]);
-    }
+    }   
 
-    public function destroy(Product $product)
+    public function destroy($id)
     {
+        $product = Product::findOrFail($id);
+
         // Hapus gambar jika ada
         if ($product->image_url) {
-            Storage::disk('public')->delete($product->image_url);
+            Storage::disk('public')->delete(str_replace('/storage/', '', $product->image_url));
         }
 
+        // Hapus produk
         $product->delete();
 
-        return response()->json(['success' => true ]);
+        return response()->json(['message' => 'Produk berhasil dihapus']);
     }
 }
