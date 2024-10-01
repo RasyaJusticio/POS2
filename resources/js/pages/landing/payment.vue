@@ -15,9 +15,11 @@
       </div>
     </div>
 
-    <div v-if="selectedPayment && !receiptVisible" class="payment-details">
-      <h3>Metode Pembayaran: {{ selectedPayment }}</h3>
-      <button @click="showConfirmationModal = true" class="btn btn-success">Konfirmasi Pembayaran</button>
+    <div v-if="order.payment_status === 1">
+      <button id="pay-button" class="btn btn-primary">Pay Now</button>
+    </div>
+    <div v-else>
+      <p>Payment successful</p>
     </div>
 
     <div v-if="receiptVisible" class="receipt">
@@ -35,13 +37,14 @@
       </li>
     </ul>
         <p><strong>Total Pembayaran: {{ currency(total) }}</strong></p>
-        <p class="payment-instruction">Silakan bayar di kasir</p> <!-- Tambahkan teks di sini -->
+        <p class="payment-instruction">Silakan bayar di kasir Melalui Cash / Debit </p> <!-- Tambahkan teks di sini -->
       </div>
      
       <div v-if="selectedPayment === 'debit'" class="qr-code">
-        <h3>Scan QR Code untuk Pembayaran</h3>
+        <h3>Scan QR Code & QRIS Payment </h3>
         <img :src="generateQRCode()" alt="QR Code" />
       </div>
+      <button @click="downloadReceipt" class="btn btn-success">Download Receipt</button>
     </div>
 
     </div>
@@ -61,7 +64,8 @@ import { currency } from '@/libs/utils';
 import { useRoute } from 'vue-router';
 import { ref, computed, onMounted } from 'vue';
 import QRCode from 'qrcode-generator';
-import backgroundImage from '@/assets/images/ppp.png'; // Sesuaikan dengan path gambar Anda
+import jsPDF from 'jspdf';
+import axios from 'axios';
 
 const route = useRoute();
 const cart = ref([]);
@@ -69,10 +73,135 @@ const selectedPayment = ref(null);
 const receiptVisible = ref(false);
 const queueNumber = ref(null);
 const showConfirmationModal = ref(false);
-const orderItems = ref([]);
+const orderId = ref(""); // This should be dynamically generated
+const totalAmount = ref(0);
+
+
+
 
 function selectPayment(method: string) {
   selectedPayment.value = method;
+}
+
+function downloadReceipt() {
+  const doc = new jsPDF();
+
+  // Header
+  doc.setFontSize(16);
+  doc.text("==================================", 20, 40);
+  doc.text("Toko : Siam Spice Co.", 20, 10);
+  doc.setFontSize(12);
+  doc.text("==================================", 20, 40);
+  doc.text("Jl. Jendral Sudirman. 10, Surabaya", 20, 20);
+  doc.text(`Tanggal: ${new Date().toLocaleString()}`, 20, 30);
+  doc.text("==================================", 20, 40);
+  
+  // Receipt Title
+  doc.setFontSize(14);
+  doc.setFont("Helvetica", "bold"); // Set font to bold
+  doc.text("Struk Pembayaran", 20, 50);
+  doc.setFont("Helvetica", "normal"); // Reset to normal
+  doc.text("==================================", 20, 60);
+  
+  // Payment Method
+  doc.setFontSize(12);
+  doc.setFont("Helvetica", "bold"); // Set font to bold for these lines
+  doc.text(`Nomer Antrian: ${queueNumber.value}`, 20, 70);
+  doc.text(`Metode Pembayaran: ${selectedPayment.value}`, 20, 80);
+  doc.setFont("Helvetica", "normal"); // Reset to normal
+  
+  // Item List
+  doc.text("Item Pesanan:", 20, 90);
+  doc.text("==================================", 20, 100);
+  
+  let yOffset = 110; // Y offset for items
+  cart.value.forEach(item => {
+    const line = `${item.name} - ${item.quantity} x ${currency(item.price)} = ${currency(item.price * item.quantity)}`;
+    doc.text(line, 20, yOffset);
+    yOffset += 10; // Increase line height
+  });
+
+  doc.text("==================================", 20, yOffset);
+  yOffset += 10;
+  doc.setFont("Helvetica", "bold"); // Set font to bold for the total line
+  doc.text(`Total Pembayaran: ${currency(total.value)}`, 20, yOffset);
+  doc.setFont("Helvetica", "normal"); // Reset to normal
+  yOffset += 10;
+  doc.text("Silakan bayar di kasir", 20, yOffset);
+
+  // Footer
+  yOffset += 20;
+  doc.setFont("Helvetica", "bold"); // Set font to bold for the footer
+  doc.text("========THANKS FOR COMING IN HERE!!!!!!!!!!!========", 20, yOffset);
+  doc.setFont("Helvetica", "normal"); // Reset to normal
+
+  // Save PDF
+  doc.save("struk_pembayaran.pdf");
+}
+
+
+
+
+// Inisialisasi status pesanan
+const order = ref({ payment_status: 1 });
+const snapToken = ref('');
+let clientKey = 'YOUR_CLIENT_KEY'; // Ganti dengan logika untuk mendapatkan kunci klien
+
+// Fungsi untuk memuat skrip Midtrans Snap
+const loadMidtransScript = () => {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = "https://app.sandbox.midtrans.com/snap/snap.js";
+        script.setAttribute('data-client-key', clientKey);
+        script.onload = () => resolve(true);
+        script.onerror = () => reject(new Error('Gagal memuat skrip Midtrans'));
+        document.body.appendChild(script);
+    });
+};
+
+// Ambil status pesanan dan token
+const fetchOrderData = async (orderId) => {
+    try {
+        const response = await axios.get(`/orders/${orderId}`); // Pastikan ini menggunakan endpoint yang benar
+        order.value.payment_status = response.data.payment_status;
+        clientKey = response.data.client_key;
+    } catch (error) {
+        console.error('Error fetching order data:', error);
+    }
+};
+
+const fetchSnapToken = async (orderId) => {
+    try {
+        const response = await axios.post('/orders/snap-token', { order_id: orderId }); // Perbaikan di sini
+        snapToken.value = response.data.snap_token;
+    } catch (error) {
+        console.error('Error fetching snap token:', error);
+    }
+};
+
+// Gunakan onMounted untuk memuat skrip saat komponen dipasang
+onMounted(() => {
+    const orderId = 1; // Ganti dengan ID pesanan yang sesuai
+    fetchOrderData(orderId);
+    loadMidtransScript()
+        .then(() => {
+            console.log('Skrip Midtrans berhasil dimuat');
+            return fetchSnapToken(orderId); // Ambil token setelah skrip dimuat
+        })
+        .then(() => {
+            console.log('Token snap berhasil diambil:', snapToken.value);
+            // Anda dapat memulai pembayaran di sini jika diperlukan
+        })
+        .catch(error => {
+            console.error('Kesalahan saat memuat skrip Midtrans:', error);
+        });
+});
+
+
+function showReceipt() {
+  queueNumber.value = Math.floor(Math.random() * 1000);
+  receiptVisible.value = true;
+  showConfirmationModal.value = false;
 }
 
 function confirmPayment() {
@@ -119,7 +248,7 @@ function generateQRCode() {
 
 <style>
 body {
-  background: url('@/assets/images/ppp.png') no-repeat center center fixed;
+  background: url('@/assets/images/aaa.png') no-repeat center center fixed;
   background-size: cover;
   font-family: 'Arial', sans-serif;
 }
@@ -130,7 +259,7 @@ body {
   text-align: center;
   padding: 20px;
   background: #ffffff;
-  border-radius: 50px;
+  border-radius: 20px;
   box-shadow: 0 6px 1000px rgba(0, 0, 0, 0.2);
 }
 
@@ -174,6 +303,7 @@ body {
 }
 
 .btn-success {
+  margin-top: 20px;
   background-color: #28a745;
 }
 
@@ -204,7 +334,7 @@ body {
   padding-right: 150px;
   background: #e0f7fa;
   border-radius: 20px;
-  box-shadow: 10px 15px 15px rgba(0, 0, 0, 0.1);
+  
   max-width: 800px; /* Atur lebar maksimum lebih besar */
   width: 100%; /* Agar bisa responsif di layar kecil */
   height: auto; /* Tinggi otomatis sesuai konten */
@@ -214,6 +344,7 @@ body {
 
 
 .qr-code {
+  border-radius: 30px;
   margin-top: 20px;
   margin-bottom: auto;
 }

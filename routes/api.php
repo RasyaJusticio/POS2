@@ -6,6 +6,8 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\OrderController;
+
 
 use Illuminate\Support\Facades\Route;
 
@@ -84,3 +86,9 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
             });
     
         });
+
+Route::prefix('orders')->group(function () {
+    Route::get('/{id}', [OrderController::class, 'show']);
+    Route::post('/snap-token', [OrderController::class, 'getSnapToken']);
+
+});
