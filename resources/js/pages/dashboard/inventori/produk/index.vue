@@ -36,7 +36,7 @@ const columns = [
     header: "Image",
     cell: (cell) =>
         h("img", {
-            src: `/storage/${cell.getValue()}`,
+            src: `/storage/produk/${cell.getValue()}`,
             alt: "Product Image",
             width: 100,
         }),

@@ -23,7 +23,7 @@ const formData = ref<Product>({} as Product);
 const imagePreview = ref<string | null>(null);
 const formRef = ref();
 const photo = ref<any>([]);
-const fileTypes = ref(["image/jpeg", "image/png", "image/jpg"]);
+const fileTypes = ref(["image_url/jpeg", "image_url/png", "image_url/jpg"]);
 
 // Skema validasi menggunakan Yup
 const formSchema = Yup.object().shape({
