@@ -33,10 +33,14 @@ const columns = [
         header: "Description",
     }),
     column.accessor("image_url", {
-        header: "Image",
-        cell: (cell) =>
-            h("img", { src: cell.getValue(), alt: "Product Image", width: 100 }),
-    }),
+    header: "Image",
+    cell: (cell) =>
+        h("img", {
+            src: `/storage/${cell.getValue()}`,
+            alt: "Product Image",
+            width: 100,
+        }),
+}),
     column.accessor("id", {
         header: "Actions",
         cell: (cell) =>
