@@ -437,18 +437,9 @@
  
 <section id="contact" class="contact-section text-center mb-5">
     <div class="container">
-      
         <h2 class="mb-4">Get in Touch with Us</h2>
         <p class="lead mb-4">We're here to serve you! For inquiries, feedback, or reservations, please reach out.</p>
-        
-
-          <!-- Menambahkan video di atas bagian tim -->
-  <div class="background-container">
-    <video autoplay muted loop class="video-layer">
-      <source src="@/assets/images/kg.mp4" type="video/mp4">
-      Your browser does not support the video tag.
-    </video>
-  </div>
+                 
         <div class="social-icons mb-4">
             <a href="https://www.instagram.com/whozviaa?igsh=emp5YnBpZzI3MzNi" target="_blank" class="btn btn-outline-danger mx-2">
                 <i class="fab fa-instagram"></i> Instagram
@@ -460,8 +451,6 @@
                 <i class="fab fa-facebook-f"></i> Facebook
             </a>
         </div>
-
-        
 
         <h3 class="mt-5" style="padding-top: 80px;">Find Us Here</h3>
         <div class="map-container mb-4">
@@ -476,38 +465,39 @@
         </div>
         
         <div class="reservation-section">
-        <h3 class="mt-5">Make a Reservation</h3>
-        <form @submit.prevent="submitReservation" class="mb-4">
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <label for="name">Name</label>
-              <input type="text" class="form-control" id="name" v-model="reservation.name" required />
-            </div>
-            <div class="form-group col-md-6">
-              <label for="phone">Phone</label>
-              <input type="tel" class="form-control" id="phone" v-model="reservation.phone" required />
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <label for="date">Date</label>
-              <input type="date" class="form-control" id="date" v-model="reservation.date" required />
-            </div>
-            <div class="form-group col-md-6">
-              <label for="time">Time</label>
-              <input type="time" class="form-control" id="time" v-model="reservation.time" required />
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="guests">Number of Guests</label>
-            <input type="number" class="form-control" id="guests" v-model="reservation.guests" min="1" required />
-          </div>
-          <button type="submit" class="btn btn-lg btn-info">Reserve Table</button>
-        </form>
-      </div>
+            <h3 class="mt-5">Make a Reservation</h3>
+            <form @submit.prevent="submitReservation" class="mb-4">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="name">Name</label>
+                        <input type="text" class="form-control" id="name" v-model="reservation.name" required />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="phone">Phone</label>
+                        <input type="tel" class="form-control" id="phone" v-model="reservation.phone" required />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="date">Date</label>
+                        <input type="date" class="form-control" id="date" v-model="reservation.date" required />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="time">Time</label>
+                        <input type="time" class="form-control" id="time" v-model="reservation.time" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="guests">Number of Guests</label>
+                    <input type="number" class="form-control" id="guests" v-model="reservation.guests" min="1" required />
+                </div>
+                <button type="submit" class="btn-reserve">Reserve Table</button>
 
+            </form>
+        </div>
     </div>
 </section>
+
       
     </main>
   </div>
@@ -515,6 +505,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+
 
 const reservation = ref({
   name: '',
@@ -890,12 +881,12 @@ h3 {
 }
 
 .btn-outline-primary {
-  border-color: #d9534f;
-  color: #d9534f;
+  border-color: #105fc7;
+  color: #000000;
 }
 
 .btn-outline-primary:hover {
-  background-color: #d9534f;
+  background-color: #1c84c0;
   color: white;
 }
 
@@ -948,7 +939,7 @@ h3 {
 
 /*-------------------------------------------CSS CONTACT-------------------------------------*/
 .contact-section {
-    background-color: #f9f9f9;
+    background-color: #ffffff;
     padding: 40px 0;
 }
 
@@ -994,7 +985,7 @@ h3 {
 
 h5 {
     font-size: 1.5rem; /* Font size for the chef's name */
-    color: #007bff; /* Blue color for the name */
+    color: #803e20; /* Blue color for the name */
     margin-bottom: 10px; /* Space below the name */
 }
 
@@ -1102,4 +1093,19 @@ p {
   border-bottom: none; /* Remove border from last row */
 }
 
+.btn-reserve {
+  background-color: #1a217c; /* Warna hijau */
+  color: white; /* Teks berwarna putih */
+  border: none; /* Tanpa border */
+  padding: 15px 30px; /* Padding tombol */
+  font-size: 1.25rem; /* Ukuran font */
+  border-radius: 5px; /* Sudut melingkar */
+  transition: background-color 0.3s, transform 0.3s; /* Efek transisi */
+  margin-top: 5%;
+}
+
+.btn-reserve:hover {
+  background-color: #1a217c; /* Warna lebih gelap saat hover */
+  transform: scale(1.05); /* Efek pembesaran */
+}
 </style>
