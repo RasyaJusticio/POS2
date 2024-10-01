@@ -151,20 +151,31 @@ const routes: Array<RouteRecordRaw> = [
                     pageTitle: "Landing Index",
                 },
             },
-
-            {
-                path: "/landing/thai", // untuk rute dasar "/landing"
-                name: "landingthai",
-                component: () => import("@/pages/landing/thai.vue"), // Pastikan path ini sesuai
-                meta: {
-                    pageTitle: "Landing Index",
-                },
-            },
             
             
         ],
     },
+
     
+
+    {
+        path: "/landing/thai", // untuk rute dasar "/landing"
+        name: "landingthai",
+        component: () => import("@/pages/landing/thai.vue"), // Pastikan path ini sesuai
+        meta: {
+            pageTitle: "Landing Index",
+        },
+    },
+
+    {
+        path: "/landing/payment", // untuk rute dasar "/landing"
+        name: "landingcheck",
+        component: () => import("@/pages/landing/payment.vue"), // Pastikan path ini sesuai
+        meta: {
+            pageTitle: "Landing Index",
+        },
+    },
+
 
     {
         path: "/",

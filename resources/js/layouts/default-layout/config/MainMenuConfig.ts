@@ -22,7 +22,7 @@ const MainMenuConfig: Array<MenuItem> = [
             {
                 sectionTitle: "Master",
                 route: "/master",
-                keenthemesIcon: "cube-3",
+                keenthemesIcon: "user-square",
                 name: "master",
                 sub: [
                     {

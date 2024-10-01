@@ -16,16 +16,16 @@ const { delete: deleteUser } = useDelete({
 
 const columns = [
     column.accessor("no", {
-        header: "#",
+        header: "No",
     }),
     column.accessor("name", {
         header: "Nama",
     }),
+    column.accessor("address", {
+        header: "Alamat",
+    }),
     column.accessor("email", {
         header: "Email",
-    }),
-    column.accessor("phone", {
-        header: "No. Telp",
     }),
     column.accessor("uuid", {
         header: "Aksi",

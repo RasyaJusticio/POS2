@@ -24,6 +24,7 @@ const formRef = ref();
 
 const formSchema = Yup.object().shape({
     name: Yup.string().required("Nama harus diisi"),
+    address: Yup.string().required("Alamat harus diisi"),
     email: Yup.string()
         .email("Email harus valid")
         .required("Email harus diisi"),
@@ -53,8 +54,11 @@ function getEdit() {
 }
 
 function submit() {
+    alert("Test");
+
     const formData = new FormData();
     formData.append("name", user.value.name);
+    formData.append("address", user.value.address);
     formData.append("email", user.value.email);
     formData.append("phone", user.value.phone);
     formData.append("role_id", user.value.role_id);
@@ -161,6 +165,28 @@ watch(
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">
                                 <ErrorMessage name="name" />
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Input group-->
+                </div>
+                <div class="col-md-6">
+                    <!--begin::Input group-->
+                    <div class="fv-row mb-7">
+                        <label class="form-label fw-bold fs-6 required">
+                            Alamat
+                        </label>
+                        <Field
+                            class="form-control form-control-lg form-control-solid"
+                            type="text"
+                            name="alamat"
+                            autocomplete="off"
+                            v-model="user.address"
+                            placeholder="Masukkan Alamat"
+                        />
+                        <div class="fv-plugins-message-container">
+                            <div class="fv-help-block">
+                                <ErrorMessage name="address" />
                             </div>
                         </div>
                     </div>

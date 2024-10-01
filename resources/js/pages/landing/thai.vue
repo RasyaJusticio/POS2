@@ -1,8 +1,11 @@
 <template>
   <header class="pos-header">
-    <h1 class="header-title">OUR MENU</h1>
-    <div class="header-image" style="text-align: center; margin: 20px 0;">
-      <img :src="'media/avatars/spice.png'" alt="Spice Image" style="max-width: 100%; height: auto;" />
+      <router-link to="/landing/PAGE">
+        <button class="btn btn-lg btn-secondary">
+    <i class="fas fa-arrow-left "></i>
+</button>            </router-link>
+    <div class="header-image">
+      <img src="@/assets/images/spice.png" alt="Spice Image" style="max-width: 60%; height: auto;" />
     </div>
     <div class="pos-actions">
       <div class="search-container">
@@ -46,8 +49,8 @@
                   <span class="item-price">{{ formatCurrency(item.price) }}</span>
                   <div class="btn-container">
                     <button @click="addToCart(item)" class="btn btn-primary">
-                      <i class="fas fa-shopping-cart"></i>
-                    </button>
+                 <i class="fas fa-shopping-cart"></i>
+                 </button>
                   </div>
                 </div>
               </div>
@@ -57,18 +60,19 @@
       </main>
   
       <!-- Fixed cart button -->
-  <button @click="toggleCart" class="floating-cart-button">
-      <i class="fas fa-shopping-cart"></i>
-      <span class="cart-count">{{ cartTotalQuantity }}</span>
-  </button>
-  
+      <button @click="toggleCart" class="btn btn-primary">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-count">{{ cartTotalQuantity }}</span>
+        </button>
+        
   
       <!-- Shopping Cart -->
       <aside v-if="isCartVisible" class="pos-cart">
         <h2 style="padding-top: 20px;">Shopping Cart</h2>
         <ul class="cart-list">
           <li v-for="cartItem in cart" :key="cartItem.id" class="cart-item">
-            <span>{{ cartItem.name }}</span>
+              <!-- <span> {{ cart }} </span> -->
+              <span>{{ cartItem.name }}</span>
             <span>{{ cartItem.quantity }} x {{ formatCurrency(cartItem.price) }}</span>
             <button @click="removeFromCart(cartItem)" class="btn btn-secondary">Remove</button>
           </li>
@@ -77,7 +81,10 @@
         <div class="total">
           <strong>Total: {{ formatCurrency(total) }}</strong>
         </div>
-        <button @click="checkout" class="btn btn-success" style="margin-right: 10px;">Checkout</button>
+        <router-link :to="{ path: '/landing/payment', query: { cart: JSON.stringify(cart) } }">
+  <button class="btn btn-success" style="margin-right: 30px;">Checkout</button>
+</router-link>
+
         <button @click="clearCart" class="btn btn-danger">Clear Cart</button>
   
       </aside>
@@ -110,6 +117,7 @@
   import paorImage from '@/assets/images/P Aor.jpg';
   import pranakornImage from '@/assets/images/Pranakorn .jpg';
   import savoeyImage from '@/assets/images/Savoey.jpg';
+  
   
   
   // Sample data for items
@@ -220,11 +228,9 @@
     align-items: center;
     margin-bottom: 20px;
   }
-  
-  .header-title {
-    font-size: 2.5rem;
-    color: #333;
-    text-transform: uppercase;
+
+  .header-image {
+    margin-left: 33%;
   }
   
   .pos-actions {
@@ -395,17 +401,7 @@
     color: #28a745;
     margin-bottom: 10px;
   }
-  
-  .btn-primary {
-    background-color: #007bff;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
+
   .btn-primary {
       position: fixed; /* Fixes the button at a specific position */
       bottom: 20px; /* Adjust this value to move it up or down */
@@ -428,13 +424,13 @@
   }
   
   .btn-secondary {
-    background-color: #ffffff;
+    background-color: #8d8e8e;
     color: rgb(0, 0, 0);
     border: none;
     padding: 10px 15px;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.4s;
     margin-left: 10px;
   }
   
@@ -467,18 +463,18 @@
       border-radius: 50%;
       width: 60px;
       height: 60px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 10px rgb(14, 15, 72);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: background-color 0.3s, transform 0.3s;
+      transition: background-color 0.1s, transform 0.1s;
       z-index: 1000;
   }
   
   .floating-cart-button {
       width: 80px; /* Increased size */
-      height: 80px; /* Increased size */
+      height: 85px; /* Increased size */
   }
   
   
