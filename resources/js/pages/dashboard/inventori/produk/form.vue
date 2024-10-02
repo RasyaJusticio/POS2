@@ -23,7 +23,7 @@ const formData = ref<Product>({} as Product);
 const imagePreview = ref<string | null>(null);
 const formRef = ref();
 const photo = ref<any>([]);
-const fileTypes = ref(["image_url/jpeg", "image_url/png", "image_url/jpg"]);
+const fileTypes = ref(["image/jpeg", "image/png", "image/jpg"]);
 
 // Skema validasi menggunakan Yup
 const formSchema = Yup.object().shape({
@@ -37,13 +37,15 @@ const formSchema = Yup.object().shape({
 // Fungsi untuk mendapatkan data produk yang akan diedit
 function getEdit() {
     block(document.getElementById("form-produk"));
-    ApiService.get("/inventori/produk", props.selected)
+    ApiService.get(`/inventori/produk/${props.selected}`)
         .then(({ data }) => {
             formData.value = data.produk;
             if (data.product.image_url) {
-                imagePreview.value = "/storage/" + data.produk.image_url;
-                photo.value = ["/storage/" + data.produk.image_url];
+                toast.info("Retrieving existing photo")
+                imagePreview.value = data.produk.image_url;
+                photo.value = [data.produk.image_url];
             } else {
+                toast.info("There's no existing photo")
                 photo.value = [];
             }
         })
@@ -86,7 +88,7 @@ function submit() {
         ? `/inventori/produk/${props.selected}`
         : "/inventori/produk/store";
 
-    const method = props.selected ? "put" : "post";
+    const method = "post";
 
     axios({
         method: method,
@@ -121,6 +123,7 @@ watch(
     () => props.selected,
     () => {
         if (props.selected) {
+            toast.info("Toas")
             getEdit();
         }
     }

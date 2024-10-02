@@ -12,13 +12,24 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $per = $request->per ?? 10;
-        $page = $request->page ? $request->page - 1 : 0;
+        $per = $request->input('per', 10); // Jumlah item per halaman, default 10
+        $category = $request->input('category'); // Mengambil parameter kategori dari request
 
-        $data = Product::paginate($per);
+        // Query produk
+        $query = Product::query();
 
-        return response()->json($data);
+        // Filter berdasarkan kategori jika ada
+        if ($category) {
+            $query->where('category', 'LIKE', '%' . $category . '%');
+        }
+
+        // Paginate hasil query
+        $products = $query->paginate($per);
+
+        return response()->json($products);
     }
+
+    
 
     public function store(StoreProductRequest $request)
     {

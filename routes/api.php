@@ -75,12 +75,22 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
 
         Route::prefix('inventori')->group(function () {
             Route::middleware('can:inventori-produk')->group(function () {
-                Route::get('produk', [ProductController::class, 'get']);
-                Route::get('produk/{product}', [ProductController::class, 'show']);
-                Route::post('produk', [ProductController::class, 'index']);
-                Route::post('produk/store', [ProductController::class, 'store']);
-                Route::apiResource('produk', ProductController::class)
-                    ->except(['index', 'store'])->scoped(['product' => 'id']);
+                
+                
+                Route::group(['prefix' => 'produk'], function () {
+                    // Route::get('/', [ProductController::class, 'get']);
+                    Route::get('/', [ProductController::class, 'index']);
+                    Route::post('/', [ProductController::class, 'index']);
+                    Route::post('/store', [ProductController::class, 'store']);
+                    
+                    Route::group(['prefix' => '{id}'], function () { // produk/{product_id}
+                        Route::get('/', [ProductController::class, 'show']); // GET: produk/{product_id}
+                        Route::post('/', [ProductController::class, 'update']);
+                        Route::delete('/', [ProductController::class, 'destroy']);
+                    });
+                });
+                // Route::apiResource('produk', ProductController::class)
+                //     ->except(['index', 'store'])->scoped(['product' => 'id']);
             });
     
         });

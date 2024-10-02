@@ -1,8 +1,8 @@
 <template>
   <div class="default-layout">
     <header>
-      <nav class="navbar navbar-expand-lg">
-        <div class="container-fluid d-flex justify-content-between align-items-center ">
+      <nav class="navbar navbar-expand-lg navbar-dark transparent-navbar">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
           <router-link class="navbar-brand" to="/">
             <img src="@/assets/images/siam2.png"  class="rounded-4" alt="Logo" style="width: auto; height: 100px;" /> <!-- Add your logo here -->
           </router-link>
@@ -11,10 +11,10 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarNav">
             <div class="navbar-nav ms-auto">
-              <router-link class="nav-link" to="/">Home</router-link>
-              <router-link class="nav-link" to="/menu">Menu</router-link>
-              <router-link class="nav-link" to="#pricing">Pricing</router-link>
-              <router-link class="nav-link" to="/about">About Us</router-link>
+              <router-link class="nav-link" to="#home"><i class="fas fa-home"></i> Home</router-link>
+              <router-link class="nav-link" to="#menu"><i class="fas fa-utensils"></i> Menu</router-link>
+              <router-link class="nav-link" to="#about"><i class="fas fa-info-circle"></i> About Us</router-link>
+              <router-link class="nav-link" to="#contact"><i class="fas fa-envelope"></i> Contact</router-link>
             </div>
           </div>
         </div>
@@ -26,12 +26,7 @@
     </main>
 
     <footer>
-      <p>&copy; {{ new Date().getFullYear() }} Siam Spice. All Rights Reserved.</p>
-      <div class="social-icons">
-        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-      </div>
+      <p>&copy; {{ new Date().getFullYear() }} Siam Spice Co. All Rights Reserved.</p>
     </footer>
   </div>
 </template>
@@ -44,6 +39,8 @@ const title = ref('Siam Spice'); // Change this to your desired title
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
 .default-layout {
   display: flex;
   flex-direction: column;
@@ -53,8 +50,20 @@ const title = ref('Siam Spice'); // Change this to your desired title
 }
 
 header {
-  background-color: #343a40; /* Dark header */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: fixed; /* Fixed position */
+  top: 0; /* Stick to the top */
+  width: 100%; /* Full width */
+  z-index: 1000; /* Above other content */
+}
+
+.transparent-navbar {
+  background: rgba(1, 13, 24, 0.815); /* Transparent background */
+  backdrop-filter: blur(4px); /* Blur effect */
+  box-shadow: none; /* Remove shadow */
+}
+
+main {
+  margin-top: 80px; /* Adjust based on the height of the navbar */
 }
 
 .navbar {
@@ -63,7 +72,7 @@ header {
 
 .logo {
   height: 80px; /* Logo size */
-  transition: transform 0.3s; /* Logo scaling effect */
+  transition: transform 0.3s; /* Scale on hover */
 }
 
 .logo:hover {
@@ -73,14 +82,22 @@ header {
 .nav-link {
   color: #ffffff; /* Link color */
   margin: 0 15px; /* Space between links */
-  padding: 10px 15px; /* Add padding for clickable area */
+  padding: 10px 15px; /* Padding for clickable area */
   transition: background-color 0.3s, color 0.3s; /* Smooth transitions */
+  border-radius: 5px; /* Rounded corners */
+  font-weight: bold; /* Make text bold */
+  display: flex;
+  align-items: center;
+}
+
+.nav-link i {
+  margin-right: 8px; /* Adjusted space between icon and text */
+  font-size: 1.1rem; /* Icon size */
 }
 
 .nav-link:hover {
-  background-color: #d9534f; /* Highlight color on hover */
-  color: #ffffff; /* Keep text color on hover */
-  border-radius: 5px; /* Rounded corners on hover */
+  background-color: rgba(255, 255, 255, 0.1); /* Highlight on hover */
+  color: #d9534f; /* Change text color on hover */
 }
 
 footer {
@@ -89,6 +106,7 @@ footer {
   text-align: center;
   padding: 20px;
   margin-top: auto; /* Push footer to the bottom */
+  font-weight: bold; /* Make footer text bold */
 }
 
 footer p {
@@ -108,5 +126,16 @@ footer p {
 
 .social-icons a:hover {
   color: #d9534f; /* Change icon color on hover */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .nav-link {
+    padding: 8px 10px; /* Smaller padding on mobile */
+  }
+
+  .logo {
+    height: 60px; /* Adjust logo size for mobile */
+  }
 }
 </style>
