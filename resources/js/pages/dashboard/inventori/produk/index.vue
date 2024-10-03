@@ -12,6 +12,10 @@ const selected = ref<number | undefined>(undefined);
 const openForm = ref<boolean>(false);
 const selectedCategory = ref<string>("");
 
+const { delete: deleteProduct } = useDelete({
+    onSuccess: () => paginateRef.value.refetch(),
+});
+
 const categories = ref([
     { id: "1", name: "makanan" },
     { id: "2", name: "dessert" },
