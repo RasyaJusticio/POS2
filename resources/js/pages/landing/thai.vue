@@ -166,7 +166,7 @@
   // Calculate total quantity in cart
   const cartTotalQuantity = computed(() => {
     return cart.value.reduce((acc, item) => acc + item.quantity, 0);
-  });
+  });//
   
   // Format currency to Rupiah
   const formatCurrency = (value) => {

@@ -10,17 +10,20 @@ const column = createColumnHelper<Product>();
 const paginateRef = ref<any>(null);
 const selected = ref<number | undefined>(undefined);
 const openForm = ref<boolean>(false);
+const selectedCategory = ref<string>("");
 
-const { delete: deleteProduct } = useDelete({
-    onSuccess: () => paginateRef.value?.refetch(), // Refetch setelah delete
-});
+const categories = ref([
+    { id: "1", name: "makanan" },
+    { id: "2", name: "dessert" },
+    { id: "3", name: "minuman" },
+]);
 
 const columns = [
     column.accessor("name", {
         header: "Product Name",
     }),
     column.accessor("category", {
-        header: "Category", // Kolom kategori setelah nama
+        header: "Category",
     }),
     column.accessor("price", {
         header: "Price",
@@ -35,7 +38,11 @@ const columns = [
     column.accessor("image_url", {
         header: "Image",
         cell: (cell) =>
-            h("img", { src: cell.getValue(), alt: "Product Image", width: 100 }),
+            h("img", {
+                src: `${cell.getValue()}`,
+                alt: "Product Image",
+                width: 100,
+            }),
     }),
     column.accessor("id", {
         header: "Actions",
@@ -65,7 +72,8 @@ const columns = [
     }),
 ];
 
-const refresh = () => paginateRef.value?.refetch(); // Refetch table saat dibutuhkan
+// Fungsi untuk refresh tabel
+const refresh = () => paginateRef.value?.refetch();
 
 watch(openForm, (val) => {
     if (!val) {
@@ -73,6 +81,21 @@ watch(openForm, (val) => {
     }
     window.scrollTo(0, 0); // Scroll ke atas saat buka/tutup form
 });
+
+watch(selectedCategory, (newCategory) => {
+    if (paginateRef.value) {
+        const params = { per: 10 }; // Set jumlah item per halaman
+        if (newCategory) {
+            params.category = newCategory; // Mengirim kategori sebagai parameter
+        } else {
+            delete params.category; // Menghapus parameter kategori jika tidak ada
+        }
+        paginateRef.value.setParams(params); // Set parameter untuk request
+        paginateRef.value.refetch(); // Meminta ulang data
+    }
+});
+
+
 </script>
 
 <template>
@@ -86,6 +109,16 @@ watch(openForm, (val) => {
     <div class="card">
         <div class="card-header align-items-center">
             <h2 class="mb-0">Product List</h2>
+
+            <!-- Dropdown Kategori -->
+            <select v-model="selectedCategory" class="form-select me-3" style="width: auto">
+                <option value="">All Categories</option>
+                <option v-for="category in categories" :key="category.id" :value="category.name.toLowerCase()">
+                    {{ category.name }}
+                </option>
+            </select>
+
+            <!-- Tombol Tambah Produk -->
             <button
                 type="button"
                 class="btn btn-sm btn-primary ms-auto"
@@ -96,7 +129,9 @@ watch(openForm, (val) => {
                 <i class="la la-plus"></i>
             </button>
         </div>
+
         <div class="card-body">
+            <!-- Komponen Pagination -->
             <paginate
                 ref="paginateRef"
                 id="table-produk"

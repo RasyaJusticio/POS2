@@ -19,6 +19,8 @@ Route::get('/', function () {
     return view('app');
 });
 
+
+
 // Menangani rute wildcard
 Route::get('/{any}', function () {
     return view('app');
