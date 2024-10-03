@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Route;
 // Authentication Route
 Route::middleware(['json'])->prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->withoutMiddleware('auth');
-    Route::post('register', [AuthController::class, 'register'])->withoutMiddleware('auth'); // Rute untuk registrasi
+    Route::post('reset-password', [AuthController::class, 'reset']);
     Route::delete('logout', [AuthController::class, 'logout']);
     Route::get('me', [AuthController::class, 'me']);
 });
@@ -84,3 +84,5 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
             });
     
         });
+
+        

@@ -127,11 +127,11 @@ const routes: Array<RouteRecordRaw> = [
                 },
             },
             {
-                path: "/register",
-                name: "register",
-                component: () => import("@/pages/auth/sign-up/Index.vue"),
+                path: "/resets",
+                name: "resets",
+                component: () => import("@/pages/auth/resets/Index.vue"),
                 meta: {
-                    pageTitle: "Register",
+                    pageTitle: "Resets",
                     middleware: "guest",
                 },
             },

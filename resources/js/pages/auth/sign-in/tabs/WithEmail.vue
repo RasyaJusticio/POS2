@@ -24,8 +24,8 @@
                     v-model="data.password" autocomplete="off" />
                 
                 <!-- Tautan ke halaman pendaftaran -->
-                <router-link to="/register" class="link-primary fs-6 fw-bold">
-                    Register?
+                <router-link to="/resets" class="link-primary fs-6 fw-bold">
+                    Reset Password?
                 </router-link>
                 
                 <span class="btn btn-sm btn-icon position-absolute translate-middle top-50 end-0 me-n2">
