@@ -15,12 +15,8 @@
       </div>
     </div>
 
-    <div v-if="order.payment_status === 1">
-      <button id="pay-button" class="btn btn-primary">Pay Now</button>
-    </div>
-    <div v-else>
-      <p>Payment successful</p>
-    </div>
+      <button @click="handlePayment" class="btn btn-primary">Pay Now</button>
+
 
     <div v-if="receiptVisible" class="receipt">
       <h2>Struk Pembayaran</h2>
@@ -75,7 +71,7 @@ const queueNumber = ref(null);
 const showConfirmationModal = ref(false);
 const orderId = ref(""); // This should be dynamically generated
 const totalAmount = ref(0);
-
+const snapToken = '{{ $snapToken }}';
 
 
 
@@ -139,63 +135,23 @@ function downloadReceipt() {
   doc.save("struk_pembayaran.pdf");
 }
 
-
-
-
-// Inisialisasi status pesanan
-const order = ref({ payment_status: 1 });
-const snapToken = ref('');
-let clientKey = 'YOUR_CLIENT_KEY'; // Ganti dengan logika untuk mendapatkan kunci klien
-
-// Fungsi untuk memuat skrip Midtrans Snap
-const loadMidtransScript = () => {
-    return new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = "https://app.sandbox.midtrans.com/snap/snap.js";
-        script.setAttribute('data-client-key', clientKey);
-        script.onload = () => resolve(true);
-        script.onerror = () => reject(new Error('Gagal memuat skrip Midtrans'));
-        document.body.appendChild(script);
-    });
-};
-
-// Ambil status pesanan dan token
-const fetchOrderData = async (orderId) => {
-    try {
-        const response = await axios.get(`/orders/${orderId}`); // Pastikan ini menggunakan endpoint yang benar
-        order.value.payment_status = response.data.payment_status;
-        clientKey = response.data.client_key;
-    } catch (error) {
-        console.error('Error fetching order data:', error);
-    }
-};
-
-const fetchSnapToken = async (orderId) => {
-    try {
-        const response = await axios.post('/orders/snap-token', { order_id: orderId }); // Perbaikan di sini
-        snapToken.value = response.data.snap_token;
-    } catch (error) {
-        console.error('Error fetching snap token:', error);
-    }
-};
-
-// Gunakan onMounted untuk memuat skrip saat komponen dipasang
-onMounted(() => {
-    const orderId = 1; // Ganti dengan ID pesanan yang sesuai
-    fetchOrderData(orderId);
-    loadMidtransScript()
-        .then(() => {
-            console.log('Skrip Midtrans berhasil dimuat');
-            return fetchSnapToken(orderId); // Ambil token setelah skrip dimuat
-        })
-        .then(() => {
-            console.log('Token snap berhasil diambil:', snapToken.value);
-            // Anda dapat memulai pembayaran di sini jika diperlukan
-        })
-        .catch(error => {
-            console.error('Kesalahan saat memuat skrip Midtrans:', error);
+function handlePayment() {
+  axios.post(`/orders/checkout/40c5db80-e1b8-4889-9895-e9dd79f47429`)
+    .then(response => {
+      if (window.snap) {
+        window.snap.pay(response.data.payment_url, {
+          onSuccess: (result) => {
+            console.log("Pembayaran berhasil:", result);
+          }
         });
-});
+      }
+    })
+    .catch(error => {
+        console.error('Error during order checkout:', error);
+    });
+}
+
+
 
 
 function showReceipt() {
@@ -226,6 +182,8 @@ onMounted(() => {
   if (cartParam) {
     cart.value = JSON.parse(cartParam);
   }
+
+  console.log(cartParam)
 });
 
 const total = computed(() => {

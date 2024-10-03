@@ -88,7 +88,6 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
         });
 
 Route::prefix('orders')->group(function () {
-    Route::get('/{id}', [OrderController::class, 'show']);
-    Route::post('/snap-token', [OrderController::class, 'getSnapToken']);
-
+    Route::post('/checkout/{uuid}', [OrderController::class, 'payment']);
+    Route::get('/show/${uuid}', [OrderController::class, 'show']);
 });

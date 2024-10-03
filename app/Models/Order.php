@@ -2,17 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Traits\Uuid;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Order extends Model
 {
-    use HasFactory;
+    use HasFactory, Uuid;
 
     protected $fillable = [
-        'customer_name',
-        'payment_status',
-        'total_amount',
-        'client_key',
+        'name',
+        'description',
+        'price',
+        'category',
     ];
 }
