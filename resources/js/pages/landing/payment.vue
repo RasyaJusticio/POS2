@@ -1,19 +1,11 @@
 <template>
   <div class="payment-page">
-    <h1 class="title">Transaksi Pembayaran</h1>
+    <video autoplay muted loop class="background-video">
+      <source src="@/assets/images/asik.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    <h1 class="title" :style="{ color: blueColor }">Transaksi Pembayaran</h1>
     <img src="@/assets/images/spice.png" alt="Logo" class="logo" /> <!-- Tambahkan Logo di sini -->
-    <div v-if="!receiptVisible" class="payment-options">
-      <div class="payment-option" @click="selectPayment('cash')">
-        <i class="fas fa-money-bill-wave"></i>
-        <h2>Cash</h2>
-        <p>Pembayaran menggunakan Uang Tunai.</p>
-      </div>
-      <div class="payment-option" @click="selectPayment('debit')">
-        <i class="fas fa-credit-card"></i>
-        <h2>Debit</h2>
-        <p>Pembayaran menggunakan kartu Debit.</p>
-      </div>
-    </div>
 
       <button @click="handlePayment" class="btn btn-primary">Pay Now</button>
 
@@ -48,11 +40,12 @@
     <div v-if="showConfirmationModal" class="modal">
       <div class="modal-content">
         <h3>Konfirmasi Pembayaran</h3>
-        <p>Apakah Anda yakin ingin melanjutkan pembayaran dengan {{ selectedPayment }}?</p>
+        <p>Apakah Anda yakin ingin melanjutkan pembayaran dengan {{ handlePayment }}?</p>
         <button @click="confirmPayment" class="btn btn-success">Ya</button>
         <button @click="cancelPayment" class="btn btn-secondary">Tidak</button>
       </div>
     </div>
+    
 </template>
 
 <script setup lang="ts">
@@ -72,6 +65,7 @@ const showConfirmationModal = ref(false);
 const orderId = ref(""); // This should be dynamically generated
 const totalAmount = ref(0);
 const snapToken = '{{ $snapToken }}';
+const blueColor = '#0000FF';  // Atau warna biru hex atau nama warna
 
 
 
@@ -206,17 +200,25 @@ function generateQRCode() {
 
 <style>
 body {
-  background: url('@/assets/images/aaa.png') no-repeat center center fixed;
-  background-size: cover;
+  margin: 0; /* Menghilangkan margin default */
   font-family: 'Arial', sans-serif;
 }
 
+.background-video {
+  position: fixed; /* Memperbaiki posisi video */
+  top: 0;
+  left: 0;
+  width: 100%; /* Mengatur lebar video */
+  height: 100%; /* Mengatur tinggi video */
+  object-fit: cover; /* Menyesuaikan ukuran video agar menutupi area */
+  z-index: -1; /* Menempatkan video di belakang konten */
+}
 .payment-page {
   max-width: 600px;
   margin: auto;
   text-align: center;
   padding: 20px;
-  background: #ffffff;
+  background: #fdf2f2;
   border-radius: 20px;
   box-shadow: 0 6px 1000px rgba(0, 0, 0, 0.2);
 }

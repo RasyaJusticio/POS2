@@ -4,17 +4,29 @@
       <nav class="navbar navbar-expand-lg navbar-dark transparent-navbar">
         <div class="container-fluid d-flex justify-content-between align-items-center">
           <router-link class="navbar-brand" to="/">
-            <img src="@/assets/images/siam2.png"  class="rounded-4" alt="Logo" style="width: auto; height: 100px;" /> <!-- Add your logo here -->
+            <img src="@/assets/images/spice.png"  class="rounded-4" alt="Logo" style="width: auto; height: 100px;" /> <!-- Add your logo here -->
           </router-link>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarNav">
             <div class="navbar-nav ms-auto">
-              <router-link class="nav-link" to="#home"><i class="fas fa-home"></i> Home</router-link>
-              <router-link class="nav-link" to="#menu"><i class="fas fa-utensils"></i> Menu</router-link>
-              <router-link class="nav-link" to="#about"><i class="fas fa-info-circle"></i> About Us</router-link>
-              <router-link class="nav-link" to="#contact"><i class="fas fa-envelope"></i> Contact</router-link>
+              <router-link class="nav-link" to="#home" style="color: #00132e; font-size: 18px;">
+                <i class="fas fa-home" style="color: #00132e; font-size: 20px;"></i> Home
+              </router-link>
+
+              <router-link class="nav-link" to="#menu" style="color: #00132e; font-size: 18px;">
+                <i class="fas fa-utensils" style="color: #00132e; font-size: 20px;"></i> Menu
+              </router-link>
+
+              <router-link class="nav-link" to="#about" style="color: #00132e; font-size: 18px;">
+                <i class="fas fa-info-circle" style="color: #00132e; font-size: 20px;"></i> About Us
+              </router-link>
+
+              <router-link class="nav-link" to="#contact" style="color: #00132e; font-size: 18px;">
+                <i class="fas fa-envelope" style="color: #00132e; font-size: 20px;"></i> Contact
+              </router-link>
+
             </div>
           </div>
         </div>
@@ -46,7 +58,7 @@ const title = ref('Siam Spice'); // Change this to your desired title
   flex-direction: column;
   min-height: 100vh;
   font-family: 'Poppins', sans-serif; /* Clean font style */
-  background-color: #f8f9fa; /* Light background */
+  background-color: #f8f9fa6b; /* Light background */
 }
 
 header {
@@ -56,8 +68,9 @@ header {
   z-index: 1000; /* Above other content */
 }
 
+
 .transparent-navbar {
-  background: rgba(1, 13, 24, 0.815); /* Transparent background */
+  background: rgba(255, 255, 255, 0); /* Transparent background */
   backdrop-filter: blur(4px); /* Blur effect */
   box-shadow: none; /* Remove shadow */
 }

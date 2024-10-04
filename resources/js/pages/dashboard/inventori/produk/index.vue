@@ -63,8 +63,14 @@ const columns = [
                     "button",
                     {
                         class: "btn btn-sm btn-icon btn-danger",
-                        onClick: () =>
-                            deleteProduct(`/inventori/produk/${cell.getValue()}`), // Ganti URL menjadi API yang benar
+                        onClick: () => {
+                            const deleteHook = useDelete({
+                                onSuccess: () => {
+                                    refresh() //Refresh data table setelah dihapus
+                                }
+                            });
+                            deleteHook.delete('/inventori/produk/${cell.getValue()}')
+                        }
                     },
                     h("i", { class: "la la-trash fs-2" })
                 ),
