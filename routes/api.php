@@ -91,8 +91,14 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
                         Route::delete('/', [ProductController::class, 'destroy']);
                     });
                 });
+
                 // Route::apiResource('produk', ProductController::class)
                 //     ->except(['index', 'store'])->scoped(['product' => 'id']);
+            });
+
+            Route::prefix('orders')->group(function () {
+                Route::post('/checkout/{uuid}', [OrderController::class, 'payment']);
+                Route::get('/show/${uuid}', [OrderController::class, 'show']);
             });
     
         });

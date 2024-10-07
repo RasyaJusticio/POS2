@@ -718,30 +718,30 @@ const showDescription = (id: string) => {
 }
 
 .floating-card {
-  position: relative;
-  top: 50%;
-  left: 50%;
+  position: absolute; /* Use absolute positioning for placement */
+  top: 0;
+  left: 0;
   transform: translate(-50%, -50%);
-  background: rgba(255, 255, 255, 0.9); /* Adjust alpha for transparency */
+  background: rgba(255, 255, 255, 0.9);
   padding: 20px;
   border-radius: 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  z-index: 1000; /* Ensure it appears above other content */
-  display: flex; /* Enable Flexbox */
-  flex-direction: column; /* Stack children vertically */
-  align-items: center; /* Center children horizontally */
-  justify-content: center; /* Center children vertically */
-  text-align: justify; /* Justify text inside */
+  z-index: 1000;
+  display: none; /* Initially hidden */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: justify;
   font-size: 18px;
-  width: 80%; /* Set the width to 80% of the viewport */
-  max-width: 400px; /* Optional: Set a maximum width */
+  width: 80%;
+  max-width: 400px;
 }
 
 .floating-card h3 {
-  font-size: 24px; /* Larger font for titles */
-  margin-bottom: 10px; /* Space below title */
-  color: #000000; /* Title color */
-  text-transform: uppercase; /* Uppercase titles for emphasis */
+  font-size: 24px;
+  margin-bottom: 10px;
+  color: #000000;
+  text-transform: uppercase;
 }
 
 .close-btn {
@@ -756,8 +756,9 @@ const showDescription = (id: string) => {
 
 .floating-card p {
   margin: 10px 0;
-  margin-top: 0%;
+  margin-top: 0;
 }
+
 
 .category-card1 {
     margin-bottom: 30px; /* Jarak antar card */
