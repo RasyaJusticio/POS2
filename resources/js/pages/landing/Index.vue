@@ -441,7 +441,7 @@
         <p class="lead mb-4">We're here to serve you! For inquiries, feedback, or reservations, please reach out.</p>
                  
         <div class="social-icons mb-4">
-            <a href="https://www.instagram.com/whozviaa?igsh=emp5YnBpZzI3MzNi" target="_blank" class="btn btn-outline-danger mx-2">
+            <a href="https://www.instagram.com/whozviaa?igsh=emp5YnBpZzI3MzNi" target="_blank" class="btn btn-outline-us mx-2">
                 <i class="fab fa-instagram"></i> Instagram
             </a>
             <a href="https://wa.me/qr/STA2YM5YISFCF1" target="_blank" class="btn btn-outline-success mx-2">
@@ -879,6 +879,28 @@ h3 {
   color: #555; /* Darker text for better readability */
   font-family: 'Poppins', sans-serif; /* Change to Poppins */
 }
+
+.btn-outline-success {
+  border-color: #0ba74f;
+  color: #000000;
+}
+
+.btn-outline-success:hover {
+  background-color: #0ba74f;
+  color: white;
+}
+
+.btn-outline-us {
+  border-color: #db2e2e;
+  color: #000000;
+}
+
+.btn-outline-us:hover {
+  background-color: #db2e2e;
+  color: white;
+}
+
+
 
 .btn-outline-primary {
   border-color: #105fc7;

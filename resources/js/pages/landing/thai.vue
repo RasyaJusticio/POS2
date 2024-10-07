@@ -1,5 +1,9 @@
 <template>
   <header class="pos-header">
+    <video autoplay muted loop class="background-video">
+      <source src="@/assets/images/asiks.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
       <router-link to="/landing/PAGE">
         <button class="btn btn-lg btn-secondary">
     <i class="fas fa-arrow-left "></i>
@@ -18,13 +22,11 @@
         />
       </div>
     </div>
-  
   </header>
   
   
       <main class="pos-body">
         <section class="pos-items">
-          <h2>Available Items</h2>
           <div class="categories">
             <button
               v-for="category in categories"
@@ -90,7 +92,7 @@
       </aside>
   
       <footer class="pos-footer">
-        <p>&copy; {{ new Date().getFullYear() }} AON Cashier</p>
+        <p>&copy; {{ new Date().getFullYear() }} Siam Spice Co.</p>
       </footer>
     
   </template>
@@ -241,6 +243,19 @@ onMounted(() => {
       border-radius: 10px;
       box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
   }
+
+  .background-video {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: -1; /* Pastikan video berada di belakang konten lainnya */
+    transform: translate(-50%, -50%);
+    object-fit: cover; /* Memastikan video memenuhi area yang tersedia */
+}
   
   .pos-header {
     display: flex;
@@ -297,11 +312,12 @@ onMounted(() => {
   
   .pos-items {
     flex: 2;
-    background-color: #fff;
+    background: rgba(255, 255, 255, 0); /* Transparent background */
+    box-shadow: none; /* Remove shadow */
     border-radius: 10px;
     padding: 20px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-  }
+}
+
   
   .fixed-cart-button {
     position: fixed;
@@ -349,7 +365,7 @@ onMounted(() => {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    background-color: #007bff;
+    background-color: #123352;
     color: white;
     transition: background-color 0.3s;
     font-size: 1.2rem; /* Increased font size */
@@ -357,11 +373,15 @@ onMounted(() => {
   
   
   .btn-category:hover {
-    background-color: #0056b3;
+    background-color: #ffffff;
+    color: rgb(173, 126, 25);
+
   }
   
   .btn-category.active {
-    background-color: #0056b3;
+    background-color: #ffffff;
+    color: rgb(173, 126, 25);
+
   }
   
   .item-list {
