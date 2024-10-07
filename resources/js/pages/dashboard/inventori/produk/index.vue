@@ -33,9 +33,9 @@ const columns = [
         header: "Price",
         cell: (cell) => formatRupiah(cell.getValue()),
     }),
-    column.accessor("quantity", {
-        header: "Quantity",
-    }),
+    // column.accessor("quantity", {
+    //     header: "Quantity",
+    // }),
     column.accessor("description", {
         header: "Description",
     }),

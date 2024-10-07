@@ -13,16 +13,16 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique(); // Tambahkan UUID
             $table->string('name');
             $table->string('category');
             $table->integer('price');
-            $table->integer('quantity');
+            // $table->integer('quantity');
             $table->text('description')->nullable();
             $table->string('image_url')->nullable();
             $table->timestamps();
         });
     }
-
 
     /**
      * Reverse the migrations.
