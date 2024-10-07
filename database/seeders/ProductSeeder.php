@@ -18,18 +18,16 @@ class ProductSeeder extends Seeder
         $product = [
             [
                 'name' => 'Khao Soi',
-                'category'=> 'Makanan',
+                'category'=> 'makanan',
                 'price' => 30000,
-                'quantity' => 20,
                 'description' => 'Mie kari berbasis santan',
                 'image_url' => '/storage/produk/soi.jpeg', // Ganti dengan link gambar yang sesuai
             ],
 
             [
                 'name' => 'Som Tam',
-                'category'=> 'Makanan',
+                'category'=> 'makanan',
                 'price' => 22000,
-                'quantity' => 25,
                 'description' => 'Salad pepaya hijau pedas',
                 'image_url' => '/storage/produk/somtam.jpeg', // Ganti dengan link gambar yang sesuai
             ],

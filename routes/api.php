@@ -75,6 +75,11 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
 
         });
 
+        Route::prefix('orders')->group(function () {
+            Route::post('/checkout/{uuid}', [OrderController::class, 'payment']);
+            Route::get('/show/${uuid}', [OrderController::class, 'show']);
+        });
+
         Route::prefix('inventori')->group(function () {
             Route::middleware('can:inventori-produk')->group(function () {
                 

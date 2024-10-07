@@ -29,7 +29,7 @@ const fileTypes = ref(["image/jpeg", "image/png", "image/jpg"]);
 const formSchema = Yup.object().shape({
     name: Yup.string().required("Nama Harus Diisi"),
     price: Yup.number().required("Harga Harus Diisi").positive("Harga Harus Positif"),
-    quantity: Yup.number().required("Kuantitas harus diisi").integer("Jumlah Harus Diisi Angka").min(0, "Kuantitas minimal 0"),
+    // quantity: Yup.number().required("Kuantitas harus diisi").integer("Jumlah Harus Diisi Angka").min(0, "Kuantitas minimal 0"),
     description: Yup.string(),
     category: Yup.string().required("Kategori Diperlukan"),
 });
@@ -77,7 +77,7 @@ function submit() {
     formDataToSubmit.append("name", formData.value.name);
     formDataToSubmit.append("category", formData.value.category);
     formDataToSubmit.append("price", Math.floor(formData.value.price).toString());
-    formDataToSubmit.append("quantity", formData.value.quantity.toString());
+    // formDataToSubmit.append("quantity", formData.value.quantity.toString());
     formDataToSubmit.append("description", formData.value.description || '');
 
     if (photo.value && photo.value.length > 0) {
@@ -199,7 +199,7 @@ watch(
                 </div>
 
                 <!-- Field Quantity -->
-                <div class="col-md-6">
+                <!-- <div class="col-md-6">
                     <div class="fv-row mb-7">
                         <label class="form-label fw-bold fs-6 required" for="produk-quantity">
                             Quantity
@@ -214,7 +214,7 @@ watch(
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Field Description -->
                 <div class="col-md-6">
