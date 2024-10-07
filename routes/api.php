@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\Route;
 // Authentication Route
 Route::middleware(['json'])->prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->withoutMiddleware('auth');
-    Route::post('register', [AuthController::class, 'register'])->withoutMiddleware('auth'); // Rute untuk registrasi
+    Route::post('reset-password', [AuthController::class, 'reset']);
     Route::delete('logout', [AuthController::class, 'logout']);
     Route::get('me', [AuthController::class, 'me']);
 });
@@ -75,6 +75,11 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
 
         });
 
+        Route::prefix('orders')->group(function () {
+            Route::post('/checkout/{uuid}', [OrderController::class, 'payment']);
+            Route::get('/show/${uuid}', [OrderController::class, 'show']);
+        });
+
         Route::prefix('inventori')->group(function () {
             Route::middleware('can:inventori-produk')->group(function () {
                 
@@ -96,8 +101,3 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
             });
     
         });
-
-Route::prefix('orders')->group(function () {
-    Route::post('/checkout/{uuid}', [OrderController::class, 'payment']);
-    Route::get('/show/${uuid}', [OrderController::class, 'show']);
-});

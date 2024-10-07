@@ -13,9 +13,7 @@ use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // Menampilkan daftar pengguna
     public function get(Request $request)
     {
         return response()->json([
@@ -26,9 +24,7 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Display a paginated list of the resource.
-     */
+    // Menampilkan daftar pengguna dengan pagination
     public function index(Request $request)
     {
         $per = $request->per ?? 10;
@@ -44,9 +40,7 @@ class UserController extends Controller
         return response()->json($data);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // Menyimpan pengguna baru
     public function store(StoreUserRequest $request)
     {
         $validatedData = $request->validated();
@@ -66,9 +60,7 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
+    // Menampilkan pengguna spesifik
     public function show(User $user)
     {
         $user['role_id'] = $user?->role?->id;
@@ -77,9 +69,7 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    // Memperbarui pengguna
     public function update(UpdateUserRequest $request, User $user)
     {
         $validatedData = $request->validated();
@@ -107,9 +97,7 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    // Menghapus pengguna
     public function destroy(User $user)
     {
         if ($user->photo) {

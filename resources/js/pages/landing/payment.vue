@@ -130,7 +130,7 @@ function downloadReceipt() {
 }
 
 function handlePayment() {
-  axios.post(`/orders/checkout/40c5db80-e1b8-4889-9895-e9dd79f47429`)
+  axios.post(`/orders/checkout/9ef064bc-f001-4678-86c2-de2e625e8b1a`)
     .then(response => {
       if (window.snap) {
         window.snap.pay(response.data.payment_url, {
