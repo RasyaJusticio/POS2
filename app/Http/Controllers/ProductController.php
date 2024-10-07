@@ -5,28 +5,47 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $per = $request->input('per', 10); // Jumlah item per halaman, default 10
-        $category = $request->input('category'); // Mengambil parameter kategori dari request
+        $validator = Validator::make($request->all(), [
+            'per' => 'integer|nullable',
+            'page' => 'integer|nullable',
+            'category' => 'string|nullable'
+        ]);
 
-        // Query produk
-        $query = Product::query();
-
-        // Filter berdasarkan kategori jika ada
-        if ($category) {
-            $query->where('category', 'LIKE', '%' . $category . '%');
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Salah input data',
+                'errors' => $validator->errrors()
+            ], 422);
         }
 
-        // Paginate hasil query
-        $products = $query->paginate($per);
+        $validated = $validator->validated();
 
-        return response()->json($products);
+        $category = $validated['category'] ?? null;
+        $per = $validated['per'] ?? null;
+        $page = $validated['page'] ?? null;
+
+        // Query produk
+        $query = Product::query()
+            ->when($category, function (Builder $query, string $category) {
+                return $query->where('category', 'LIKE', '%' . $category . '%');
+            });
+        
+        if ($per && $page) {
+            $result = $query->paginate($per, ['*'], 'page', $page);
+        } else {
+            $result = $query->get();
+        }
+
+        return response()->json($result);
     }
 
     
@@ -97,4 +116,14 @@ class ProductController extends Controller
 
         return response()->json(['message' => 'Produk berhasil dihapus']);
     }
+
+    public function toggleSoldOut($id)
+    {
+        $product = Product::findOrFail($id);
+        $product->is_sold_out = !$product->is_sold_out; // Toggle the sold out status
+        $product->save();
+
+        return response()->json(['message' => 'Product sold out status updated successfully.', 'product' => $product]);
+    }
+
 }

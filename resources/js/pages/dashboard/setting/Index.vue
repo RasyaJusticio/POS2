@@ -14,7 +14,7 @@
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">
                                 <ErrorMessage name="app" />
-                            </div>``
+                            </div>
                         </div>
                     </div>
                     <!--end::Input group-->
