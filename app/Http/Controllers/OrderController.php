@@ -34,6 +34,12 @@ class OrderController extends Controller
             'payment_url' => $snapToken,
             'order' => $order
         ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Order not found'
+            ], 404); // 404 adalah status HTTP Not Found
+        }
     }
 
     public function show($uuid)

@@ -77,7 +77,7 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
 
         Route::prefix('orders')->group(function () {
             Route::post('/checkout/{uuid}', [OrderController::class, 'payment']);
-            Route::get('/show/${uuid}', [OrderController::class, 'show']);
+            Route::get('/show/{uuid}', [OrderController::class, 'show']);
         });
 
         Route::prefix('inventori')->group(function () {
@@ -86,7 +86,7 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
                 
                 Route::group(['prefix' => 'produk'], function () {
                     // Route::get('/', [ProductController::class, 'get']);
-                    Route::get('/', [ProductController::class, 'index']);
+                    Route::get('/', [ProductController::class, 'index'])->withoutMiddleware('can:inventori-produk');git 
                     Route::post('/', [ProductController::class, 'index']);
                     Route::post('/store', [ProductController::class, 'store']);
                     
