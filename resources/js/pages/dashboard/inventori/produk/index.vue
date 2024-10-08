@@ -5,6 +5,7 @@ import Form from "./form.vue"; // Sesuaikan path ke komponen form
 import { createColumnHelper } from "@tanstack/vue-table";
 import type { Product } from "@/types/pos"; // Sesuaikan tipe Produk dengan model
 import { formatRupiah } from "@/libs/utilss"; // Import formatRupiah helper
+import axios from "@/libs/axios";
 
 const column = createColumnHelper<Product>();
 const paginateRef = ref<any>(null);
@@ -16,6 +17,33 @@ const { delete: deleteProduct } = useDelete({
     onSuccess: () => paginateRef.value.refetch(),
 });
 
+const toggleSoldOut = async (productId) => {
+    try {
+        console.log('Data produk:', paginateRef.value.data); // Tambahkan ini untuk memeriksa struktur data
+        const response = await axios.post(`/inventori/produk/${productId}/toggle-sold-out`);
+        
+        // Periksa apakah respons berhasil
+        if (response.status === 200) {
+            // Pastikan paginateRef.value.data adalah array
+            if (Array.isArray(paginateRef.value.data)) {
+                const product = paginateRef.value.data.find((p: Product) => p.id === productId);
+                if (product) {
+                    product.is_sold_out = response.data.product.is_sold_out; // Perbarui status dengan nilai dari respons
+                }
+            } else {
+                console.error("paginateRef.value.data bukan array:", paginateRef.value.data);
+            }
+        } else {
+            console.error("Gagal memperbarui status sold out:", response);
+        }
+    } catch (error) {
+        console.error("Error toggling sold out status:", error);
+    }
+};
+
+
+
+
 const categories = ref([
     { id: "1", name: "makanan" },
     { id: "2", name: "dessert" },
@@ -23,6 +51,10 @@ const categories = ref([
 ]);
 
 const columns = [
+    column.display({
+        header: "N",
+        cell: (cell) => cell.row.index + 1, // Menampilkan nomor urut berdasarkan index row
+    }),
     column.accessor("name", {
         header: "Product Name",
     }),
@@ -48,38 +80,45 @@ const columns = [
                 width: 100,
             }),
     }),
+
     column.accessor("id", {
-        header: "Actions",
-        cell: (cell) =>
-            h("div", { class: "d-flex gap-2" }, [
-                h(
-                    "button",
-                    {
-                        class: "btn btn-sm btn-icon btn-info",
-                        onClick: () => {
-                            selected.value = cell.getValue(); // Set produk terpilih untuk edit
-                            openForm.value = true; // Buka form untuk edit
-                        },
+    header: "Actions",
+    cell: (cell) =>
+        h("div", { class: "d-flex gap-2" }, [
+            // Tombol untuk mengedit
+            h(
+                "button",
+                {
+                    class: "btn btn-sm btn-icon btn-info",
+                    onClick: () => {
+                        selected.value = cell.getValue();
+                        openForm.value = true;
                     },
-                    h("i", { class: "la la-pencil fs-2" })
-                ),
-                h(
-                    "button",
-                    {
-                        class: "btn btn-sm btn-icon btn-danger",
-                        onClick: () => {
-                            const deleteHook = useDelete({
-                                onSuccess: () => {
-                                    refresh() //Refresh data table setelah dihapus
-                                }
-                            });
-                            deleteHook.delete(`/inventori/produk/${cell.getValue()}`)
-                        }
-                    },
-                    h("i", { class: "la la-trash fs-2" })
-                ),
-            ]),
+                },
+                h("i", { class: "la la-pencil fs-2" })
+            ),
+            // Tombol untuk menghapus
+            h(
+                "button",
+                {
+                    class: "btn btn-sm btn-icon btn-danger",
+                    onClick: () =>
+                        deleteProduct(`/inventori/produk/${cell.getValue()}`),
+                },
+                h("i", { class: "la la-trash fs-2" })
+            ),
+            // Tombol untuk toggle sold out
+            h(
+                "button",
+                {
+                    class: "btn btn-sm btn-icon",
+                    onClick: () => toggleSoldOut(cell.getValue()),
+                },
+                h("span", cell.row.original.is_sold_out ? "Available" : "Sold Out")
+            ),
+        ]),
     }),
+
 ];
 
 // Fungsi untuk refresh tabel

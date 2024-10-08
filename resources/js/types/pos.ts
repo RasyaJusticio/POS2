@@ -8,4 +8,5 @@ export interface Product {
     // quantity: number;
     description: string;
     image_url: string;
+    is_sold_out?: boolean;
 }

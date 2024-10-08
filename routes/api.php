@@ -94,6 +94,8 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
                         Route::get('/', [ProductController::class, 'show']); // GET: produk/{product_id}
                         Route::post('/', [ProductController::class, 'update']);
                         Route::delete('/', [ProductController::class, 'destroy']);
+                        Route::post('/toggle-sold-out', [ProductController::class, 'toggleSoldOut']);
+
                     });
                 });
                 // Route::apiResource('produk', ProductController::class)

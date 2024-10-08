@@ -17,6 +17,7 @@ class Product extends Model
         // 'quantity',
         'description',
         'image_url',
+        'is_sold_out',
     ];
 
     // Override fungsi boot untuk membuat UUID otomatis

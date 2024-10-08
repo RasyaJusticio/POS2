@@ -50,10 +50,11 @@
                   <p class="item-description">{{ item.description }}</p>
                   <span class="item-price">{{ formatCurrency(item.price) }}</span>
                   <div class="btn-container">
-                    <button @click="addToCart(item)" class="btn btn-primary">
+                    <button @click="addToCart(item)" class="btn btn-primary" :disabled="item.is_sold_out">
                  <i class="fas fa-shopping-cart"></i>
                  </button>
-                  </div>
+                </div>
+                  <span v-if="item.is_sold_out" class="sold-out-label">Sold Out</span> <!-- Tambahkan label ini -->
                 </div>
               </div>
             </div>
@@ -101,6 +102,7 @@
   import { ref, computed, onMounted } from 'vue';
   import type { Product } from "@/types/pos"; 
   import ApiService from "@/core/services/ApiService";
+  import { toast } from "vue3-toastify";
   
   // // Import images 
   // import somTamImage from '@/assets/images/somtam.jpeg';
@@ -157,8 +159,8 @@
   const fetchProducts = async () => {
     try {
         const response = await ApiService.get('/inventori/produk');
-        console.log(response.data.data);
-        items.value = response.data.data; 
+        console.log(response.data);
+        items.value = response.data; 
     } catch (error) {
         console.error("Error fetching products:", error);
     }
@@ -197,6 +199,11 @@ onMounted(() => {
   
   // Add item to cart
   const addToCart = (item) => {
+    if (item.is_sold_out) {
+      toast.error("Item ini sudah terjual habis dan tidak bisa dipesan")
+    return; // Keluar dari metode jika sold out
+  }
+  
     const existingItem = cart.value.find(cartItem => cartItem.id === item.id);
     if (existingItem) {
       existingItem.quantity++;
@@ -528,4 +535,15 @@ onMounted(() => {
       padding: 5px;
       font-size: 12px;
  }
+
+ .sold-out {
+    filter: grayscale(100%); /* Menjadikan item hitam putih */
+    opacity: 0.5; /* Mengurangi opasitas */
+  }
+
+  .sold-out-label {
+    color: red; /* Warna label sold out */
+    font-weight: bold; /* Menggunakan huruf tebal */
+  }
+
 </style>
