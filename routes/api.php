@@ -90,7 +90,7 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
                     Route::post('/', [ProductController::class, 'index']);
                     Route::post('/store', [ProductController::class, 'store']);
                     
-                    Route::group(['prefix' => '{id}'], function () { // produk/{product_id}
+                    Route::group(['prefix' => '{uuid}'], function () { // produk/{product_id}
                         Route::get('/', [ProductController::class, 'show']); // GET: produk/{product_id}
                         Route::post('/', [ProductController::class, 'update']);
                         Route::delete('/', [ProductController::class, 'destroy']);

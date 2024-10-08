@@ -10,24 +10,24 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    public function index(Request $request)
-    {
-        $per = $request->input('per', 10); // Jumlah item per halaman, default 10
-        $category = $request->input('category'); // Mengambil parameter kategori dari request
+            public function index(Request $request)
+        {
+            $per = $request->input('per', 10);
+            $category = $request->input('category');
 
-        // Query produk
-        $query = Product::query();
+            // Query produk
+            $query = Product::query();
 
-        // Filter berdasarkan kategori jika ada
-        if ($category) {
-            $query->where('category', 'LIKE', '%' . $category . '%');
+            if ($category) {
+                $query->where('category', 'LIKE', '%' . $category . '%');
+            }
+
+            // Dapatkan data produk, pastikan UUID disertakan
+            $products = $query->paginate($per);
+
+            return response()->json($products);
         }
 
-        // Paginate hasil query
-        $products = $query->paginate($per);
-
-        return response()->json($products);
-    }
 
     
 

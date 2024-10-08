@@ -73,7 +73,7 @@ const columns = [
                                     refresh() //Refresh data table setelah dihapus
                                 }
                             });
-                            deleteHook.delete('/inventori/produk/${cell.getValue()}')
+                            deleteHook.delete(`/inventori/produk/${cell.getValue()}`)
                         }
                     },
                     h("i", { class: "la la-trash fs-2" })
