@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str; // Import Str untuk UUID
 
 class ProductSeeder extends Seeder
 {
@@ -15,7 +16,7 @@ class ProductSeeder extends Seeder
     public function run()
     {
         // Data contoh untuk produk
-        $product = [
+        $products = [
             [
                 'name' => 'Khao Soi',
                 'category'=> 'makanan',
@@ -23,7 +24,6 @@ class ProductSeeder extends Seeder
                 'description' => 'Mie kari berbasis santan',
                 'image_url' => '/storage/produk/soi.jpeg', // Ganti dengan link gambar yang sesuai
             ],
-
             [
                 'name' => 'Som Tam',
                 'category'=> 'makanan',
@@ -33,7 +33,12 @@ class ProductSeeder extends Seeder
             ],
         ];
 
+        // Menambahkan UUID secara dinamis
+        foreach ($products as &$product) {
+            $product['uuid'] = Str::uuid()->toString();
+        }
+
         // Mengisi tabel produk
-        DB::table('products')->insert($product);
+        DB::table('products')->insert($products);
     }
 }

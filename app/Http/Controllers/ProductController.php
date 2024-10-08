@@ -33,18 +33,6 @@ class ProductController extends Controller
         $per = $validated['per'] ?? null;
         $page = $validated['page'] ?? null;
 
-            // Query produk
-            $query = Product::query();
-
-            if ($category) {
-                $query->where('category', 'LIKE', '%' . $category . '%');
-            }
-
-            // Dapatkan data produk, pastikan UUID disertakan
-            $products = $query->paginate($per);
-
-            return response()->json($products);
-        }
         // Query produk
         $query = Product::query()
             ->when($category, function (Builder $query, string $category) {
@@ -59,7 +47,6 @@ class ProductController extends Controller
 
         return response()->json($result);
     }
-
 
     
 

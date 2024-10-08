@@ -77,7 +77,7 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
 
         Route::prefix('orders')->group(function () {
             Route::post('/checkout/{uuid}', [OrderController::class, 'payment']);
-            Route::get('/show/${uuid}', [OrderController::class, 'show']);
+            Route::get('/show/{uuid}', [OrderController::class, 'show']);
         });
 
         Route::prefix('inventori')->group(function () {
@@ -90,7 +90,7 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
                     Route::post('/', [ProductController::class, 'index']);
                     Route::post('/store', [ProductController::class, 'store']);
                     
-                    Route::group(['prefix' => '{uuid}'], function () { // produk/{product_id}
+                    Route::group(['prefix' => '{id}'], function () { // produk/{product_id}
                         Route::get('/', [ProductController::class, 'show']); // GET: produk/{product_id}
                         Route::post('/', [ProductController::class, 'update']);
                         Route::delete('/', [ProductController::class, 'destroy']);

@@ -130,37 +130,18 @@ function downloadReceipt() {
 }
 
 function handlePayment(uuid) {
-  // Pastikan path lengkap menuju endpoint API sudah benar, contoh: '/api/orders/checkout/{uuid}'
   axios.post(`/orders/checkout/${uuid}`)
     .then(response => {
-      // Cek apakah window.snap ada dan payment_url disediakan dalam response
-      if (window.snap && response.data.payment_url) {
-        // Jalankan pop-up pembayaran dengan Midtrans Snap
+      if (window.snap) {
         window.snap.pay(response.data.payment_url, {
           onSuccess: (result) => {
             console.log("Pembayaran berhasil:", result);
-            // Opsional: Tangani setelah pembayaran berhasil (misalnya redirect atau perbarui UI)
-          },
-          onPending: (result) => {
-            console.log("Pembayaran tertunda:", result);
-            // Opsional: Tangani skenario pembayaran tertunda
-          },
-          onError: (result) => {
-            console.error("Pembayaran gagal:", result);
-            // Opsional: Tangani skenario kesalahan (tampilkan notifikasi ke pengguna)
-          },
-          onClose: () => {
-            console.log("Pop-up ditutup oleh pengguna");
-            // Opsional: Tangani event saat pop-up ditutup
           }
         });
-      } else {
-        console.error("Snap atau URL pembayaran tidak ditemukan.");
       }
     })
     .catch(error => {
-      console.error('Kesalahan saat checkout pesanan:', error);
-      // Opsional: Tampilkan notifikasi kesalahan kepada pengguna
+        console.error('Error during order checkout:', error);
     });
 }
 
