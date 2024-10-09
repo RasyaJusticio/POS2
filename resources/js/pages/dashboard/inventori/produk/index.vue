@@ -94,6 +94,20 @@ const columns = [
                         selected.value = cell.getValue();
                         openForm.value = true;
                     },
+<<<<<<< HEAD
+                    h("i", { class: "la la-pencil fs-2" })
+                ),
+                h(
+                    "button",
+                    {
+                        class: "btn btn-sm btn-icon btn-danger",
+                        onClick: () => 
+                            deleteProduct(`/inventori/produk/${cell.getValue()}`)
+                    },
+                    h("i", { class: "la la-trash fs-2" })
+                ),
+            ]),
+=======
                 },
                 h("i", { class: "la la-pencil fs-2" })
             ),
@@ -120,6 +134,7 @@ const columns = [
                 h("span", cell.row.original.is_sold_out ? "Sold Out" : "Avail able")
             ),
         ]),
+>>>>>>> 9f291ebc4a67f74d29402bfca5b99f211a38090e
     }),
 
 ];

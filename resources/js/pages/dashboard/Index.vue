@@ -2,7 +2,7 @@
   <main class="dashboard">
     <div class="container">
       <h1 class="title">Graphic</h1>
-      
+
       <div class="stats">
         <StatCard 
           title="Total Sales" 
@@ -10,8 +10,8 @@
           iconClass="fas fa-dollar-sign" 
         /> 
         <StatCard 
-          title="Total Items" 
-          :value="totalItems" 
+          title="Total Reservation" 
+          :value="totalReservations" 
           iconClass="fas fa-box" 
         />
         <StatCard 
@@ -34,6 +34,12 @@
           <canvas id="topItemsChart"></canvas>
         </ChartCard>
       </div>
+
+      <!-- Menampilkan Total Reservations -->
+      <div>
+        <!-- Tidak perlu lagi menampilkan ini karena sudah diubah ke dalam StatCard -->
+        <!-- <h3>Total Reservations: {{ totalReservations }}</h3> -->
+      </div>
     </div>
   </main>
 </template>
@@ -43,33 +49,62 @@ import { ref, onMounted } from 'vue';
 import StatCard from './StatCard.vue';
 import ChartCard from './ChartCard.vue';
 import Chart from 'chart.js/auto';
+import axios from 'axios'; // Import axios untuk API call
 
+// Reactive state
 const totalSales = ref(0);
-const totalItems = ref(0);
+const totalItems = ref(0); // Number of reservations from the API
 const totalCustomers = ref(0);
 const profit = ref(0);
 
-onMounted(() => {
-  // Fetch data from your API or state management
-  // Simulated data for demonstration
-  totalSales.value = 0;
-  totalItems.value = 0;
-  totalCustomers.value = 0;
-  profit.value = 0;
+// Reactive state untuk total reservations
+const totalReservations = ref(0);
 
+// Fetch totalItems (reservations count) dari API
+const fetchTotalItems = async () => {
+  try {
+    const response = await fetch('http://localhost:8000/api/reservations/count');
+    if (!response.ok) {
+      throw new Error('Failed to fetch reservation count');
+    }
+    const data = await response.json();
+    totalItems.value = data.totalItems;
+  } catch (error) {
+    console.error('Error fetching reservation count:', error);
+  }
+};
+
+// Fetch totalReservations dari API (menampilkan total reservasi)
+const fetchTotalReservations = async () => {
+  try {
+    const response = await axios.get('http://localhost:8000/api/reservations/count');
+    totalReservations.value = response.data.totalItems;
+  } catch (error) {
+    console.error('Error fetching total reservations:', error);
+  }
+};
+
+// Memanggil fungsi saat komponen dimuat
+onMounted(() => {
+  // Fetch data saat dashboard dimuat
+  fetchTotalItems();
+  fetchTotalReservations();
+
+  // Initialize charts
   initializeCharts();
 });
 
 // Format currency to Rupiah
-const formatCurrency = (value) => {
+const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
   }).format(value);
 };
 
+// Fungsi untuk menginisialisasi charts
 const initializeCharts = () => {
-  const salesCtx = document.getElementById('salesChart').getContext('2d');
+  const salesCtx = document.getElementById('salesChart')?.getContext('2d');
   new Chart(salesCtx, {
     type: 'line',
     data: {
@@ -92,7 +127,7 @@ const initializeCharts = () => {
     }
   });
 
-  const topItemsCtx = document.getElementById('topItemsChart').getContext('2d');
+  const topItemsCtx = document.getElementById('topItemsChart')?.getContext('2d');
   new Chart(topItemsCtx, {
     type: 'bar',
     data: {
@@ -116,6 +151,7 @@ const initializeCharts = () => {
   });
 };
 </script>
+
 
 <style scoped>
 .container {

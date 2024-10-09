@@ -22,16 +22,22 @@ const emit = defineEmits(["close", "refresh"]);
 const formData = ref<Product>({} as Product);
 const imagePreview = ref<string | null>(null);
 const formRef = ref();
-const photo = ref<any>([]);
+const photo = ref<any>([]); // Foto produk
 const fileTypes = ref(["image/jpeg", "image/png", "image/jpg"]);
+
+// Data kategori yang tersedia untuk dropdown
+const categories = ref([
+    { id: "makanan", name: "Makanan" },
+    { id: "dessert", name: "Dessert" },
+    { id: "minuman", name: "Minuman" },
+]);
 
 // Skema validasi menggunakan Yup
 const formSchema = Yup.object().shape({
     name: Yup.string().required("Nama Harus Diisi"),
     price: Yup.number().required("Harga Harus Diisi").positive("Harga Harus Positif"),
-    // quantity: Yup.number().required("Kuantitas harus diisi").integer("Jumlah Harus Diisi Angka").min(0, "Kuantitas minimal 0"),
     description: Yup.string(),
-    category: Yup.string().required("Kategori Diperlukan"),
+    category: Yup.string().required("Kategori Diperlukan"), // Validasi kategori
 });
 
 // Fungsi untuk mendapatkan data produk yang akan diedit
@@ -40,12 +46,12 @@ function getEdit() {
     ApiService.get(`/inventori/produk/${props.selected}`)
         .then(({ data }) => {
             formData.value = data.produk;
-            if (data.product.image_url) {
-                toast.info("Retrieving existing photo")
+            if (data.produk.image_url) {
+                toast.info("Retrieving existing photo");
                 imagePreview.value = data.produk.image_url;
                 photo.value = [data.produk.image_url];
             } else {
-                toast.info("There's no existing photo")
+                toast.info("There's no existing photo");
                 photo.value = [];
             }
         })
@@ -75,9 +81,8 @@ function submit() {
     block(document.getElementById("form-produk"));
     const formDataToSubmit = new FormData();
     formDataToSubmit.append("name", formData.value.name);
-    formDataToSubmit.append("category", formData.value.category);
+    formDataToSubmit.append("category", formData.value.category); // Menambahkan kategori
     formDataToSubmit.append("price", Math.floor(formData.value.price).toString());
-    // formDataToSubmit.append("quantity", formData.value.quantity.toString());
     formDataToSubmit.append("description", formData.value.description || '');
 
     if (photo.value && photo.value.length > 0) {
@@ -88,7 +93,7 @@ function submit() {
         ? `/inventori/produk/${props.selected}`
         : "/inventori/produk/store";
 
-    const method = "post";
+    const method = "post"; // Menggunakan POST untuk menambah produk baru
 
     axios({
         method: method,
@@ -123,7 +128,6 @@ watch(
     () => props.selected,
     () => {
         if (props.selected) {
-            toast.info("Toas")
             getEdit();
         }
     }
@@ -133,7 +137,7 @@ watch(
 <template>
     <VForm class="form card mb-10" @submit="submit" :validation-schema="formSchema" id="form-produk" ref="formRef">
         <div class="card-header align-items-center">
-            <h2 class="mb-0">{{ selected ? "Edit" : "Add" }} Product</h2>
+            <h2 class="mb-0">{{ props.selected ? "Edit" : "Add" }} Product</h2>
             <button type="button" class="btn btn-sm btn-light-danger ms-auto" @click="emit('close')">
                 Cancel <i class="la la-times-circle p-0"></i>
             </button>
@@ -158,7 +162,7 @@ watch(
                     </div>
                 </div>
 
-                <!-- Field Category -->
+                <!-- Dropdown Kategori -->
                 <div class="col-md-6">
                     <div class="fv-row mb-7">
                         <label class="form-label fw-bold fs-6 required" for="produk-category">
@@ -168,9 +172,11 @@ watch(
                                name="category" v-model="formData.category" 
                                id="produk-category">
                             <option value="" disabled hidden>Select Category</option>
-                            <option value="makanan">Makanan</option>
-                            <option value="dessert">Dessert</option>
-                            <option value="minuman">Minuman</option>
+                            <option v-for="category in categories" 
+                                    :key="category.id" 
+                                    :value="category.id">
+                                {{ category.name }}
+                            </option>
                         </Field>
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">
@@ -197,24 +203,6 @@ watch(
                         </div>
                     </div>
                 </div>
-
-                <!-- Field Quantity -->
-                <!-- <div class="col-md-6">
-                    <div class="fv-row mb-7">
-                        <label class="form-label fw-bold fs-6 required" for="produk-quantity">
-                            Quantity
-                        </label>
-                        <Field class="form-control form-control-lg form-control-solid" 
-                               type="number" name="quantity" autocomplete="off" 
-                               v-model="formData.quantity" id="produk-quantity" 
-                               placeholder="Enter Quantity" />
-                        <div class="fv-plugins-message-container">
-                            <div class="fv-help-block">
-                                <ErrorMessage name="quantity" />
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
 
                 <!-- Field Description -->
                 <div class="col-md-6">
@@ -260,6 +248,6 @@ watch(
             <button type="button" class="btn btn-light" @click="emit('close')">
                 Cancel
             </button>
- </div>
+        </div>
     </VForm>
 </template>

@@ -92,6 +92,11 @@ const MainMenuConfig: Array<MenuItem> = [
                         route: "/dashboard/inventori/stok",
                         name: "inventori-stok",
                     },
+                    {
+                        heading: "Reservasi",
+                        route: "/dashboard/inventori/Reservation/",
+                        name: "inventori-reservasi",
+                    },
                 ],
             },
             

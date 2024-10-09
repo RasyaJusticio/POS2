@@ -45,7 +45,10 @@
               class="item-card"
             >
               <div class="card-inner">
-                <img :src="item.image_url" alt="item.name" class="item-image" />
+                <div class="image-wrapper">
+                  <img :src="item.image_url" alt="item.name" class="item-image" :class="{ 'sold-out-image': item.is_sold_out }" />
+                  <span v-if="item.is_sold_out" class="sold-out-label">Sold Out</span> <!-- Tambahkan label ini --> 
+                </div>
                 <div class="item-details">
                   <h3 class="item-name">{{ item.name }}</h3>
                   <p class="item-description">{{ item.description }}</p>
@@ -55,7 +58,7 @@
                  <i class="fas fa-shopping-cart"></i>
                  </button>
                 </div>
-                  <span v-if="item.is_sold_out" class="sold-out-label">Sold Out</span> <!-- Tambahkan label ini -->
+                  
                 </div>
               </div>
             </div>
@@ -177,7 +180,9 @@ onMounted(() => {
   // Computed properties
   const filteredItems = computed(() => {
     return items.value.filter(item => {
-      const matchesSearch = item.name.toLowerCase().includes(searchQuery.value.toLowerCase());
+      const matchesSearch = item.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+                          item.description.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+                          item.category.toLowerCase().includes(searchQuery.value.toLowerCase());
       const matchesCategory = selectedCategory.value === 'All' || item.category === selectedCategory.value;
       return matchesSearch && matchesCategory;
     });
@@ -220,8 +225,11 @@ onMounted(() => {
   
   // Clear the cart
   const clearCart = () => {
+  if (confirm('Are you sure you want to clear the cart?')) {
     cart.value = [];
+    }
   };
+
   
   // Checkout function
   const checkout = () => {
@@ -472,16 +480,15 @@ onMounted(() => {
   }
   
   .btn-secondary {
-    background-color: #8d8e8e;
+    background-color: #ffff;
     color: rgb(0, 0, 0);
-    border: none;
     padding: 10px 15px;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.4s;
     margin-left: 10px;
   }
-  
+
   .cart-item {
     display: flex;
     justify-content: space-between;
@@ -537,16 +544,29 @@ onMounted(() => {
       font-size: 12px;
  }
 
-  .soldOut {
-    text-decoration: line-through;
-    filter: grayscale(100%); /* Buat tampilan produk jadi hitam putih jika sold out */
-    opacity: 0.6; /* Kurangi opacity jika sold out */
-  }
+ .image-wrapper {
+  position: relative;
+  display: inline-block;
+}
 
-  .sold-out-label {
-    color: red;
-    font-size: 18px; /* Warna label sold out */
-    font-weight: bold; /* Menggunakan huruf tebal */
-  }
+.sold-out-image {
+  filter: grayscale(100%);
+  opacity: 0.6;
+}
+
+.sold-out-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(185, 23, 23, 0.7); /* Latar belakang transparan */
+  color: white;
+  padding: 10px 20px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border-radius: 5px;
+  text-transform: uppercase;
+}
+
 
 </style>

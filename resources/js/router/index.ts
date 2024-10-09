@@ -72,34 +72,43 @@ const routes: Array<RouteRecordRaw> = [
                 },
             },
 
-            //Inventori
+            // Inventori
             {
                 path: "/dashboard/inventori/produk",
                 name: "dashboard.inventoriproduk",
                 component: () => import("@/pages/dashboard/inventori/produk/index.vue"),
                 meta: {
-                  pageTitle: "Inventori Produk",
-                  breadcrumbs: ["Inventori", "Produk"],
+                    pageTitle: "Inventori Produk",
+                    breadcrumbs: ["Inventori", "Produk"],
                 },
-              },
-              {
+            },
+            {
                 path: "/dashboard/inventori/kategori",
                 name: "dashboard.inventorikategori",
                 component: () => import("@/pages/dashboard/inventori/kategori/index.vue"),
                 meta: {
-                  pageTitle: "Inventori Kategori",
-                  breadcrumbs: ["Inventori", "Kategori"],
+                    pageTitle: "Inventori Kategori",
+                    breadcrumbs: ["Inventori", "Kategori"],
                 },
-              },
-              {
+            },
+            {
                 path: "/dashboard/inventori/stok",
                 name: "dashboard.inventoristok",
                 component: () => import("@/pages/dashboard/inventori/stok/index.vue"),
                 meta: {
-                  pageTitle: "POS Items",
-                  breadcrumbs: ["POS", "Items"],
+                    pageTitle: "POS Items",
+                    breadcrumbs: ["POS", "Items"],
                 },
-              },
+            },
+            {
+                path: "/dashboard/inventori/Reservation",
+                name: "dashboard.inventori.reservation",
+                component: () => import("@/pages/dashboard/inventori/Reservation/Index.vue"),
+                meta: {
+                    pageTitle: "Reservations",
+                    breadcrumbs: ["Inventori", "Reservations"],
+                },
+            },
 
             // Kasir route added here
             {
@@ -108,7 +117,7 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import("@/pages/dashboard/kasir/index.vue"),
                 meta: {
                     pageTitle: "Kasir",
-                    breadcrumbs: ["Shop", "Kasir"], // Fixed the breadcrumb here
+                    breadcrumbs: ["Shop", "Kasir"],
                 },
             },
         ],
@@ -140,42 +149,37 @@ const routes: Array<RouteRecordRaw> = [
 
     {
         path: "/landing",
-        redirect:"/landing/PAGE",
+        redirect: "/landing/PAGE",
         component: () => import("@/layouts/kasir/DefaultLayout.vue"),
         children: [
             {
-                path: "/landing/PAGE", // untuk rute dasar "/landing"
+                path: "/landing/PAGE",
                 name: "/landing.index",
-                component: () => import("@/pages/landing/Index.vue"), // Pastikan path ini sesuai
+                component: () => import("@/pages/landing/Index.vue"),
                 meta: {
                     pageTitle: "Landing Index",
                 },
             },
-            
-            
         ],
     },
 
-    
-
     {
-        path: "/landing/thai", // untuk rute dasar "/landing"
+        path: "/landing/thai",
         name: "landingthai",
-        component: () => import("@/pages/landing/thai.vue"), // Pastikan path ini sesuai
+        component: () => import("@/pages/landing/thai.vue"),
         meta: {
-            pageTitle: "Landing Index",
+            pageTitle: "Landing Thai",
         },
     },
 
     {
-        path: "/landing/payment", // untuk rute dasar "/landing"
+        path: "/landing/payment",
         name: "landingcheck",
-        component: () => import("@/pages/landing/payment.vue"), // Pastikan path ini sesuai
+        component: () => import("@/pages/landing/payment.vue"),
         meta: {
-            pageTitle: "Landing Index",
+            pageTitle: "Landing Payment",
         },
     },
-
 
     {
         path: "/",
@@ -225,9 +229,7 @@ const router = createRouter({
     },
 });
 
-// Remaining router code...
-
-
+// Middleware
 router.beforeEach(async (to, from, next) => {
     if (to.name) {
         NProgress.start();
@@ -268,5 +270,3 @@ router.afterEach(() => {
 });
 
 export default router;
-
-// resources/js/types/index.ts
