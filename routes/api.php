@@ -98,5 +98,37 @@ Route::prefix('inventori')->group(function () {
                 Route::delete('/', [ProductController::class, 'destroy']);
             });
         });
+<<<<<<< HEAD
     });
 });
+=======
+
+        Route::prefix('orders')->group(function () {
+            Route::post('/checkout/{uuid}', [OrderController::class, 'payment']);
+            Route::get('/show/{uuid}', [OrderController::class, 'show']);
+        });
+
+        Route::prefix('inventori')->group(function () {
+            Route::middleware('can:inventori-produk')->group(function () {
+                
+                
+                Route::group(['prefix' => 'produk'], function () {
+                    // Route::get('/', [ProductController::class, 'get']);
+                    Route::get('/', [ProductController::class, 'index'])->withoutMiddleware('can:inventori-produk');
+                    Route::post('/', [ProductController::class, 'index']);
+                    Route::post('/store', [ProductController::class, 'store']);
+                    
+                    Route::group(['prefix' => '{id}'], function () { // produk/{product_id}
+                        Route::get('/', [ProductController::class, 'show']); // GET: produk/{product_id}
+                        Route::post('/', [ProductController::class, 'update']);
+                        Route::delete('/', [ProductController::class, 'destroy']);
+                        Route::post('/toggle-sold-out', [ProductController::class, 'toggleSoldOut']);
+
+                    });
+                });
+                // Route::apiResource('produk', ProductController::class)
+                //     ->except(['index', 'store'])->scoped(['product' => 'id']);
+            });
+    
+        });
+>>>>>>> 9f291ebc4a67f74d29402bfca5b99f211a38090e

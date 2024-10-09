@@ -20,6 +20,7 @@ return new class extends Migration
             // $table->integer('quantity');
             $table->text('description')->nullable();
             $table->string('image_url')->nullable();
+            $table->boolean('is_sold_out')->default(false); // Tambahkan kolom is_sold_out
             $table->timestamps();
         });
     }

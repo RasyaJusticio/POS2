@@ -5,6 +5,7 @@ import Form from "./form.vue"; // Sesuaikan path ke komponen form
 import { createColumnHelper } from "@tanstack/vue-table";
 import type { Product } from "@/types/pos"; // Sesuaikan tipe Produk dengan model
 import { formatRupiah } from "@/libs/utilss"; // Import formatRupiah helper
+import axios from "@/libs/axios";
 
 const column = createColumnHelper<Product>();
 const paginateRef = ref<any>(null);
@@ -16,6 +17,33 @@ const { delete: deleteProduct } = useDelete({
     onSuccess: () => paginateRef.value.refetch(),
 });
 
+const toggleSoldOut = async (productId: number) => {
+    try {
+        console.log('Data produk:', paginateRef.value.data.data); // Tambahkan ini untuk memeriksa struktur data
+        const response = await axios.post(`/inventori/produk/${productId}/toggle-sold-out`);
+        
+        // Periksa apakah respons berhasil
+        if (response.status === 200) {
+            // Pastikan paginateRef.value.data adalah array
+            if (Array.isArray(paginateRef.value.data.data)) {
+                const product = paginateRef.value.data.data.find((p: Product) => p.id === productId);
+                if (product) {
+                    product.is_sold_out = response.data.product.is_sold_out; // Perbarui status dengan nilai dari respons
+                }
+            } else {
+                console.error("paginateRef.value.data bukan array:", paginateRef.value.data);
+            }
+        } else {
+            console.error("Gagal memperbarui status sold out:", response);
+        }
+    } catch (error) {
+        console.error("Error toggling sold out status:", error);
+    }
+};
+
+
+
+
 const categories = ref([
     { id: "1", name: "makanan" },
     { id: "2", name: "dessert" },
@@ -23,6 +51,10 @@ const categories = ref([
 ]);
 
 const columns = [
+    column.display({
+        header: "No.",
+        cell: (cell) => cell.row.index + 1, // Menampilkan nomor urut berdasarkan index row
+    }),
     column.accessor("name", {
         header: "Product Name",
     }),
@@ -48,19 +80,21 @@ const columns = [
                 width: 100,
             }),
     }),
+
     column.accessor("id", {
-        header: "Actions",
-        cell: (cell) =>
-            h("div", { class: "d-flex gap-2" }, [
-                h(
-                    "button",
-                    {
-                        class: "btn btn-sm btn-icon btn-info",
-                        onClick: () => {
-                            selected.value = cell.getValue(); // Set produk terpilih untuk edit
-                            openForm.value = true; // Buka form untuk edit
-                        },
+    header: "Actions",
+    cell: (cell) =>
+        h("div", { class: "d-flex gap-2" }, [
+            // Tombol untuk mengedit
+            h(
+                "button",
+                {
+                    class: "btn btn-sm btn-icon btn-info",
+                    onClick: () => {
+                        selected.value = cell.getValue();
+                        openForm.value = true;
                     },
+<<<<<<< HEAD
                     h("i", { class: "la la-pencil fs-2" })
                 ),
                 h(
@@ -73,7 +107,36 @@ const columns = [
                     h("i", { class: "la la-trash fs-2" })
                 ),
             ]),
+=======
+                },
+                h("i", { class: "la la-pencil fs-2" })
+            ),
+            // Tombol untuk menghapus
+            h(
+                "button",
+                {
+                    class: "btn btn-sm btn-icon btn-danger",
+                    onClick: () =>
+                        deleteProduct(`/inventori/produk/${cell.getValue()}`),
+                },
+                h("i", { class: "la la-trash fs-2" })
+            ),
+            // Tombol untuk toggle sold out
+            h(
+                "button",
+                {
+                    class: [ 
+                        "btn btn-sm btn-icon",
+                        cell.row.original.is_sold_out ? "btn-danger" : "btn-success",
+                    ],
+                    onClick: () => toggleSoldOut(cell.getValue()),
+                },
+                h("span", cell.row.original.is_sold_out ? "Sold Out" : "Avail able")
+            ),
+        ]),
+>>>>>>> 9f291ebc4a67f74d29402bfca5b99f211a38090e
     }),
+
 ];
 
 // Fungsi untuk refresh tabel
@@ -115,12 +178,6 @@ watch(selectedCategory, (newCategory) => {
             <h2 class="mb-0">Product List</h2>
 
             <!-- Dropdown Kategori -->
-            <select v-model="selectedCategory" class="form-select me-3" style="width: auto">
-                <option value="">All Categories</option>
-                <option v-for="category in categories" :key="category.id" :value="category.name.toLowerCase()">
-                    {{ category.name }}
-                </option>
-            </select>
 
             <!-- Tombol Tambah Produk -->
             <button
@@ -145,3 +202,12 @@ watch(selectedCategory, (newCategory) => {
         </div>
     </div>
 </template>
+
+<style scoped>
+
+.soldOut {
+    filter: grayscale(100%);
+    opacity: 0.6;
+}
+
+</style>

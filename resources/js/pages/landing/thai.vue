@@ -6,8 +6,9 @@
     </video>
       <router-link to="/landing/PAGE">
         <button class="btn btn-lg btn-secondary">
-    <i class="fas fa-arrow-left "></i>
-</button>            </router-link>
+          <i class="fas fa-arrow-left "></i>
+        </button>           
+    </router-link>
     <div class="header-image">
       <img src="@/assets/images/spice.png" alt="Spice Image" style="max-width: 60%; height: auto;" />
     </div>
@@ -44,16 +45,20 @@
               class="item-card"
             >
               <div class="card-inner">
-                <img :src="item.image_url" alt="item.name" class="item-image" />
+                <div class="image-wrapper">
+                  <img :src="item.image_url" alt="item.name" class="item-image" :class="{ 'sold-out-image': item.is_sold_out }" />
+                  <span v-if="item.is_sold_out" class="sold-out-label">Sold Out</span> <!-- Tambahkan label ini --> 
+                </div>
                 <div class="item-details">
                   <h3 class="item-name">{{ item.name }}</h3>
                   <p class="item-description">{{ item.description }}</p>
                   <span class="item-price">{{ formatCurrency(item.price) }}</span>
                   <div class="btn-container">
-                    <button @click="addToCart(item)" class="btn btn-primary">
+                    <button @click="addToCart(item)" class="btn btn-primary" :disabled="item.is_sold_out">
                  <i class="fas fa-shopping-cart"></i>
                  </button>
-                  </div>
+                </div>
+                  
                 </div>
               </div>
             </div>
@@ -101,6 +106,7 @@
   import { ref, computed, onMounted } from 'vue';
   import type { Product } from "@/types/pos"; 
   import ApiService from "@/core/services/ApiService";
+  import { toast } from "vue3-toastify";
   
   // // Import images 
   // import somTamImage from '@/assets/images/somtam.jpeg';
@@ -157,8 +163,8 @@
   const fetchProducts = async () => {
     try {
         const response = await ApiService.get('/inventori/produk');
-        console.log(response.data.data);
-        items.value = response.data.data; 
+        console.log(response.data);
+        items.value = response.data; 
     } catch (error) {
         console.error("Error fetching products:", error);
     }
@@ -174,7 +180,9 @@ onMounted(() => {
   // Computed properties
   const filteredItems = computed(() => {
     return items.value.filter(item => {
-      const matchesSearch = item.name.toLowerCase().includes(searchQuery.value.toLowerCase());
+      const matchesSearch = item.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+                          item.description.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+                          item.category.toLowerCase().includes(searchQuery.value.toLowerCase());
       const matchesCategory = selectedCategory.value === 'All' || item.category === selectedCategory.value;
       return matchesSearch && matchesCategory;
     });
@@ -197,6 +205,11 @@ onMounted(() => {
   
   // Add item to cart
   const addToCart = (item) => {
+    if (item.is_sold_out) {
+      toast.error("Item ini sudah terjual habis dan tidak bisa dipesan")
+    return; // Keluar dari metode jika sold out
+  }
+  
     const existingItem = cart.value.find(cartItem => cartItem.id === item.id);
     if (existingItem) {
       existingItem.quantity++;
@@ -212,8 +225,11 @@ onMounted(() => {
   
   // Clear the cart
   const clearCart = () => {
+  if (confirm('Are you sure you want to clear the cart?')) {
     cart.value = [];
+    }
   };
+
   
   // Checkout function
   const checkout = () => {
@@ -464,16 +480,15 @@ onMounted(() => {
   }
   
   .btn-secondary {
-    background-color: #8d8e8e;
+    background-color: #ffff;
     color: rgb(0, 0, 0);
-    border: none;
     padding: 10px 15px;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.4s;
     margin-left: 10px;
   }
-  
+
   .cart-item {
     display: flex;
     justify-content: space-between;
@@ -528,4 +543,30 @@ onMounted(() => {
       padding: 5px;
       font-size: 12px;
  }
+
+ .image-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.sold-out-image {
+  filter: grayscale(100%);
+  opacity: 0.6;
+}
+
+.sold-out-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(185, 23, 23, 0.7); /* Latar belakang transparan */
+  color: white;
+  padding: 10px 20px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border-radius: 5px;
+  text-transform: uppercase;
+}
+
+
 </style>
