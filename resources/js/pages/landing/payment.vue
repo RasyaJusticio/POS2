@@ -50,13 +50,13 @@
 
 <script setup lang="ts">
 import { currency } from '@/libs/utils';
-import { useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { ref, computed, onMounted } from 'vue';
 import QRCode from 'qrcode-generator';
 import jsPDF from 'jspdf';
 import axios from 'axios';
 
-const route = useRouter();
+const route = useRoute();
 const cart = ref([]);
 const selectedPayment = ref(null);
 const receiptVisible = ref(false);
@@ -130,7 +130,7 @@ function downloadReceipt() {
 }
 
 function handlePayment() {
-  axios.post(`/order/checkout/9ef064bc-f001-4678-86c2-de2e625e8b1a`)
+  axios.post(`/orders/checkout/9ef064bc-f001-4678-86c2-de2e625e8b1a`)
     .then(response => {
       if (window.snap) {
         window.snap.pay(response.data.payment_url, {
