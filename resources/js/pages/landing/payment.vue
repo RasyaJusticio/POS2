@@ -39,8 +39,8 @@
     <!-- Modal Konfirmasi -->
     <div v-if="showConfirmationModal" class="modal">
       <div class="modal-content">
-        <h3>Konfirmasi Pembayaran</h3>
-        <p>Apakah Anda yakin ingin melanjutkan pembayaran dengan {{ handlePayment }}?</p>
+        <h3>Konfirmasi Pembayaran</h3> click
+        <p>Apakah Anda yakin ingin melanjutkan pembayaran?</p> 
         <button @click="confirmPayment" class="btn btn-success">Ya</button>
         <button @click="cancelPayment" class="btn btn-secondary">Tidak</button>
       </div>
@@ -129,7 +129,19 @@ function downloadReceipt() {
   doc.save("struk_pembayaran.pdf");
 }
 
-function handlePayment(uuid) {
+// cara penggunaan: handlePayment(1234-1234-1234-1234) <--
+function handlePayment() {
+  const cartQuery: any = route.query.cart;
+  const cart = JSON.parse(cartQuery);
+
+  // Dapatkan UUID dari url
+  const uuid: any = cart[0]?.uuid;
+
+  if (!uuid) {
+    console.warn('UUID tidak terdeteksi')
+    return;
+  }
+
   axios.post(`/orders/checkout/${uuid}`)
     .then(response => {
       if (window.snap) {
