@@ -329,7 +329,6 @@
 
 <section id="about" class="about-us text-center mb-5" style="background-color: #ffff; padding: 40px 0;">
   <div class="container">
-    <h2 class="mb-4">About Us</h2>
     <div class="hero-image-container">
     <video autoplay muted loop class="img-fluid rounded hero-image11">
         <source src="@/assets/images/kgro.mp4" type="video/mp4">
@@ -441,13 +440,13 @@
         <p class="lead mb-4">We're here to serve you! For inquiries, feedback, or reservations, please reach out.</p>
                  
         <div class="social-icons mb-4">
-            <a href="https://www.instagram.com/whozviaa?igsh=emp5YnBpZzI3MzNi" target="_blank" class="btn btn-outline-us mx-2">
+            <a href="https://www.instagram.com/whozviaa?igsh=emp5YnBpZzI3MzNi" target="_blank" class="btn btn-outline-success1 mx-2">
                 <i class="fab fa-instagram"></i> Instagram
             </a>
-            <a href="https://wa.me/qr/STA2YM5YISFCF1" target="_blank" class="btn btn-outline-success mx-2">
-                <i class="fab fa-whatsapp"></i> WhatsApp
+            <a href="https://wa.me/qr/STA2YM5YISFCF1" target="_blank" class="btn btn-outline-success2 mx-2">
+                <i class="fab fa-whatsapp "></i> WhatsApp
             </a>
-            <a href="https://facebook.com/yourrestaurant" target="_blank" class="btn btn-outline-primary mx-2">
+            <a href="https://facebook.com/yourrestaurant" target="_blank" class="btn btn-outline-success3 mx-2">
                 <i class="fab fa-facebook-f"></i> Facebook
             </a>
         </div>
@@ -464,37 +463,74 @@
             </iframe>
         </div>
         
-        <div class="reservation-section">
-            <h3 class="mt-5">Make a Reservation</h3>
-            <form @submit.prevent="submitReservation" class="mb-4">
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label for="name">Name</label>
-                        <input type="text" class="form-control" id="name" v-model="reservation.name" required />
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="phone">Phone</label>
-                        <input type="tel" class="form-control" id="phone" v-model="reservation.phone" required />
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label for="date">Date</label>
-                        <input type="date" class="form-control" id="date" v-model="reservation.date" required />
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="time">Time</label>
-                        <input type="time" class="form-control" id="time" v-model="reservation.time" required />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="guests">Number of Guests</label>
-                    <input type="number" class="form-control" id="guests" v-model="reservation.guests" min="1" required />
-                </div>
-                <button type="submit" class="btn-reserve">Reserve Table</button>
+      
+        <div class="O">
+  <h2 class="Iya">Make a Reservation</h2>
 
-            </form>
-        </div>
+  <form @submit.prevent="submitReservation" class="K">
+    <!-- Name -->
+    <div class="J">
+      <label for="name" class="form-label">Name:</label>
+      <input type="text" id="name" v-model="reservation.name" class="form-control" required />
+    </div>
+
+    <!-- Phone -->
+    <div class="J">
+      <label for="phone" class="form-label">Phone:</label>
+      <input type="tel" id="phone" v-model="reservation.phone" class="form-control" required />
+    </div>
+
+    <!-- Date -->
+    <div class="J">
+      <label for="date" class="form-label">Date:</label>
+      <input 
+        type="date" 
+        id="date" 
+        v-model="reservation.date" 
+        class="form-control" 
+        required 
+        @change="fetchTotalReservations" 
+      />
+    </div>
+
+    <!-- Start Time -->
+    <div class="J">
+      <label for="start-time" class="form-label">Start Time:</label>
+      <input type="time" id="start-time" v-model="reservation.start_time" class="form-control" required />
+    </div>
+
+    <!-- End Time -->
+    <div class="J">
+      <label for="end-time" class="form-label">End Time:</label>
+      <input type="time" id="end-time" v-model="reservation.end_time" class="form-control" required />
+    </div>
+
+    <!-- Guests -->
+    <div class="J">
+      <label for="guests" class="form-label">Guests:</label>
+      <input 
+        type="number" 
+        id="guests" 
+        v-model="reservation.guests" 
+        class="form-control" 
+        min="1" 
+        required 
+      />
+    </div>
+
+    <button type="submit" class="P">Reserve</button>
+  </form>
+
+  <div v-if="reservationSuccess" class="L">
+    Reservation made successfully!
+  </div>
+
+  <div v-if="!checkReservationLimit()" class="alert alert-warning mt-3">
+    Reservation limit for this day is {{ maxGuestsPerDay }} guests. You have {{ totalItems }} guests already reserved.
+  </div>
+</div>
+
+
     </div>
 </section>
 
@@ -504,29 +540,81 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import axios from 'axios';
 
 const reservation = ref({
   name: '',
   phone: '',
   date: '',
-  time: '',
-  guests: 1,
+  start_time: '',
+  end_time: '',
+  guests: 1
 });
 
-const submitReservation = () => {
-  alert(`Reservation made for ${reservation.value.guests} guests on ${reservation.value.date} at ${reservation.value.time}.`);
-  reservation.value = {
-    name: '',
-    phone: '',
-    date: '',
-    time: '',
-    guests: 1,
-  };
+const reservationSuccess = ref(false);
+const totalItems = ref(0); // Total jumlah tamu reservasi pada hari tertentu
+const maxGuestsPerDay = 50; // Batas maksimal jumlah tamu per hari
+
+// Fungsi untuk mengambil jumlah total tamu yang sudah melakukan reservasi pada hari tersebut
+const fetchTotalReservations = async () => {
+  if (reservation.value.date) {
+    try {
+      const response = await axios.get(`http://localhost:8000/api/reservations/count?date=${reservation.value.date}`);
+      totalItems.value = response.data.totalItems;
+    } catch (error) {
+      console.error('Error fetching total reservations:', error);
+    }
+  }
 };
 
+// Fungsi untuk memeriksa apakah jumlah tamu melebihi batas per hari
+const checkReservationLimit = () => {
+  const totalGuests = totalItems.value + reservation.value.guests;
+  return totalGuests <= maxGuestsPerDay;
+};
 
+// Fungsi untuk mengirim reservasi ke backend
+const submitReservation = async () => {
+  // Validasi jika jumlah tamu melebihi batas per hari
+  if (!checkReservationLimit()) {
+    alert(`Sorry, the reservation limit for this day is ${maxGuestsPerDay} guests. Please reduce the number of guests.`);
+    return;
+  }
+
+  try {
+    // Mengirim POST request untuk membuat reservasi
+    const response = await axios.post('http://localhost:8000/api/reservations', reservation.value);
+
+    // Jika berhasil
+    reservationSuccess.value = true;
+
+    // Reset form setelah berhasil
+    reservation.value = {
+      name: '',
+      phone: '',
+      date: '',
+      start_time: '',
+      end_time: '',
+      guests: 1
+    };
+
+    alert('Reservation made successfully!');
+  } catch (error) {
+    // Tangani error jika ada
+    if (error.response && error.response.data.status === 'error') {
+      alert(error.response.data.message); // Menampilkan pesan error dari backend
+    } else {
+      console.error('Error submitting reservation:', error.response?.data || error);
+      alert('Failed to make reservation. Please try again.');
+    }
+  }
+};
+
+// Memanggil fungsi untuk mendapatkan total reservasi saat halaman dimuat
+onMounted(() => {
+  fetchTotalReservations();
+});
 
 const visibleDescription = ref<string | null>(null);
 const showAll = ref(false);
@@ -540,7 +628,6 @@ const dishes = [
 const allDishes = [
   { id: 'padthai', name: 'Pad Thai', nameInThai: 'ผัดไทย', image: '@/assets/images/pad.jpeg', description: 'A classic Thai stir-fried noodle dish made with rice noodles, shrimp or chicken, tofu, peanuts, and bean sprouts.' },
   { id: 'khao_pad', name: 'Khao Pad', nameInThai: 'ข้าวผัด', image: '@/assets/images/khao.jpeg', description: 'Thai fried rice that often includes vegetables, eggs, and your choice of protein, seasoned with soy sauce.' },
-  // Add more dishes here...
 ];
 
 const toggleMenu = () => {
@@ -555,7 +642,30 @@ const showDescription = (id: string) => {
   visibleDescription.value = visibleDescription.value === id ? null : id;
 };
 
+// Fungsi untuk mengatur posisi floating card mengikuti kursor
+const cardPosition = ref({ top: '50%', left: '50%' });
+let floatingCardElement: HTMLElement | null = null;
+
+const updateCardPosition = (event: MouseEvent) => {
+  if (floatingCardElement) {
+    // Menyelaraskan posisi kartu dengan posisi kursor
+    cardPosition.value = {
+      top: `${event.clientY + 20}px`, // 20px untuk jarak dari kursor
+      left: `${event.clientX + 20}px` // 20px untuk jarak dari kursor
+    };
+  }
+};
+
+onMounted(() => {
+  floatingCardElement = document.querySelector('.floating-card');
+  window.addEventListener('mousemove', updateCardPosition);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('mousemove', updateCardPosition);
+});
 </script>
+
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
@@ -712,29 +822,47 @@ const showDescription = (id: string) => {
   font-family: 'Poppins', sans-serif; /* Change to Poppins */
 }
 
-.btn-outline-primary:hover {
+.btn-outline-danger:hover {
   background-color: #c8102e; /* Button background on hover */
   color: white;
 }
 
+.btn-outline-prim:hover {
+  background-color: #c8102e; /* Button background on hover */
+  color: white;
+}
+
+.fab {
+  color: rgb(104, 89, 89);
+}
+
 .floating-card {
-  position: absolute; /* Use absolute positioning for placement */
-  top: 0;
-  left: 0;
+  position: fixed; /* Ganti 'relative' dengan 'fixed' supaya posisinya tetap pada layar */
+  top: 50%; /* Akan diubah oleh JavaScript */
+  left: 50%; /* Akan diubah oleh JavaScript */
   transform: translate(-50%, -50%);
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.9); /* Adjust alpha untuk transparansi */
   padding: 20px;
   border-radius: 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-  display: none; /* Initially hidden */
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  z-index: 1000; /* Pastikan card muncul di atas konten lainnya */
+  display: flex; /* Menggunakan Flexbox */
+  flex-direction: column; /* Menumpuk elemen secara vertikal */
+  align-items: center; /* Menyusun anak elemen secara horizontal di tengah */
+  justify-content: center; /* Menyusun anak elemen secara vertikal di tengah */
   text-align: justify;
   font-size: 18px;
-  width: 80%;
+  width: 80%; /* Lebar 80% dari viewport */
   max-width: 400px;
+  pointer-events: none; /* Agar card tidak menghalangi klik elemen di bawahnya */
+}
+
+.floating-card.active {
+  pointer-events: auto; /* Mengaktifkan kembali pointer-event saat card aktif */
+}
+
+.floating-card .close-btn {
+  pointer-events: auto; /* Memastikan tombol close bisa diklik */
 }
 
 .floating-card h3 {
@@ -752,13 +880,13 @@ const showDescription = (id: string) => {
   position: absolute;
   top: 10px;
   right: 10px;
+  z-index: 1100; /* Memastikan tombol close berada di atas kartu */
 }
 
 .floating-card p {
-  margin: 10px 0;
-  margin-top: 0;
+  margin: 0px 0;
+  margin-top: 0%;
 }
-
 
 .category-card1 {
     margin-bottom: 30px; /* Jarak antar card */
@@ -829,11 +957,11 @@ const showDescription = (id: string) => {
 }
 
 .hero-image11 {
-    width: 100%; /* Lebar penuh */
+    width: 80%; /* Lebar penuh */
     height: auto; /* Memelihara rasio aspek */
-    border-radius: 10px; /* Sudut membulat */
+    border-radius: 0px; /* Sudut membulat */
     object-fit: cover; /* Mengisi area dengan baik */
-    margin-top: -100px; /* Atur jarak atas */
+    margin-top: -50px; /* Atur jarak atas */
     position: relative; /* Pastikan z-index berfungsi */
     z-index: -1; /* Tempatkan di belakang konten */
 }
@@ -877,35 +1005,14 @@ h3 {
 }
 
 .pricing-section p, .about-us p {
-  color: #555; /* Darker text for better readability */
+  color: #000000; /* Darker text for better readability */
   font-family: 'Poppins', sans-serif; /* Change to Poppins */
+  margin-top: 1%;
 }
-
-.btn-outline-success {
-  border-color: #0ba74f;
-  color: #000000;
-}
-
-.btn-outline-success:hover {
-  background-color: #0ba74f;
-  color: white;
-}
-
-.btn-outline-us {
-  border-color: #db2e2e;
-  color: #000000;
-}
-
-.btn-outline-us:hover {
-  background-color: #db2e2e;
-  color: white;
-}
-
-
 
 .btn-outline-primary {
   border-color: #105fc7;
-  color: #000000;
+  color: white;
 }
 
 .btn-outline-primary:hover {
@@ -945,10 +1052,9 @@ h3 {
   top: 0; /* Mengatur gambar agar berada di bagian atas */
   left: 0; /* Mengatur gambar agar berada di sebelah kiri */
   width: 100%; /* Membuat gambar lebar penuh */
-  height: 100%; /* Membuat gambar tinggi penuh */
+  height: auto; /* Membuat gambar tinggi penuh */
   object-fit: cover; /* Menjaga rasio gambar dan mengisi area */
   z-index: -1; /* Menempatkan gambar di belakang konten */
-  margin-top: 2%;
 }
 
 .table {
@@ -976,6 +1082,7 @@ h3 {
 .social-icons .btn {
   font-size: 1.5rem; /* Increase font size */
   padding: 25px 35px; /* Add padding for better touch targets */
+  color: #6b6262
 }
 
 .social-icons .btn i {
@@ -1074,6 +1181,21 @@ h5 {
   margin-top: 10%
 }
 
+.btn-outline-success1:hover {
+  background-color: #e20404;
+  color: white;
+}
+
+.btn-outline-success2:hover {
+  background-color: #50c932;
+  color: white;
+}
+
+.btn-outline-success3:hover {
+  background-color: #5796bb;
+  color: white;
+}
+
 .lead {
   font-size: 1.2em; /* Adjust as needed */
 }
@@ -1131,4 +1253,189 @@ p {
   background-color: #1a217c; /* Warna lebih gelap saat hover */
   transform: scale(1.05); /* Efek pembesaran */
 }
+
+/* Container styling */
+.O {
+  max-width: 600px; /* Maksimal lebar container */
+  margin: 50px auto; /* Memusatkan container */
+  padding: 30px; /* Memberikan padding dalam container */
+  background-color: #fff; /* Latar belakang putih */
+  border-radius: 10px; /* Membulatkan sudut */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Menambahkan bayangan untuk efek kedalaman */
+  transition: box-shadow 0.3s ease-in-out; /* Efek transisi bayangan */
+  display: flex;
+  flex-direction: column;
+}
+
+.O:hover {
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15); /* Mengubah bayangan saat hover */
+}
+
+/* Styling untuk judul */
+.Iya {
+  text-align: center;
+  font-size: 26px;
+  margin-bottom: 30px;
+  color: #333;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Form container styling */
+.K {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Styling label dan input secara umum */
+.J {
+  margin-bottom: 20px;
+}
+
+.J label {
+  display: block;
+  font-size: 18px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.J input {
+  width: 100%; /* Lebar penuh untuk semua input */
+  padding: 12px;
+  font-size: 16px;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease-in-out;
+}
+
+.J input:focus {
+  border-color: #4CAF50;
+  box-shadow: 0 0 8px rgba(72, 192, 85, 0.2);
+}
+
+.J input::placeholder {
+  color: #aaa;
+  font-size: 14px;
+}
+
+/* Styling untuk form agar Name dan Phone, Date dan Guests bersebelahan */
+.J .row {
+  display: flex;
+  justify-content: space-between; /* Memisahkan dua kolom */
+  gap: 20px; /* Memberikan jarak antar kolom */
+}
+
+.J .row > div {
+  flex: 1; /* Membuat kolom memiliki lebar yang sama */
+}
+
+.J .row > div input {
+  width: 100%; /* Menjamin input menggunakan lebar penuh dalam kolom */
+}
+
+/* Styling untuk Start Time dan End Time agar bersebelahan */
+.J .time-container {
+  display: flex;
+  justify-content: space-between; /* Menyusun Start Time dan End Time berdampingan */
+  gap: 20px; /* Jarak antar input */
+}
+
+.J .time-container input {
+  width: 48%; /* Setengah lebar untuk masing-masing input */
+}
+
+/* Button styling */
+.P {
+  padding: 14px 20px;
+  background-color: #c8102e;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease-in-out;
+  width: 100%; /* Lebar penuh untuk tombol */
+  letter-spacing: 1px;
+  box-shadow: 0 4px 8px rgba(0, 128, 0, 0.1);
+}
+
+.P:hover {
+  background-color: #45a049;
+  transform: translateY(-2px);
+}
+
+.P:active {
+  background-color: #3e8e41;
+  transform: translateY(0);
+}
+
+.P:focus {
+  outline: none;
+  border: 1px solid #4CAF50;
+  box-shadow: 0 0 8px rgba(72, 192, 85, 0.3);
+}
+
+/* Styling untuk pesan sukses */
+.L {
+  margin-top: 20px;
+  background-color: #d4edda;
+  color: #155724;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #c3e6cb;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0, 128, 0, 0.2);
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+  .O {
+    padding: 25px;
+  }
+
+  .J input {
+    font-size: 15px;
+    padding: 10px;
+  }
+
+  .P {
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  .J .row, .J .time-container {
+    flex-direction: column; /* Menyusun kolom secara vertikal di layar kecil */
+  }
+
+  .J .row > div {
+    width: 100%; /* Full width untuk masing-masing kolom */
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .O {
+    padding: 20px;
+  }
+
+  .J input {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .P {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
+
+
 </style>

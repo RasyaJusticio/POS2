@@ -1,20 +1,22 @@
 <template>
   <div class="stat-card">
+    <!-- Bagian pertama: Icon dan value dengan ukuran besar -->
     <div class="icon-value">
       <i :class="iconClass" class="large-icon"></i>
       <p class="value">{{ value }}</p>
     </div>
+    <!-- Bagian kedua: Judul -->
     <h3>{{ title }}</h3>
+    
   </div>
 </template>
 
 <script setup lang="ts">
 defineProps({
   title: String,
-  value: [Number, String],
+  value: [String, Number],
   iconClass: String,
 });
-
 </script>
 
 <style scoped>
@@ -50,4 +52,5 @@ defineProps({
 h3 {
   margin-left: 10px; /* Jarak antara ikon-value dan judul */
 }
+
 </style>

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->uuid('uuid')->unique(); // Tambahkan UUID
             $table->string('name');
             $table->string('category');
-            $table->integer('price');
+            $table->double('price');
             // $table->integer('quantity');
             $table->text('description')->nullable();
             $table->string('image_url')->nullable();
