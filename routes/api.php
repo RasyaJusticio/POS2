@@ -86,7 +86,7 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
                 
                 Route::group(['prefix' => 'produk'], function () {
                     // Route::get('/', [ProductController::class, 'get']);
-                    Route::get('/', [ProductController::class, 'index']);
+                    Route::get('/', [ProductController::class, 'index'])->withoutMiddleware('can:inventori-produk');
                     Route::post('/', [ProductController::class, 'index']);
                     Route::post('/store', [ProductController::class, 'store']);
                     

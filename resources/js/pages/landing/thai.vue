@@ -6,8 +6,9 @@
     </video>
       <router-link to="/landing/PAGE">
         <button class="btn btn-lg btn-secondary">
-    <i class="fas fa-arrow-left "></i>
-</button>            </router-link>
+          <i class="fas fa-arrow-left "></i>
+        </button>           
+    </router-link>
     <div class="header-image">
       <img src="@/assets/images/spice.png" alt="Spice Image" style="max-width: 60%; height: auto;" />
     </div>
@@ -536,13 +537,15 @@ onMounted(() => {
       font-size: 12px;
  }
 
- .sold-out {
-    filter: grayscale(100%); /* Menjadikan item hitam putih */
-    opacity: 0.5; /* Mengurangi opasitas */
+  .soldOut {
+    text-decoration: line-through;
+    filter: grayscale(100%); /* Buat tampilan produk jadi hitam putih jika sold out */
+    opacity: 0.6; /* Kurangi opacity jika sold out */
   }
 
   .sold-out-label {
-    color: red; /* Warna label sold out */
+    color: red;
+    font-size: 18px; /* Warna label sold out */
     font-weight: bold; /* Menggunakan huruf tebal */
   }
 

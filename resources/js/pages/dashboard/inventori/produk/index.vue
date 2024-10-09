@@ -17,16 +17,16 @@ const { delete: deleteProduct } = useDelete({
     onSuccess: () => paginateRef.value.refetch(),
 });
 
-const toggleSoldOut = async (productId) => {
+const toggleSoldOut = async (productId: number) => {
     try {
-        console.log('Data produk:', paginateRef.value.data); // Tambahkan ini untuk memeriksa struktur data
+        console.log('Data produk:', paginateRef.value.data.data); // Tambahkan ini untuk memeriksa struktur data
         const response = await axios.post(`/inventori/produk/${productId}/toggle-sold-out`);
         
         // Periksa apakah respons berhasil
         if (response.status === 200) {
             // Pastikan paginateRef.value.data adalah array
-            if (Array.isArray(paginateRef.value.data)) {
-                const product = paginateRef.value.data.find((p: Product) => p.id === productId);
+            if (Array.isArray(paginateRef.value.data.data)) {
+                const product = paginateRef.value.data.data.find((p: Product) => p.id === productId);
                 if (product) {
                     product.is_sold_out = response.data.product.is_sold_out; // Perbarui status dengan nilai dari respons
                 }
@@ -52,7 +52,7 @@ const categories = ref([
 
 const columns = [
     column.display({
-        header: "N",
+        header: "No.",
         cell: (cell) => cell.row.index + 1, // Menampilkan nomor urut berdasarkan index row
     }),
     column.accessor("name", {
@@ -111,10 +111,13 @@ const columns = [
             h(
                 "button",
                 {
-                    class: "btn btn-sm btn-icon",
+                    class: [ 
+                        "btn btn-sm btn-icon",
+                        cell.row.original.is_sold_out ? "btn-danger" : "btn-success",
+                    ],
                     onClick: () => toggleSoldOut(cell.getValue()),
                 },
-                h("span", cell.row.original.is_sold_out ? "Available" : "Sold Out")
+                h("span", cell.row.original.is_sold_out ? "Sold Out" : "Avail able")
             ),
         ]),
     }),
@@ -160,12 +163,6 @@ watch(selectedCategory, (newCategory) => {
             <h2 class="mb-0">Product List</h2>
 
             <!-- Dropdown Kategori -->
-            <select v-model="selectedCategory" class="form-select me-3" style="width: auto">
-                <option value="">All Categories</option>
-                <option v-for="category in categories" :key="category.id" :value="category.name.toLowerCase()">
-                    {{ category.name }}
-                </option>
-            </select>
 
             <!-- Tombol Tambah Produk -->
             <button
@@ -190,3 +187,12 @@ watch(selectedCategory, (newCategory) => {
         </div>
     </div>
 </template>
+
+<style scoped>
+
+.soldOut {
+    filter: grayscale(100%);
+    opacity: 0.6;
+}
+
+</style>

@@ -15,7 +15,7 @@ class OrderController extends Controller
             \Midtrans\Config::$isProduction = false;
             \Midtrans\Config::$isSanitized = true;
             \Midtrans\Config::$is3ds = true;
-
+        
             // Siapkan parameter transaksi
             $params = [
                 'transaction_details' => [
@@ -23,10 +23,10 @@ class OrderController extends Controller
                     'gross_amount' => $order->price,
                 ],
             ];
-
+        
             // Dapatkan Snap Token dari Midtrans
             $snapToken = \Midtrans\Snap::getSnapToken($params);
-
+        
             return response()->json([
                 'success' => true,
                 'payment_url' => $snapToken,
