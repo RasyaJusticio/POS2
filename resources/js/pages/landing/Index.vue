@@ -542,6 +542,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import axios from 'axios';
+import { toast } from "vue3-toastify"
 
 const reservation = ref({
   name: '',
@@ -578,7 +579,7 @@ const checkReservationLimit = () => {
 const submitReservation = async () => {
   // Validasi jika jumlah tamu melebihi batas per hari
   if (!checkReservationLimit()) {
-    alert(`Sorry, the reservation limit for this day is ${maxGuestsPerDay} guests. Please reduce the number of guests.`);
+    toast.info("Sorry, the reservation limit for this day is ${maxGuestsPerDay} guests. Please reduce the number of guests.");
     return;
   }
 
@@ -599,14 +600,14 @@ const submitReservation = async () => {
       guests: 1
     };
 
-    alert('Reservation made successfully!');
+    toast.success("Reservation made successfully!");
   } catch (error) {
     // Tangani error jika ada
     if (error.response && error.response.data.status === 'error') {
       alert(error.response.data.message); // Menampilkan pesan error dari backend
     } else {
       console.error('Error submitting reservation:', error.response?.data || error);
-      alert('Failed to make reservation. Please try again.');
+      toast.error("Failed to make reservation. Please try again.");
     }
   }
 };

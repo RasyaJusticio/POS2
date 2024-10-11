@@ -94,20 +94,6 @@ const columns = [
                         selected.value = cell.getValue();
                         openForm.value = true;
                     },
-<<<<<<< HEAD
-                    h("i", { class: "la la-pencil fs-2" })
-                ),
-                h(
-                    "button",
-                    {
-                        class: "btn btn-sm btn-icon btn-danger",
-                        onClick: () => 
-                            deleteProduct(`/inventori/produk/${cell.getValue()}`)
-                    },
-                    h("i", { class: "la la-trash fs-2" })
-                ),
-            ]),
-=======
                 },
                 h("i", { class: "la la-pencil fs-2" })
             ),
@@ -134,7 +120,6 @@ const columns = [
                 h("span", cell.row.original.is_sold_out ? "Sold Out" : "Avail able")
             ),
         ]),
->>>>>>> 9f291ebc4a67f74d29402bfca5b99f211a38090e
     }),
 
 ];
@@ -144,7 +129,7 @@ const refresh = () => paginateRef.value?.refetch();
 
 watch(openForm, (val) => {
     if (!val) {
-        selected.value = undefined; // Reset selected saat form ditutup
+        selected.value = ""; // Reset selected saat form ditutup
     }
     window.scrollTo(0, 0); // Scroll ke atas saat buka/tutup form
 });
@@ -203,11 +188,4 @@ watch(selectedCategory, (newCategory) => {
     </div>
 </template>
 
-<style scoped>
 
-.soldOut {
-    filter: grayscale(100%);
-    opacity: 0.6;
-}
-
-</style>

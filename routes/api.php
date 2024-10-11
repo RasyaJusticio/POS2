@@ -9,12 +9,18 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReservationController;
 
+
 use Illuminate\Support\Facades\Route;
 
 /*
 |-------------------------------------------------------------------------- 
 | API Routes 
 |-------------------------------------------------------------------------- 
+| 
+| Here is where you can register API routes for your application. These 
+| routes are loaded by the RouteServiceProvider and all of them will 
+| be assigned to the "api" middleware group. Make something great! 
+| 
 */
 
 // Authentication Route
@@ -75,33 +81,10 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
 
         // Rute untuk menghapus item
         Route::delete('pos-items/{id}', [ItemController::class, 'destroy']);
-    });
-});
 
-// Rute untuk Orders
-Route::prefix('orders')->group(function () {
-    Route::post('/checkout/{uuid}', [OrderController::class, 'payment']);
-    Route::get('/show/{uuid}', [OrderController::class, 'show']);
-});
-
-// Rute untuk Produk
-Route::prefix('inventori')->group(function () {
-    Route::middleware('can:inventori-produk')->group(function () {
-        Route::group(['prefix' => 'produk'], function () {
-            Route::get('/', [ProductController::class, 'index']);
-            Route::post('/', [ProductController::class, 'index']);
-            Route::post('/store', [ProductController::class, 'store']);
-            
-            Route::group(['prefix' => '{id}'], function () {
-                Route::get('/', [ProductController::class, 'show']); // GET: produk/{product_id}
-                Route::post('/', [ProductController::class, 'update']);
-                Route::delete('/', [ProductController::class, 'destroy']);
             });
+
         });
-<<<<<<< HEAD
-    });
-});
-=======
 
         Route::prefix('orders')->group(function () {
             Route::post('/checkout/{uuid}', [OrderController::class, 'payment']);
@@ -131,4 +114,3 @@ Route::prefix('inventori')->group(function () {
             });
     
         });
->>>>>>> 9f291ebc4a67f74d29402bfca5b99f211a38090e
