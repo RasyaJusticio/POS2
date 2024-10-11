@@ -4,7 +4,7 @@ use App\Models\Order;
 use Illuminate\Http\Request;
 class OrderController extends Controller
 {
-    public function payment($uuid)
+    public function payment(Request $request, $id)
     {
 
         $order = Order::findByUuid($uuid);

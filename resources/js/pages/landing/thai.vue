@@ -88,9 +88,7 @@
         <div class="total">
           <strong>Total: {{ formatCurrency(total) }}</strong>
         </div>
-        <router-link :to="{ path: '/landing/payment', query: { cart: JSON.stringify(cart) } }">
-  <button class="btn btn-success" style="margin-right: 30px;">Checkout</button>
-</router-link>
+        <button class="btn btn-success" style="margin-right: 30px;" @click="submit(cart)" >Checkout</button>
 
         <button @click="clearCart" class="btn btn-danger">Clear Cart</button>
   
@@ -107,7 +105,9 @@
   import type { Product } from "@/types/pos"; 
   import ApiService from "@/core/services/ApiService";
   import { toast } from "vue3-toastify";
-  
+  import axios from "@/libs/axios";
+  import { useRouter } from 'vue-router';
+
   // // Import images 
   // import somTamImage from '@/assets/images/somtam.jpeg';
   // import padImage from '@/assets/images/pad.jpeg';
@@ -158,7 +158,8 @@
   const selectedCategory = ref('All');
   const discount = ref(0);
   const isCartVisible = ref(false);
-  
+  const router = useRouter();
+  const pembelian = ref();
 
   const fetchProducts = async () => {
     try {
@@ -172,9 +173,13 @@
 
 onMounted(() => {
     fetchProducts();
+    cart.value.forEach(id => {
+      console.log(id)
+    })
 });
 
 
+const valueTotal = ref()
 
 
   // Computed properties
@@ -187,9 +192,54 @@ onMounted(() => {
       return matchesSearch && matchesCategory;
     });
   });
+
+
+  function submit (items: any){
+    const formDataToSubmit = new FormData();
+    formDataToSubmit.append('total_price' , valueTotal.value);
+    items.map((item) => {
+      // console.log(item.id)
+      formDataToSubmit.append('products_id[]', item.id)
+    })
+    
+
+    axios({
+        method: "post",
+        url: "/itempembelian/submit",
+        data: formDataToSubmit,
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    })
+      .then((data) => {
+          pembelian.value = data.data.Pembelian
+          console.log(pembelian.value)
+          toast.success("Produk berhasil disimpan");
+          // formRef.value.resetForm();
+          router.push({
+            name: 'landingcheck', 
+            // params: {pembelian_id: pembelian.value.id}
+          })
+          if (window.snap) {
+            window.snap.pay(data.data.payment_url, {
+              onSuccess: (result) => {
+                console.log("Pembayaran berhasil:", result);
+              }
+            });
+          }
+      })
+      .catch((err: any) => {
+          // formRef.value.setErrors(err.response.data.errors);
+          toast.error(err.response.data.message);
+      })
+  }
+
+
   
   const total = computed(() => {
     const subtotal = cart.value.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+
+    valueTotal.value = subtotal - (subtotal * (discount.value / 100))
     return subtotal - (subtotal * (discount.value / 100));
   });
   

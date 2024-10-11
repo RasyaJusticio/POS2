@@ -20,6 +20,10 @@ class Product extends Model
         'is_sold_out',
     ];
 
+    public function items(){
+        $this->belongsToMany(Pembelian::class, 'itempembelians');
+    }
+
     // Override fungsi boot untuk membuat UUID otomatis
     protected static function boot()
     {

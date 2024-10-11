@@ -7,8 +7,7 @@
     <h1 class="title" :style="{ color: blueColor }">Transaksi Pembayaran</h1>
     <img src="@/assets/images/spice.png" alt="Logo" class="logo" /> <!-- Tambahkan Logo di sini -->
 
-      <button @click="handlePayment" class="btn btn-primary">Pay Now</button>
-
+    <router-link to="/landing ">  <button class="btn btn-lg btn-primary">BACK</button> </router-link>
 
     <div v-if="receiptVisible" class="receipt">
       <h2>Struk Pembayaran</h2>
@@ -131,30 +130,32 @@ function downloadReceipt() {
 
 // cara penggunaan: handlePayment(1234-1234-1234-1234) <--
 function handlePayment() {
-  const cartQuery: any = route.query.cart;
-  const cart = JSON.parse(cartQuery);
+  const pembelian_id = route.params.pembelian_id
+  console.log(pembelian_id)
+  // const cartQuery: any = route.query.cart;
+  // const cart = JSON.parse(cartQuery);
 
-  // Dapatkan UUID dari url
-  const uuid: any = cart[0]?.uuid;
+  // // Dapatkan UUID dari url
+  // const uuid: any = cart[0]?.uuid;
 
-  if (!uuid) {
-    console.warn('UUID tidak terdeteksi')
-    return;
-  }
+  // if (!uuid) {
+  //   console.warn('UUID tidak terdeteksi')
+  //   return;
+  // }
 
-  axios.post(`/orders/checkout/${uuid}`)
-    .then(response => {
-      if (window.snap) {
-        window.snap.pay(response.data.payment_url, {
-          onSuccess: (result) => {
-            console.log("Pembayaran berhasil:", result);
-          }
-        });
-      }
-    })
-    .catch(error => {
-        console.error('Error during order checkout:', error);
-    });
+  // axios.post(`/orders/checkout/${uuid}`)
+  //   .then(response => {
+      // if (window.snap) {
+      //   window.snap.pay(response.data.payment_url, {
+      //     onSuccess: (result) => {
+      //       console.log("Pembayaran berhasil:", result);
+      //     }
+      //   });
+      // }
+  //   })
+  //   .catch(error => {
+  //       console.error('Error during order checkout:', error);
+  //   });
 }
 
 

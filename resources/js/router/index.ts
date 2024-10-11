@@ -173,7 +173,7 @@ const routes: Array<RouteRecordRaw> = [
     },
 
     {
-        path: "/landing/payment",
+        path: "/landing/payment/",
         name: "landingcheck",
         component: () => import("@/pages/landing/payment.vue"),
         meta: {

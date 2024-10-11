@@ -17,7 +17,7 @@ const { delete: deleteProduct } = useDelete({
     onSuccess: () => paginateRef.value.refetch(),
 });
 
-const toggleSoldOut = async (productId: number) => {
+const toggleSoldOut = async (productId: any) => {
     try {
         console.log('Data produk:', paginateRef.value.data.data); // Tambahkan ini untuk memeriksa struktur data
         const response = await axios.post(`/inventori/produk/${productId}/toggle-sold-out`);
@@ -94,20 +94,6 @@ const columns = [
                         selected.value = cell.getValue();
                         openForm.value = true;
                     },
-<<<<<<< HEAD
-                    h("i", { class: "la la-pencil fs-2" })
-                ),
-                h(
-                    "button",
-                    {
-                        class: "btn btn-sm btn-icon btn-danger",
-                        onClick: () => 
-                            deleteProduct(`/inventori/produk/${cell.getValue()}`)
-                    },
-                    h("i", { class: "la la-trash fs-2" })
-                ),
-            ]),
-=======
                 },
                 h("i", { class: "la la-pencil fs-2" })
             ),
@@ -129,12 +115,11 @@ const columns = [
                         "btn btn-sm btn-icon",
                         cell.row.original.is_sold_out ? "btn-danger" : "btn-success",
                     ],
-                    onClick: () => toggleSoldOut(cell.getValue()),
+                    onClick: () => axios.get(`/inventori/produk/${cell.getValue()}/test`),
                 },
                 h("span", cell.row.original.is_sold_out ? "Sold Out" : "Avail able")
             ),
         ]),
->>>>>>> 9f291ebc4a67f74d29402bfca5b99f211a38090e
     }),
 
 ];
@@ -211,3 +196,4 @@ watch(selectedCategory, (newCategory) => {
 }
 
 </style>
+ 
