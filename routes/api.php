@@ -8,8 +8,8 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReservationController;
-
-
+use App\Http\Controllers\ItempembelianController;
+use App\Http\Controllers\PembelianController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -81,36 +81,42 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
 
         // Rute untuk menghapus item
         Route::delete('pos-items/{id}', [ItemController::class, 'destroy']);
+    });
+});
 
+// Rute untuk Orders
+Route::prefix('orders')->group(function () {
+    Route::post('/checkout/{id}', [OrderController::class, 'payment']);
+    Route::get('/show/{uuid}', [OrderController::class, 'show']);
+});
+
+Route::post('/itempembelian/submit', [PembelianController::class, 'store']);
+Route::get('/itempembelian/products', [ItempembelianController::class, 'getProducts']);
+
+
+Route::prefix('orders')->group(function () {
+    Route::post('/checkout/{uuid}', [OrderController::class, 'payment']);
+    Route::get('/show/{uuid}', [OrderController::class, 'show']);
+});
+
+Route::prefix('inventori')->group(function () {
+    Route::middleware('can:inventori-produk')->group(function () {
+
+
+        Route::group(['prefix' => 'produk'], function () {
+            // Route::get('/', [ProductController::class, 'get']);
+            Route::get('/', [ProductController::class, 'index'])->withoutMiddleware('can:inventori-produk');
+            Route::post('/', [ProductController::class, 'index']);
+            Route::post('/store', [ProductController::class, 'store']);
+
+            Route::group(['prefix' => '{id}'], function () { // produk/{product_id}
+                Route::get('/', [ProductController::class, 'show']); // GET: produk/{product_id}
+                Route::post('/', [ProductController::class, 'update']);
+                Route::delete('/', [ProductController::class, 'destroy']);
+                Route::post('/toggle-sold-out', [ProductController::class, 'toggleSoldOut']);
             });
-
         });
-
-        Route::prefix('orders')->group(function () {
-            Route::post('/checkout/{uuid}', [OrderController::class, 'payment']);
-            Route::get('/show/{uuid}', [OrderController::class, 'show']);
-        });
-
-        Route::prefix('inventori')->group(function () {
-            Route::middleware('can:inventori-produk')->group(function () {
-                
-                
-                Route::group(['prefix' => 'produk'], function () {
-                    // Route::get('/', [ProductController::class, 'get']);
-                    Route::get('/', [ProductController::class, 'index'])->withoutMiddleware('can:inventori-produk');
-                    Route::post('/', [ProductController::class, 'index']);
-                    Route::post('/store', [ProductController::class, 'store']);
-                    
-                    Route::group(['prefix' => '{id}'], function () { // produk/{product_id}
-                        Route::get('/', [ProductController::class, 'show']); // GET: produk/{product_id}
-                        Route::post('/', [ProductController::class, 'update']);
-                        Route::delete('/', [ProductController::class, 'destroy']);
-                        Route::post('/toggle-sold-out', [ProductController::class, 'toggleSoldOut']);
-
-                    });
-                });
-                // Route::apiResource('produk', ProductController::class)
-                //     ->except(['index', 'store'])->scoped(['product' => 'id']);
-            });
-    
-        });
+        // Route::apiResource('produk', ProductController::class)
+        //     ->except(['index', 'store'])->scoped(['product' => 'id']);
+    });
+});
