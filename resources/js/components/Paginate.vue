@@ -126,6 +126,7 @@ export default defineComponent({
             cacheTime: 0,
             enabled: props.enabled,
             onSuccess: (data) => {
+                console.log(data);
                 if (page.value > data.last_page) page.value = data.last_page;
             },
             onError: (err) => {

@@ -23,7 +23,7 @@ defineProps({
 .stat-card {
   flex: 1;
   background: #ffffff;
-  padding: 20px;
+  padding: 10px;
   border-radius: 8px;
   box-shadow: 2px 4px 4px hsla(0, 0%, 10%, 0.461);
   align-items: flex-start; /* Mengatur item ke atas */
@@ -44,9 +44,10 @@ defineProps({
 }
 
 .value {
-  font-size: 2rem; /* Sesuaikan ukuran untuk nilai */
+  font-size: 2.5rem; /* Sesuaikan ukuran untuk nilai */
   font-weight: bold;
   margin-left: 5px; /* Jarak untuk nilai */
+  margin-top: 5%;
 }
 
 h3 {

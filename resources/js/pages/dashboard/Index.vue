@@ -9,10 +9,11 @@
           :value="formatCurrency(totalSales)" 
           iconClass="fas fa-dollar-sign" 
         /> 
-        <StatCard 
+        <StatCard  
           title="Total Reservation" 
           :value="totalReservations" 
           iconClass="fas fa-box" 
+          @click="navigateToReservation"
         />
         <StatCard 
           title="Total Customers" 
@@ -37,8 +38,7 @@
 
       <!-- Menampilkan Total Reservations -->
       <div>
-        <!-- Tidak perlu lagi menampilkan ini karena sudah diubah ke dalam StatCard -->
-        <!-- <h3>Total Reservations: {{ totalReservations }}</h3> -->
+
       </div>
     </div>
   </main>
@@ -46,17 +46,21 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';  // Import useRouter
 import StatCard from './StatCard.vue';
 import ChartCard from './ChartCard.vue';
 import Chart from 'chart.js/auto';
 import axios from 'axios'; // Import axios untuk API call
 
-// Reactive state
+const router = useRouter();  // Inisialisasi router
 const totalSales = ref(0);
 const totalItems = ref(0); // Number of reservations from the API
-const totalCustomers = ref(0);
+const totalCustomers = ref(0); // Ini adalah state untuk total customers
 const profit = ref(0);
 
+const navigateToReservation = () => {
+  router.push({ name: 'dashboard.inventori.reservation' });  // Arahkan ke halaman reservasi
+};
 // Reactive state untuk total reservations
 const totalReservations = ref(0);
 
@@ -84,13 +88,21 @@ const fetchTotalReservations = async () => {
   }
 };
 
+// Fetch totalCustomers dari API (menampilkan total customers)
+const fetchTotalCustomers = async () => {
+  try {
+    const response = await axios.get('http://localhost:8000/api/total-customers');
+    totalCustomers.value = response.data.total_customers;
+  } catch (error) {
+    console.error('Error fetching total customers:', error);
+  }
+};
+
 // Memanggil fungsi saat komponen dimuat
 onMounted(() => {
-  // Fetch data saat dashboard dimuat
   fetchTotalItems();
   fetchTotalReservations();
-
-  // Initialize charts
+  fetchTotalCustomers(); // Tambahkan ini untuk mengambil total customer
   initializeCharts();
 });
 

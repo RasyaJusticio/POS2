@@ -17,7 +17,8 @@ class ProductController extends Controller
         $validator = Validator::make($request->all(), [
             'per' => 'integer|nullable',
             'page' => 'integer|nullable',
-            'category' => 'string|nullable'
+            'category' => 'string|nullable',
+            'search' => 'string|nullable'
         ]);
 
         if ($validator->fails()) {
@@ -32,11 +33,13 @@ class ProductController extends Controller
         $category = $validated['category'] ?? null;
         $per = $validated['per'] ?? null;
         $page = $validated['page'] ?? null;
+        $search = $validated['search'] ?? null;
 
         // Query produk
         $query = Product::query()
-            ->when($category, function (Builder $query, string $category) {
-                return $query->where('category', 'LIKE', '%' . $category . '%');
+            ->when($search, function ($q) use ($search) {
+                $q->where('name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('description', 'LIKE', '%' . $search . '%');
             });
         
         if ($per && $page) {

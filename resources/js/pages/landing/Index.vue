@@ -543,6 +543,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import axios from 'axios';
 
+// Data reservasi
 const reservation = ref({
   name: '',
   phone: '',
@@ -578,7 +579,19 @@ const checkReservationLimit = () => {
 const submitReservation = async () => {
   // Validasi jika jumlah tamu melebihi batas per hari
   if (!checkReservationLimit()) {
-    alert(`Sorry, the reservation limit for this day is ${maxGuestsPerDay} guests. Please reduce the number of guests.`);
+    // Tampilkan pesan menggunakan SweetAlert2
+    Swal.fire({
+      title: 'Reservation Limit Exceeded',
+      html: `
+        <p>We are sorry, but the reservation limit for this day has been reached.</p>
+        <p>Current guests: <strong>${totalItems.value}</strong></p>
+        <p>Available seats: <strong>${maxGuestsPerDay - totalItems.value}</strong></p>
+        <p>Please reduce the number of guests or select another day.</p>
+      `,
+      icon: 'error',
+      confirmButtonText: 'OK',
+      confirmButtonColor: '#d33',
+    });
     return;
   }
 
@@ -599,14 +612,33 @@ const submitReservation = async () => {
       guests: 1
     };
 
-    alert('Reservation made successfully!');
+    // Tampilkan pesan sukses menggunakan SweetAlert2
+    Swal.fire({
+      title: 'Reservation Successful!',
+      text: 'Your reservation has been successfully created.',
+      icon: 'success',
+      confirmButtonText: 'OK',
+      confirmButtonColor: '#28a745',
+    });
   } catch (error) {
     // Tangani error jika ada
     if (error.response && error.response.data.status === 'error') {
-      alert(error.response.data.message); // Menampilkan pesan error dari backend
+      Swal.fire({
+        title: 'Error!',
+        text: error.response.data.message, // Menampilkan pesan error dari backend
+        icon: 'error',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#dc3545',
+      });
     } else {
       console.error('Error submitting reservation:', error.response?.data || error);
-      alert('Failed to make reservation. Please try again.');
+      Swal.fire({
+        title: 'Failed to make reservation',
+        text: 'Something went wrong. Please try again.',
+        icon: 'error',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#dc3545',
+      });
     }
   }
 };
@@ -829,7 +861,7 @@ onBeforeUnmount(() => {
 
 .btn-outline-prim:hover {
   background-color: #c8102e; /* Button background on hover */
-  color: white;
+  color: rgb(0, 0, 0);
 }
 
 .fab {
@@ -1011,13 +1043,13 @@ h3 {
 }
 
 .btn-outline-primary {
-  border-color: #105fc7;
-  color: white;
+  border-color: #c8102e;
+  color: rgb(0, 0, 0);
 }
 
 .btn-outline-primary:hover {
-  background-color: #1c84c0;
-  color: white;
+  background-color: #c8102e;
+  color: rgb(255, 255, 255);
 }
 
 .about-us {
