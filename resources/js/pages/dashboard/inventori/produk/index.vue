@@ -17,7 +17,7 @@ const { delete: deleteProduct } = useDelete({
     onSuccess: () => paginateRef.value.refetch(),
 });
 
-const toggleSoldOut = async (productId: any) => {
+const toggleSoldOut = async (productId: number) => {
     try {
         console.log('Data produk:', paginateRef.value.data.data); // Tambahkan ini untuk memeriksa struktur data
         const response = await axios.post(`/inventori/produk/${productId}/toggle-sold-out`);
@@ -115,7 +115,7 @@ const columns = [
                         "btn btn-sm btn-icon",
                         cell.row.original.is_sold_out ? "btn-danger" : "btn-success",
                     ],
-                    onClick: () => toggleSoldOut(cell.getValue()), 
+                    onClick: () => toggleSoldOut(cell.getValue()),
                 },
                 h("span", cell.row.original.is_sold_out ? "Sold Out" : "Avail able")
             ),
@@ -129,7 +129,7 @@ const refresh = () => paginateRef.value?.refetch();
 
 watch(openForm, (val) => {
     if (!val) {
-        selected.value = undefined; // Reset selected saat form ditutup
+        selected.value = ""; // Reset selected saat form ditutup
     }
     window.scrollTo(0, 0); // Scroll ke atas saat buka/tutup form
 });
@@ -188,12 +188,4 @@ watch(selectedCategory, (newCategory) => {
     </div>
 </template>
 
-<style scoped>
 
-.soldOut {
-    filter: grayscale(100%);
-    opacity: 0.6;
-}
-
-</style>
- 

@@ -94,6 +94,8 @@ onMounted(() => {
   initializeCharts();
 });
 
+
+
 // Format currency to Rupiah
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('id-ID', {
