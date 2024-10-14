@@ -115,7 +115,7 @@ const columns = [
                         "btn btn-sm btn-icon",
                         cell.row.original.is_sold_out ? "btn-danger" : "btn-success",
                     ],
-                    onClick: () => axios.get(`/inventori/produk/${cell.getValue()}/test`),
+                    onClick: () => toggleSoldOut(cell.getValue()), 
                 },
                 h("span", cell.row.original.is_sold_out ? "Sold Out" : "Avail able")
             ),

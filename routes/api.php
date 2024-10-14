@@ -81,27 +81,13 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
 
 // Rute untuk Orders
 Route::prefix('orders')->group(function () {
-    Route::post('/checkout/{id}', [OrderController::class, 'payment']);
+    Route::post('/checkout/{uuid}', [OrderController::class, 'payment']);
     Route::get('/show/{uuid}', [OrderController::class, 'show']);
 });
 
 Route::post('/itempembelian/submit', [PembelianController::class, 'store']);
 Route::get('/itempembelian/products', [ItempembelianController::class, 'getProducts']);
 
-// Rute untuk Produk
-Route::prefix('inventori')->group(function () {
-    Route::middleware('can:inventori-produk')->group(function () {
-        Route::group(['prefix' => 'produk'], function () {
-            Route::get('/', [ProductController::class, 'index'])->withoutMiddleware(['can:inventori-produk']);
-            Route::post('/', [ProductController::class, 'index']);
-            Route::post('/store', [ProductController::class, 'store']);
-            
-            Route::group(['prefix' => '{id}'], function () {
-                Route::get('/', [ProductController::class, 'show']); // GET: produk/{product_id}
-                Route::post('/', [ProductController::class, 'update']);
-                Route::delete('/', [ProductController::class, 'destroy']);
-            });
-        });
 
         Route::prefix('orders')->group(function () {
             Route::post('/checkout/{uuid}', [OrderController::class, 'payment']);
@@ -123,7 +109,7 @@ Route::prefix('inventori')->group(function () {
                         Route::post('/', [ProductController::class, 'update']);
                         Route::delete('/', [ProductController::class, 'destroy']);
                         Route::post('/toggle-sold-out', [ProductController::class, 'toggleSoldOut']);
-                        Route::get('test', [ProductController::class, 'toggleSoldOut']);
+                        
                     });
                 });
                 // Route::apiResource('produk', ProductController::class)
@@ -131,5 +117,4 @@ Route::prefix('inventori')->group(function () {
             });
     
         });
-    });
-});
+        
