@@ -17,7 +17,7 @@ const { delete: deleteProduct } = useDelete({
     onSuccess: () => paginateRef.value.refetch(),
 });
 
-const toggleSoldOut = async (productId: any) => {
+const toggleSoldOut = async (productId: number) => {
     try {
         console.log('Data produk:', paginateRef.value.data.data); // Tambahkan ini untuk memeriksa struktur data
         const response = await axios.post(`/inventori/produk/${productId}/toggle-sold-out`);
@@ -187,3 +187,5 @@ watch(selectedCategory, (newCategory) => {
         </div>
     </div>
 </template>
+
+

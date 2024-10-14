@@ -37,10 +37,10 @@ class ProductController extends Controller
 
         // Query produk
         $query = Product::query()
-            ->when($search, function ($q) use ($search) {
-                $q->where('name', 'LIKE', '%' . $search . '%')
-                    ->orWhere('description', 'LIKE', '%' . $search . '%');
-            });
+        ->when($search, function ($q) use ($search) {
+            $q->where('name', 'like', '%' . $search . '%')
+              ->orWhere('description', 'like', '%' . $search . '%');
+        });
         
         if ($per && $page) {
             $result = $query->paginate($per, ['*'], 'page', $page);

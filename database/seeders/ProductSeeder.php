@@ -109,7 +109,7 @@ class ProductSeeder extends Seeder
                 'uuid' => Str::uuid(),
                 'name' => 'P Aor',
                 'category'=> 'makanan',
-                'price' => 800000,
+                'price' => 80000,
                 'description' => '',
                 'image_url' => '/storage/produk/paor.jpg', // Ganti dengan link gambar yang sesuai
             ],
