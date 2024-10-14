@@ -16,7 +16,7 @@ class ProductSeeder extends Seeder
     public function run()
     {
         // Data contoh untuk produk
-        $product = [
+        $products = [
             [
                 'uuid' => Str::uuid(),
                 'name' => 'Khao Pad',
@@ -164,7 +164,12 @@ class ProductSeeder extends Seeder
 
         ];
 
+        // Menambahkan UUID secara dinamis
+        foreach ($products as &$product) {
+            $product['uuid'] = Str::uuid()->toString();
+        }
+
         // Mengisi tabel produk
-        DB::table('products')->insert($product);
+        DB::table('products')->insert($products);
     }
 }

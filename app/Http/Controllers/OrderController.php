@@ -1,17 +1,13 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Models\Order;
 use Illuminate\Http\Request;
-
 class OrderController extends Controller
 {
-    public function payment($uuid)
+    public function payment(Request $request, $id)
     {
 
         $order = Order::findByUuid($uuid);
-
 
         if ($order) {
             // Konfigurasi Midtrans
@@ -47,7 +43,6 @@ class OrderController extends Controller
     public function show($uuid)
 {
     $order = Order::findByUuid($uuid);
-
     if ($order) {
         return response()->json([
             'success' => true,
@@ -60,5 +55,4 @@ class OrderController extends Controller
         ], 404); // 404 adalah status HTTP Not Found
     }
 }
-
 }
