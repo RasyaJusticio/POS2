@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\TransactionReport;
 use Illuminate\Http\Request;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
 
 class TransactionReportController extends Controller
@@ -17,11 +19,11 @@ class TransactionReportController extends Controller
         Log::info('Midtrans Callback Data: ', $data);
 
         // Validasi data yang diterima
-        if (empty($data['status']) || empty($data['order_id'])) {
+        if (empty($data['transaction_status']) || empty($data['order_id'])) {
             return response()->json(['success' => false, 'message' => 'Data tidak lengkap.'], 400);
         }
 
-        $transactionStatus = $data['status'];
+        $transactionStatus = $data['transaction_status'];
         $orderId = $data['order_id']; // Ambil order_id dari callback
 
         // Temukan laporan transaksi berdasarkan pembelian_id
@@ -43,6 +45,31 @@ class TransactionReportController extends Controller
             }
         } else {
             return response()->json(['success' => false, 'message' => 'Laporan transaksi tidak ditemukan.'], 404);
+        }
+    }
+
+    public function getTransactionStatus($orderId)
+    {
+        // Inisialisasi klien Guzzle
+        $client = new Client();
+        $server_key = config('midtrans.server_key'); // Ambil server key dari konfigurasi
+
+        try {
+            $response = $client->request('GET', "https://api.sandbox.midtrans.com/v2/$orderId/status", [
+                'headers' => [
+                    'Authorization' => 'Basic ' . base64_encode($server_key . ':'),
+                    'Accept' => 'application/json',
+                ],
+            ]);
+
+            // Mengambil isi respons
+            $responseBody = json_decode($response->getBody(), true);
+            
+            return response()->json($responseBody);
+        } catch (RequestException $e) {
+            // Tangani kesalahan jika ada
+            Log::error('Error fetching transaction status: ' . $e->getMessage());
+            return response()->json(['error' => 'Gagal mengambil status transaksi.'], 500);
         }
     }
 

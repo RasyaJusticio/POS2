@@ -9,6 +9,8 @@ import { formatRupiah } from "@/libs/utilss";
 const column = createColumnHelper<TransactionReport>();
 const paginateRef = ref<any>(null);
 const transactions = ref<TransactionReport[]>([]); // Menyimpan data transaksi
+const selectedTransaction = ref<TransactionReport | null>(null);
+
 
 const { delete: deleteTransactionReport } = useDelete({
     onSuccess: () => paginateRef.value.refetch(),
@@ -55,10 +57,7 @@ const columns = [
                     "button",
                     {
                         class: "btn btn-sm btn-icon btn-info",
-                        onClick: () => {
-                            // Tampilkan detail pesanan
-                            alert(`Detail Pesanan:\nID Pembelian: ${cell.row.getValue("pembelian_id")}\nStatus: ${cell.row.getValue("status")}\nTotal: ${cell.row.getValue("total_price")}`);
-                        },
+                        onClick: () => selectedTransaction.value = cell.row.original,
                     },
                     h("i", { class: "la la-eye fs-2" })
                 ),
@@ -93,4 +92,19 @@ const refresh = () => paginateRef.value.refetch();
             ></paginate>
         </div>
     </div>
+
+    <!-- Detail Transaksi -->
+    <div v-if="selectedTransaction" class="card mt-4">
+        <div class="card-header">
+            <h5>Detail Transaksi</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>ID Pembelian:</strong> {{ selectedTransaction?.pembelian_id }}</p>
+            <p><strong>Status Pembayaran:</strong> {{ selectedTransaction?.status }}</p>
+            <p><strong>Total Harga:</strong> {{ formatRupiah(selectedTransaction?.total_price) }}</p>
+            <p><strong>Tanggal Transaksi:</strong> {{ new Date(selectedTransaction?.created_at).toLocaleDateString("id-ID") }}</p>
+            <button class="btn btn-secondary" @click="selectedTransaction = null">Tutup Detail</button>
+        </div>
+    </div>
 </template>
+

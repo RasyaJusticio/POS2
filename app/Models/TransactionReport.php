@@ -14,4 +14,13 @@ class TransactionReport extends Model
         'status',
         'total_price',
     ];
+
+    /**
+     * Relasi dengan model Pembelian
+     * Sebuah 'TransactionReport' dimiliki oleh 'Pembelian'.
+     */
+    public function pembelian()
+    {
+        return $this->belongsTo(Pembelian::class, 'pembelian_id');
+    }
 }

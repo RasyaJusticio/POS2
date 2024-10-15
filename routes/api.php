@@ -8,8 +8,6 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReservationController;
-use App\Http\Controllers\ItempembelianController;
-use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\TransactionReportController;
 use App\Models\Pembelian;
 use Illuminate\Support\Facades\Route;
@@ -145,11 +143,14 @@ Route::prefix('inventori')->group(function () {
 
         // Rute untuk Laporan Transaksi
         Route::group(['prefix' => 'laporan'], function () {
-            Route::post('/', [TransactionReportController::class, 'index']); // Mendapatkan semua laporan transaksi
+            Route::post('/', [TransactionReportController::class, 'index']);
             Route::delete('/{id}', [TransactionReportController::class, 'destroy']);
             Route::post('/midtrans/callback', [TransactionReportController::class, 'handleMidtransCallback']);
+            Route::get('/midtrans/status/{orderId}', [TransactionReportController::class, 'getTransactionStatus']); // Rute baru untuk mendapatkan status transaksi
         });
     });
+    
+    Route::post('/midtrans/callback', [PembelianController::class, 'updateTransactionStatus']);
 
 
         // Route::apiResource('produk', ProductController::class)
