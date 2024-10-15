@@ -508,7 +508,7 @@ const closeCart = () => {
   align-items: center;
 }
 
-.quantity-controls {
+.quantity-cntrols {
   font-weight: 600;
   display: flex;
   align-items: center;

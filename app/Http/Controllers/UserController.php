@@ -10,9 +10,31 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Exports\UsersExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends Controller
 {
+    public function print(Request $request)
+{
+    $data = User::select('name', 'address', 'email')
+        ->when($request->search, function (Builder $query, string $search) {
+            $query->where('name', 'like', "%$search%")
+                ->orWhere('email', 'like', "%$search%")
+                ->orWhere('address', 'like', "%$search%");
+        })->get();
+
+    return response()->json([
+        'success' => true,
+        'data' => $data,
+    ]);
+}
+
+    public function export()
+    {
+        return Excel::download(new UsersExport(), 'users.xlsx');
+    }
+
     // Menampilkan daftar pengguna
     public function get(Request $request)
     {

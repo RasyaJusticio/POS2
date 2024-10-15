@@ -13,6 +13,19 @@ use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\TransactionReportController;
 use App\Models\Pembelian;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PembelianController;
+use App\Http\Controllers\ItempembelianController;
+use App\Models\Reservation;
+
+Route::get('/master/users/export', [UserController::class, 'export'])->name('users.export');
+Route::get('/master/users/print', [UserController::class, 'print']);
+Route::get('reservations/export', [ReservationController::class, 'export']);
+
+Route::post('/pembelian', [PembelianController::class, 'store']);
+Route::get('/top-selling-items', [PembelianController::class, 'topSellingItems']);
+// Add other routes as necessary
+
+Route::get('/itempembelian/chart-data', [ItempembelianController::class, 'chartData']);
 
 /*
 |-------------------------------------------------------------------------- 
