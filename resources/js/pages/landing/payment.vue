@@ -10,7 +10,6 @@
     <router-link to="/landing/PAGE">
               <button class="btn btn-lg btn-primary">BACK</button>
             </router-link>
-            
 
 
     <div v-if="receiptVisible" class="receipt">
@@ -35,7 +34,6 @@
         <h3>Scan QR Code & QRIS Payment </h3>
         <img :src="generateQRCode()" alt="QR Code" />
       </div>
-      <button @click="downloadReceipt" class="btn btn-success">Download Receipt</button>
     </div>
 
     </div>
@@ -74,62 +72,6 @@ const blueColor = '#0000FF';  // Atau warna biru hex atau nama warna
 
 function selectPayment(method: string) {
   selectedPayment.value = method;
-}
-
-function downloadReceipt() {
-  const doc = new jsPDF();
-
-  // Header
-  doc.setFontSize(16);
-  doc.text("==================================", 20, 40);
-  doc.text("Toko : Siam Spice Co.", 20, 10);
-  doc.setFontSize(12);
-  doc.text("==================================", 20, 40);
-  doc.text("Jl. Jendral Sudirman. 10, Surabaya", 20, 20);
-  doc.text(`Tanggal: ${new Date().toLocaleString()}`, 20, 30);
-  doc.text("==================================", 20, 40);
-  
-  // Receipt Title
-  doc.setFontSize(14);
-  doc.setFont("Helvetica", "bold"); // Set font to bold
-  doc.text("Struk Pembayaran", 20, 50);
-  doc.setFont("Helvetica", "normal"); // Reset to normal
-  doc.text("==================================", 20, 60);
-  
-  // Payment Method
-  doc.setFontSize(12);
-  doc.setFont("Helvetica", "bold"); // Set font to bold for these lines
-  doc.text(`Nomer Antrian: ${queueNumber.value}`, 20, 70);
-  doc.text(`Metode Pembayaran: ${selectedPayment.value}`, 20, 80);
-  doc.setFont("Helvetica", "normal"); // Reset to normal
-  
-  // Item List
-  doc.text("Item Pesanan:", 20, 90);
-  doc.text("==================================", 20, 100);
-  
-  let yOffset = 110; // Y offset for items
-  cart.value.forEach(item => {
-    const line = `${item.name} - ${item.quantity} x ${currency(item.price)} = ${currency(item.price * item.quantity)}`;
-    doc.text(line, 20, yOffset);
-    yOffset += 10; // Increase line height
-  });
-
-  doc.text("==================================", 20, yOffset);
-  yOffset += 10;
-  doc.setFont("Helvetica", "bold"); // Set font to bold for the total line
-  doc.text(`Total Pembayaran: ${currency(total.value)}`, 20, yOffset);
-  doc.setFont("Helvetica", "normal"); // Reset to normal
-  yOffset += 10;
-  doc.text("Silakan bayar di kasir", 20, yOffset);
-
-  // Footer
-  yOffset += 20;
-  doc.setFont("Helvetica", "bold"); // Set font to bold for the footer
-  doc.text("========THANKS FOR COMING IN HERE!!!!!!!!!!!========", 20, yOffset);
-  doc.setFont("Helvetica", "normal"); // Reset to normal
-
-  // Save PDF
-  doc.save("struk_pembayaran.pdf");
 }
 
 // cara penggunaan: handlePayment(1234-1234-1234-1234) <--

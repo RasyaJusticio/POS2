@@ -46,4 +46,4 @@ class PembelianController extends Controller
         //     'data' => $pembelian
         // ]);
     }
-}
+}   
