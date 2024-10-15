@@ -12,7 +12,7 @@ class CreateTransactionReportsTable extends Migration
             $table->id();
             $table->foreignId('pembelian_id')->constrained()->onDelete('cascade');
             $table->string('status'); // Status transaksi
-            $table->json('items'); // Menyimpan item pesanan dan kuantitas dalam format JSON
+            $table->integer('total_price'); // Menyimpan item pesanan dan kuantitas dalam format JSON
             $table->timestamps();
         });
     }

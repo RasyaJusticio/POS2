@@ -133,7 +133,8 @@ Route::prefix('inventori')->group(function () {
         // Rute untuk Laporan Transaksi
         Route::group(['prefix' => 'laporan'], function () {
             Route::post('/', [TransactionReportController::class, 'index']); // Mendapatkan semua laporan transaksi
-            Route::post('/midtrans/callback', [TransactionReportController::class, 'handleMidtransCallback'])->withoutMiddleware('auth');
+            Route::delete('/{id}', [TransactionReportController::class, 'destroy']);
+            Route::post('/midtrans/callback', [TransactionReportController::class, 'handleMidtransCallback']);
         });
     });
 

@@ -12,6 +12,6 @@ class TransactionReport extends Model
     protected $fillable = [
         'pembelian_id',
         'status',
-        'items',
+        'total_price',
     ];
 }

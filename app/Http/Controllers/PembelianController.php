@@ -39,7 +39,7 @@ class PembelianController extends Controller
         TransactionReport::create([
             'pembelian_id' => $pembelian->id,
             'status' => 'pending', // Status awal
-            'items' => json_encode($request->products_id), // Simpan produk dalam format JSON
+            'total_price' => $request->total_price// Simpan produk dalam format JSON
         ]);
 
         return response()->json([

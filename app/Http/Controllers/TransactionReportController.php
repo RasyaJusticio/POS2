@@ -16,23 +16,26 @@ class TransactionReportController extends Controller
         // Tambahkan logging untuk memeriksa data yang diterima
         Log::info('Midtrans Callback Data: ', $data);
 
-        // Pastikan status pembayaran ada dan valid
-        if (empty($data['transaction_status']) || empty($data['order_id'])) {
+        // Validasi data yang diterima
+        if (empty($data['status']) || empty($data['order_id'])) {
             return response()->json(['success' => false, 'message' => 'Data tidak lengkap.'], 400);
         }
 
-        $transactionStatus = $data['transaction_status'];
+        $transactionStatus = $data['status'];
         $orderId = $data['order_id']; // Ambil order_id dari callback
 
-        // Temukan laporan transaksi berdasarkan order_id
+        // Temukan laporan transaksi berdasarkan pembelian_id
         $report = TransactionReport::where('pembelian_id', $orderId)->first();
 
         if ($report) {
             try {
-                // Perbarui status transaksi sesuai dengan status yang diterima dari Midtrans
-                $report->status = $transactionStatus;
-                $report->save();
-
+                // Perbarui status transaksi jika status baru berbeda
+                if ($report->status !== $transactionStatus) {
+                    $report->status = $transactionStatus;
+                    $report->save();
+                    Log::info("Status transaksi diperbarui untuk order_id: $orderId menjadi $transactionStatus");
+                }
+                
                 return response()->json(['success' => true, 'message' => 'Status transaksi diperbarui.']);
             } catch (\Exception $e) {
                 Log::error('Error updating transaction report: ' . $e->getMessage());
@@ -49,5 +52,27 @@ class TransactionReportController extends Controller
         $reports = TransactionReport::paginate(10); // Atur jumlah item per halaman sesuai kebutuhan
 
         return response()->json($reports);
+    }
+
+    public function destroy($id)
+    {
+        // Temukan laporan transaksi berdasarkan ID
+        $report = TransactionReport::find($id);
+
+        // Cek apakah laporan ditemukan
+        if ($report) {
+            try {
+                // Hapus laporan transaksi
+                $report->delete();
+                Log::info("Laporan transaksi dengan ID $id telah dihapus.");
+
+                return response()->json(['message' => 'Laporan transaksi berhasil dihapus.']);
+            } catch (\Exception $e) {
+                Log::error('Error deleting transaction report: ' . $e->getMessage());
+                return response()->json(['success' => false, 'message' => 'Gagal menghapus laporan transaksi.'], 500);
+            }
+        } else {
+            return response()->json(['success' => false, 'message' => 'Laporan transaksi tidak ditemukan.'], 404);
+        }
     }
 }

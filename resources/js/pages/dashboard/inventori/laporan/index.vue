@@ -4,12 +4,13 @@ import { useDelete } from "@/libs/hooks";
 import { createColumnHelper } from "@tanstack/vue-table";
 import type { TransactionReport } from "@/types/laporan"; // Ganti dengan path yang sesuai
 import axios from "@/libs/axios";
+import { formatRupiah } from "@/libs/utilss";
 
 const column = createColumnHelper<TransactionReport>();
 const paginateRef = ref<any>(null);
 const transactions = ref<TransactionReport[]>([]); // Menyimpan data transaksi
 
-const { delete: deleteTransaction } = useDelete({
+const { delete: deleteTransactionReport } = useDelete({
     onSuccess: () => paginateRef.value.refetch(),
 });
 
@@ -17,12 +18,14 @@ const { delete: deleteTransaction } = useDelete({
 onMounted(async () => {
     try {
         const response = await axios.post('/inventori/laporan');
-        transactions.value = response.data; // Simpan data transaksi ke dalam ref
-        paginateRef.value.refetch(); // Memanggil refetch jika perlu
+        console.log("Response data:", response.data);
+        transactions.value = response.data; 
+        paginateRef.value.refetch(); 
     } catch (error) {
         console.error('Error fetching transactions:', error);
     }
 });
+
 
 const columns = [
     column.accessor("id", {
@@ -34,12 +37,9 @@ const columns = [
     column.accessor("status", {
         header: "Status Pembayaran",
     }),
-    column.accessor("items", {
-        header: "Detail Item",
-        cell: (cell) => {
-            const items = JSON.parse(cell.getValue());
-            return h("div", {}, items.map((item: any) => `Produk ID: ${item}`).join(", "));
-        },
+    column.accessor("total_price", {
+        header: "Total",
+        cell: (cell) => formatRupiah(cell.getValue()),
     }),
     column.accessor("created_at", {
         header: "Tanggal Pesanan",
@@ -57,7 +57,7 @@ const columns = [
                         class: "btn btn-sm btn-icon btn-info",
                         onClick: () => {
                             // Tampilkan detail pesanan
-                            alert(`Detail Pesanan:\nID Pembelian: ${cell.row.getValue("pembelian_id")}\nStatus: ${cell.row.getValue("status")}\nItems: ${cell.row.getValue("items")}`);
+                            alert(`Detail Pesanan:\nID Pembelian: ${cell.row.getValue("pembelian_id")}\nStatus: ${cell.row.getValue("status")}\nTotal: ${cell.row.getValue("total_price")}`);
                         },
                     },
                     h("i", { class: "la la-eye fs-2" })
@@ -67,7 +67,7 @@ const columns = [
                     {
                         class: "btn btn-sm btn-icon btn-danger",
                         onClick: () =>
-                            deleteTransaction(`/inventori/laporan/${cell.getValue()}`),
+                            deleteTransactionReport(`/inventori/laporan/${cell.getValue()}`),
                     },
                     h("i", { class: "la la-trash fs-2" })
                 ),
