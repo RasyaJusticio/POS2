@@ -7,7 +7,11 @@
     <h1 class="title" :style="{ color: blueColor }">Transaksi Pembayaran</h1>
     <img src="@/assets/images/spice.png" alt="Logo" class="logo" /> <!-- Tambahkan Logo di sini -->
 
-    <router-link to="/landing/thai ">  <button class="btn btn-lg btn-primary">BACK</button> </router-link>
+    <router-link to="/landing/PAGE">
+              <button class="btn btn-lg btn-primary">BACK</button>
+            </router-link>
+            
+
 
     <div v-if="receiptVisible" class="receipt">
       <h2>Struk Pembayaran</h2>

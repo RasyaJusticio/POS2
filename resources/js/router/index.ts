@@ -23,6 +23,7 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
             middleware: "auth",
         },
+        
         children: [
             {
                 path: "/dashboard",

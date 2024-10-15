@@ -4,26 +4,9 @@
       <h2 class="mb-0">Reservations List</h2>
     </div>
 
-    <!-- Filter and Sort section -->
+    <!-- Filter, Sort and Total section -->
     <div class="card-body">
       <div class="row align-items-center mb-4">
-        <!-- Items per page -->
-        <div class="col-md-4">
-          <label class="form-label fw-bold fs-6">Items per page:</label>
-          <select
-            v-model="itemsPerPage"
-            @change="paginateReservations"
-            class="form-select form-select-solid"
-            style="width: 120px;"
-          >
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="15">15</option>
-            <option value="20">20</option>
-            <option value="25">25</option>
-          </select>
-        </div>
-
         <!-- Filter by Date -->
         <div class="col-md-4">
           <div class="fv-row">
@@ -53,6 +36,18 @@
             </select>
           </div>
         </div>
+
+        <!-- Total Reservations and Guests -->
+        <div class="col-md-4 text-center">
+          <div class="d-flex justify-content-center">
+            <h5 class="mb-0 me-3">
+              Total Reservations: <span class="badge bg-primary fs-5 text-white">{{ totalReservations }}</span>
+            </h5>
+            <h5 class="mb-0">
+              Total Guests: <span class="badge bg-success fs-5 text-white">{{ totalGuests }}</span>
+            </h5>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -76,7 +71,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="reservation in paginatedReservations" :key="reservation.id" :class="getReservationClass(reservation)">
+          <tr v-for="reservation in filteredReservations" :key="reservation.id" :class="getReservationClass(reservation)">
             <td>{{ reservation.id }}</td>
             <td>{{ reservation.name }}</td>
             <td>{{ reservation.phone }}</td>
@@ -88,41 +83,21 @@
           </tr>
         </tbody>
       </table>
-
-      <!-- Pagination controls -->
-      <div class="d-flex justify-content-center mt-4">
-        <!-- Previous Page Button -->
-        <button
-          class="btn btn-secondary me-2"
-          @click="previousPage"
-          :disabled="currentPage === 1"
-        >
-          Previous
-        </button>
-        <!-- Next Page Button -->
-        <button
-          class="btn btn-secondary"
-          @click="nextPage"
-          :disabled="currentPage === totalPages"
-        >
-          Next
-        </button>
-      </div>
     </div>
   </VForm>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
 
+// State variables
 const reservations = ref<any[]>([]);
 const filteredReservations = ref<any[]>([]);
-const paginatedReservations = ref<any[]>([]);
 const selectedDate = ref('');
 const sortOrder = ref('asc'); // Sorting order
-const itemsPerPage = ref(5); // Items per page
-const currentPage = ref(1); // Track current page
+const totalReservations = ref(0);
+const totalGuests = ref(0);
 
 // Fetch reservations only once when the component mounts
 const fetchReservations = async () => {
@@ -131,7 +106,7 @@ const fetchReservations = async () => {
     reservations.value = response.data.reservations; // Save all fetched reservations
     filteredReservations.value = [...reservations.value]; // Initialize filteredReservations
     sortReservations(); // Apply default sorting
-    paginateReservations(); // Initial pagination
+    calculateTotals();  // Calculate totals on initial load
   } catch (error) {
     console.error('Error fetching reservations:', error);
   }
@@ -146,8 +121,9 @@ const filterByDate = () => {
   } else {
     filteredReservations.value = [...reservations.value]; // If no date is selected, show all
   }
+  
   sortReservations(); // Apply sorting after filtering
-  paginateReservations(); // Apply pagination after filtering
+  calculateTotals();  // Calculate total reservations and guests
 };
 
 // Function to sort reservations by date
@@ -155,39 +131,17 @@ const sortReservations = () => {
   filteredReservations.value.sort((a: any, b: any) => {
     const dateA = new Date(a.date);
     const dateB = new Date(b.date);
-
     return sortOrder.value === 'asc' ? dateA.getTime() - dateB.getTime() : dateB.getTime() - dateA.getTime();
   });
-  paginateReservations(); // Re-paginate after sorting
+
+  calculateTotals();  // Recalculate total reservations and guests after sorting
 };
 
-// Function to handle pagination
-const paginateReservations = () => {
-  const start = (currentPage.value - 1) * itemsPerPage.value;
-  const end = start + itemsPerPage.value;
-  paginatedReservations.value = filteredReservations.value.slice(start, end); // Paginate filteredReservations
+// Function to calculate total reservations and guests
+const calculateTotals = () => {
+  totalReservations.value = filteredReservations.value.length;
+  totalGuests.value = filteredReservations.value.reduce((sum, reservation) => sum + reservation.guests, 0);
 };
-
-// Function to handle Next Page
-const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++;
-    paginateReservations(); // Update view to next page
-  }
-};
-
-// Function to handle Previous Page
-const previousPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--;
-    paginateReservations(); // Update view to previous page
-  }
-};
-
-// Computed property to calculate total pages based on filtered data and items per page
-const totalPages = computed(() => {
-  return Math.ceil(filteredReservations.value.length / itemsPerPage.value);
-});
 
 // Function to check if a reservation has ended based on current time
 const isReservationEnded = (reservation: any) => {
@@ -211,3 +165,12 @@ onMounted(() => {
   fetchReservations();
 });
 </script>
+
+<style scoped>
+h5 {
+  font-size: 1.25rem; /* Adjust font size as needed */
+}
+.text-white {
+  color: white; /* Set text color to white for numbers */
+}
+</style>
