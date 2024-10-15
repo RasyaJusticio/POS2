@@ -83,9 +83,9 @@ const MainMenuConfig: Array<MenuItem> = [
                         name: "inventori-produk",
                     },
                     {
-                        heading: "Kategori",
-                        route: "/dashboard/inventori/kategori",
-                        name: "inventori-kategori",
+                        heading: "Laporan",
+                        route: "/dashboard/inventori/laporan",
+                        name: "inventori-laporan",
                     },
                     {
                         heading: "Stok",

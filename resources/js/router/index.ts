@@ -84,12 +84,12 @@ const routes: Array<RouteRecordRaw> = [
                 },
             },
             {
-                path: "/dashboard/inventori/kategori",
-                name: "dashboard.inventorikategori",
-                component: () => import("@/pages/dashboard/inventori/kategori/index.vue"),
+                path: "/dashboard/inventori/laporan",
+                name: "dashboard.inventorilaporan",
+                component: () => import("@/pages/dashboard/inventori/laporan/index.vue"),
                 meta: {
-                    pageTitle: "Inventori Kategori",
-                    breadcrumbs: ["Inventori", "Kategori"],
+                    pageTitle: "Laporan Transaksi",
+                    breadcrumbs: ["Inventori", "Laporan"],
                 },
             },
             {
