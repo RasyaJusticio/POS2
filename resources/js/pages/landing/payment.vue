@@ -10,6 +10,7 @@
     <router-link to="/landing/PAGE">
               <button class="btn btn-lg btn-primary">BACK</button>
             </router-link>
+            
 
 
     <div v-if="receiptVisible" class="receipt">

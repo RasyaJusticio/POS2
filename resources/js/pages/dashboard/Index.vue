@@ -3,78 +3,55 @@
     <div class="container">
       <h1 class="title">Graphic</h1>
 
-      <div class="stats">
+      <div class="stats"> 
         <StatCard 
           title="Total Sales" 
           :value="formatCurrency(totalSales)" 
-          iconClass="fas fa-dollar-sign" 
+          iconClass="fas fa-dollar-sign"  
         /> 
-        <StatCard 
+        <StatCard  
           title="Total Reservation" 
           :value="totalReservations" 
           iconClass="fas fa-box" 
+          @click="navigateToReservation"
         />
         <StatCard 
           title="Total Customers" 
           :value="totalCustomers" 
           iconClass="fas fa-users" 
         />
-        <StatCard 
-          title="Profit" 
-          :value="formatCurrency(profit)" 
-          iconClass="fas fa-chart-line" 
-        />
       </div>
 
       <div class="charts">
         <ChartCard title="Sales Over Time">
           <canvas id="salesChart"></canvas>
-        </ChartCard>
-        <ChartCard title="Top Selling Items">
-          <canvas id="topItemsChart"></canvas>
-        </ChartCard>
+        </ChartCard>  
       </div>
 
       <!-- Menampilkan Total Reservations -->
-      <div>
-        <!-- Tidak perlu lagi menampilkan ini karena sudah diubah ke dalam StatCard -->
-        <!-- <h3>Total Reservations: {{ totalReservations }}</h3> -->
-      </div>
+      <div></div>
     </div>
   </main>
 </template>
 
+
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import StatCard from './StatCard.vue';
 import ChartCard from './ChartCard.vue';
 import Chart from 'chart.js/auto';
-import axios from 'axios'; // Import axios untuk API call
+import axios from 'axios';
 
-// Reactive state
+const router = useRouter();
 const totalSales = ref(0);
-const totalItems = ref(0); // Number of reservations from the API
-const totalCustomers = ref(0);
-const profit = ref(0);
-
-// Reactive state untuk total reservations
 const totalReservations = ref(0);
+const totalCustomers = ref(0);
 
-// Fetch totalItems (reservations count) dari API
-const fetchTotalItems = async () => {
-  try {
-    const response = await fetch('http://localhost:8000/api/reservations/count');
-    if (!response.ok) {
-      throw new Error('Failed to fetch reservation count');
-    }
-    const data = await response.json();
-    totalItems.value = data.totalItems;
-  } catch (error) {
-    console.error('Error fetching reservation count:', error);
-  }
+const navigateToReservation = () => {
+  router.push({ name: 'dashboard.inventori.reservation' });
 };
 
-// Fetch totalReservations dari API (menampilkan total reservasi)
 const fetchTotalReservations = async () => {
   try {
     const response = await axios.get('http://localhost:8000/api/reservations/count');
@@ -84,19 +61,31 @@ const fetchTotalReservations = async () => {
   }
 };
 
-// Memanggil fungsi saat komponen dimuat
-onMounted(() => {
-  // Fetch data saat dashboard dimuat
-  fetchTotalItems();
-  fetchTotalReservations();
+const fetchTotalCustomers = async () => {
+  try {
+    const response = await axios.get('http://localhost:8000/api/total-customers');
+    totalCustomers.value = response.data.total_customers;
+  } catch (error) {
+    console.error('Error fetching total customers:', error);
+  }
+};
 
-  // Initialize charts
+const fetchTotalSales = async () => {
+  try {
+    const response = await axios.get('http://localhost:8000/api/totalsales');
+    totalSales.value = response.data.totalSales;
+  } catch (error) {
+    console.error('Error fetching total sales:', error);
+  }
+};
+
+onMounted(() => {
+  fetchTotalReservations();
+  fetchTotalCustomers();
+  fetchTotalSales();
   initializeCharts();
 });
 
-
-
-// Format currency to Rupiah
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('id-ID', {
     style: 'currency',
@@ -104,7 +93,6 @@ const formatCurrency = (value: number) => {
   }).format(value);
 };
 
-// Fungsi untuk menginisialisasi charts
 const initializeCharts = () => {
   const salesCtx = document.getElementById('salesChart')?.getContext('2d');
   new Chart(salesCtx, {
@@ -128,52 +116,88 @@ const initializeCharts = () => {
       }
     }
   });
-
-  const topItemsCtx = document.getElementById('topItemsChart')?.getContext('2d');
-  new Chart(topItemsCtx, {
-    type: 'bar',
-    data: {
-      labels: ['Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5'],
-      datasets: [{
-        label: 'Top Selling Items',
-        data: [12, 19, 3, 5, 2],
-        backgroundColor: 'rgba(153, 102, 255, 0.2)',
-        borderColor: 'rgba(153, 102, 255, 1)',
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
-    }
-  });
 };
 </script>
+
 
 
 <style scoped>
 .container {
   padding: 20px;
 }
+
 .title {
   margin-bottom: 20px;
 }
+
 .stats {
   display: flex;
-  gap: 20px;
+  gap: 10px;
   margin-bottom: 20px;
+  
+  background: var(--card-bg);
+  color: var(--text-color);
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 2px 4px 4px hsla(0, 0%, 10%, 0.461);
+  flex: 1;
+  transition: background 0.3s ease, color 0.3s ease;
 }
+
 .charts {
-  display: flex;
-  gap: 20px;
+  background: transparent; /* Membuat background chart transparan */
+  border: none; /* Menghilangkan border */
+  flex: 1;
 }
+
 .large-icon {
   font-size: 10rem; /* Ukuran lebih besar untuk ikon */
-  color: #000000; /* Warna ikon yang lebih mencolok */
+  color: var(--text-color); /* Menggunakan variabel untuk warna */
   margin-bottom: 10px; /* Jarak antara ikon dan teks */
+}
+
+:root {
+  --card-bg: #ffffff; /* Background untuk mode terang */
+  --card-bg-dark: #1a202c; /* Background untuk mode gelap */
+  --text-color: #000000; /* Warna teks untuk mode terang */
+  --text-color-dark: #ffffff; /* Warna teks untuk mode gelap */
+  --chart-bg: rgba(255, 255, 255, 0.5); /* Background chart transparan untuk mode terang */
+  --chart-bg-dark: rgba(0, 0, 0, 0.5); /* Background chart transparan untuk mode gelap */
+}
+
+.stat-card {
+  background: var(--card-bg);
+  color: var(--text-color);
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 2px 4px 4px hsla(0, 0%, 10%, 0.461);
+  flex: 1;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.stat-card h3 {
+  margin-left: 10px;
+  color: var(--text-color);
+}
+
+/* Dark mode styles */
+.dark .stat-card {
+  background: var(--card-bg-dark);
+  color: var(--text-color-dark);
+}
+
+.dark .stat-card h3 {
+  color: var(--text-color-dark);
+}
+
+.chart-card {
+  background: transparent; /* Membuat background chart transparan */
+  border: none; /* Menghilangkan border */
+  flex: 1;
+  transition: background 0.3s ease;
+}
+
+.dark .chart-card {
+  background: var(--chart-bg-dark); /* Transparan untuk dark mode */
 }
 </style>

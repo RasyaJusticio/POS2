@@ -4,29 +4,28 @@
       <nav class="navbar navbar-expand-lg navbar-dark transparent-navbar">
         <div class="container-fluid d-flex justify-content-between align-items-center">
           <router-link class="navbar-brand" to="/dashboard">
-            <img src="@/assets/images/spice.png"  class="rounded-4" alt="Logo" style="width: auto; height: 100px;" /> <!-- Add your logo here -->
+            <img src="@/assets/images/spice.png" class="rounded-4" alt="Logo" style="width: auto; height: 100px;" />
           </router-link>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarNav">
             <div class="navbar-nav ms-auto">
-              <router-link class="nav-link" to="#home" style="color: #00132e; font-size: 18px;">
+              <router-link class="nav-link" to="#home" :class="{ active: $route.hash === '#home' }" style="color: #00132e; font-size: 18px;">
                 <i class="fas fa-home" style="color: #00132e; font-size: 20px;"></i> Home
               </router-link>
 
-              <router-link class="nav-link" to="#menu" style="color: #00132e; font-size: 18px;">
+              <router-link class="nav-link" to="#menu" :class="{ active: $route.hash === '#menu' }" style="color: #00132e; font-size: 18px;">
                 <i class="fas fa-utensils" style="color: #00132e; font-size: 20px;"></i> Menu
               </router-link>
 
-              <router-link class="nav-link" to="#about" style="color: #00132e; font-size: 18px;">
+              <router-link class="nav-link" to="#about" :class="{ active: $route.hash === '#about' }" style="color: #00132e; font-size: 18px;">
                 <i class="fas fa-info-circle" style="color: #00132e; font-size: 20px;"></i> About Us
               </router-link>
 
-              <router-link class="nav-link" to="#contact" style="color: #00132e; font-size: 18px;">
+              <router-link class="nav-link" to="#contact" :class="{ active: $route.hash === '#contact' }" style="color: #00132e; font-size: 18px;">
                 <i class="fas fa-envelope" style="color: #00132e; font-size: 20px;"></i> Contact
               </router-link>
-
             </div>
           </div>
         </div>
@@ -68,7 +67,6 @@ header {
   z-index: 1000; /* Above other content */
 }
 
-
 .transparent-navbar {
   background: rgba(255, 255, 255, 0); /* Transparent background */
   backdrop-filter: blur(4px); /* Blur effect */
@@ -106,6 +104,11 @@ main {
 .nav-link i {
   margin-right: 8px; /* Adjusted space between icon and text */
   font-size: 1.1rem; /* Icon size */
+}
+
+.nav-link.active {
+  border-bottom: 3px solid #080e42; /* Garis bawah untuk tautan aktif */
+  color: #d9534f; /* Warna teks berubah saat aktif */
 }
 
 .nav-link:hover {

@@ -44,5 +44,6 @@ class Pembelian extends Model
     public function items()
     {
         return $this->belongsToMany(Product::class, 'itempembelians');
+        return $this->belongsToMany(Item::class)->withPivot('quantity'); 
     }
 }

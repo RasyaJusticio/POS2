@@ -36,14 +36,23 @@ Route::prefix('setting')->group(function () {
     Route::get('', [SettingController::class, 'index']);
 });
 
+Route::get('/totalsales', function () {
+    // Menghitung total sales dari tabel pembelians
+    $totalSales = Pembelian::sum('total_price');
+    return response()->json(['totalSales' => $totalSales]);
+});
 // API routes for reservations
 // Route untuk membuat reservasi
 Route::post('/reservations', [ReservationController::class, 'store']);
 
 // Route untuk mendapatkan semua reservasi
 Route::get('/reservations', [ReservationController::class, 'index']);
-
+Route::get('/dashboard/stats', [ReservationController::class, 'getDashboardStats']);
 Route::get('/reservations/count', [ReservationController::class, 'countReservations']);
+Route::get('/total-customers', [ReservationController::class, 'totalCustomers']);
+Route::get('/reservations/summary', [ReservationController::class, 'totalSummary']);
+Route::get('/api/reservations/customers-per-month', [ReservationController::class, 'getCustomersPerMonth']);
+
 
 
 Route::middleware(['auth', 'verified', 'json'])->group(function () {
@@ -100,11 +109,6 @@ Route::prefix('orders')->group(function () {
     Route::get('/show/{uuid}', [OrderController::class, 'show']);
 });
 
-Route::get('/totalsales', function () {
-    // Menghitung total sales dari tabel pembelians
-    $totalSales = Pembelian::sum('total_price');
-    return response()->json(['totalSales' => $totalSales]);
-});
 
 Route::prefix('inventori')->group(function () {
     Route::middleware('can:inventori-produk')->group(function () {
