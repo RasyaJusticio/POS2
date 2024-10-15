@@ -27,9 +27,9 @@ const fileTypes = ref(["image/jpeg", "image/png", "image/jpg"]);
 
 // Data kategori yang tersedia untuk dropdown
 const categories = ref([
-    { id: "makanan", name: "Makanan" },
+    { id: "makanan", name: "makanan" },
     { id: "dessert", name: "Dessert" },
-    { id: "minuman", name: "Minuman" },
+    { id: "minuman", name: "minuman" },
 ]);
 
 // Skema validasi menggunakan Yup

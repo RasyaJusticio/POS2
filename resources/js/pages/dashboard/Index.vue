@@ -23,35 +23,15 @@
       </div>
 
       <div class="charts">
-<<<<<<< HEAD
-    <!-- Sales Over Time Chart -->
-    <ChartCard title="Customer Over Time">
-      <canvas id="salesChart"></canvas>
-    </ChartCard>
-
-    <!-- Top Selling Items Chart -->
-    <ChartCard title="Top Selling Items">
-      <canvas id="topItemsChart"></canvas>
-    </ChartCard>
-  </div>
-
-      <!-- Menampilkan Total Reservations -->
-      <div>
-        <!-- Anda dapat menambahkan komponen lain di sini jika diperlukan -->
-      </div>
-=======
-        <ChartCard title="Sales Over Time">
+        <!-- Sales Over Time Chart -->
+        <ChartCard title="Customer Over Time">
           <canvas id="salesChart"></canvas>
-        </ChartCard>  
+        </ChartCard>
       </div>
 
-      <!-- Menampilkan Total Reservations -->
-      <div></div>
->>>>>>> 95b450d393a8ed18bea191bc3950961c5ed6ec16
     </div>
   </main>
 </template>
-
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
@@ -113,7 +93,7 @@ const formatCurrency = (value: number) => {
 
 const initializeCharts = () => {
   const salesCtx = document.getElementById('salesChart')?.getContext('2d');
-  if (!salesCtx) return; // Tambahkan pengecekan untuk menghindari error jika elemen tidak ada
+  if (!salesCtx) return;
 
   new Chart(salesCtx, {
     type: 'line',
@@ -136,18 +116,17 @@ const initializeCharts = () => {
       }
     }
   });
-<<<<<<< HEAD
+
+  initializeTopItemsChart(); // Call this function to initialize the top items chart
 };
 
-// Fungsi untuk inisialisasi chart 'Top Selling Items'
+// Function for initializing the 'Top Selling Items' chart
 const initializeTopItemsChart = async () => {
   try {
     const response = await axios.get('http://localhost:8000/api/top-selling-items');
-    console.log(response.data);  // Debugging line to check the response
-
     const topItems = response.data;
-    const labels = topItems.map(item => item.name);  // Gunakan nama produk sebagai label
-    const data = topItems.map(item => item.total_sold);  // Gunakan jumlah terjual untuk data
+    const labels = topItems.map(item => item.name);
+    const data = topItems.map(item => item.total_sold);
 
     const topItemsCtx = document.getElementById('topItemsChart')?.getContext('2d');
     if (!topItemsCtx) return;
@@ -176,63 +155,8 @@ const initializeTopItemsChart = async () => {
   } catch (error) {
     console.error('Error fetching top selling items:', error);
   }
-=======
->>>>>>> 95b450d393a8ed18bea191bc3950961c5ed6ec16
 };
-
-
-<<<<<<< HEAD
-// Fungsi untuk fetch total items (reservations count) dari API
-const fetchTotalItems = async () => {
-  try {
-    const response = await fetch('http://localhost:8000/api/reservations/count');
-    if (!response.ok) {
-      throw new Error('Failed to fetch reservation count');
-    }
-    const data = await response.json();
-    totalItems.value = data.totalItems;
-  } catch (error) {
-    console.error('Error fetching reservation count:', error);
-  }
-};
-
-// Fungsi untuk fetch total reservasi dari API
-const fetchTotalReservations = async () => {
-  try {
-    const response = await axios.get('http://localhost:8000/api/reservations/count');
-    totalReservations.value = response.data.totalItems;
-  } catch (error) {
-    console.error('Error fetching total reservations:', error);
-  }
-};
-
-// Fungsi untuk fetch total pelanggan dari API
-const fetchTotalCustomers = async () => {
-  try {
-    const response = await axios.get('http://localhost:8000/api/total-customers');
-    totalCustomers.value = response.data.total_customers;
-  } catch (error) {
-    console.error('Error fetching total customers:', error);
-  }
-};
-
-// Format currency to Rupiah
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-  }).format(value);
-};
-
-// Fungsi untuk navigasi ke halaman reservasi
-const navigateToReservation = () => {
-  router.push({ name: 'dashboard.inventori.reservation' });
-};
-
-
 </script>
-=======
->>>>>>> 95b450d393a8ed18bea191bc3950961c5ed6ec16
 
 <style scoped>
 .container {
