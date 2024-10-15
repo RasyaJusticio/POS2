@@ -253,7 +253,7 @@ const exportReservations = async () => {
     console.error("Error downloading the Excel file:", error);
   }
 };
-
+ 
 // Fetch reservations when component mounts (only once)
 onMounted(() => {
   fetchReservations();

@@ -8,6 +8,7 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReservationController;
+use App\Models\Pembelian;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\ItempembelianController;
@@ -46,6 +47,11 @@ Route::prefix('setting')->group(function () {
     Route::get('', [SettingController::class, 'index']);
 });
 
+Route::get('/totalsales', function () {
+    // Menghitung total sales dari tabel pembelians
+    $totalSales = Pembelian::sum('total_price');
+    return response()->json(['totalSales' => $totalSales]);
+});
 // API routes for reservations
 // Route untuk membuat reservasi
 Route::post('/reservations', [ReservationController::class, 'store']);
@@ -101,7 +107,7 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
 
 // Rute untuk Orders
 Route::prefix('orders')->group(function () {
-    Route::post('/checkout/{id}', [OrderController::class, 'payment']);
+    Route::post('/checkout/{uuid}', [OrderController::class, 'payment']);
     Route::get('/show/{uuid}', [OrderController::class, 'show']);
 });
 
@@ -113,6 +119,7 @@ Route::prefix('orders')->group(function () {
     Route::post('/checkout/{uuid}', [OrderController::class, 'payment']);
     Route::get('/show/{uuid}', [OrderController::class, 'show']);
 });
+
 
 Route::prefix('inventori')->group(function () {
     Route::middleware('can:inventori-produk')->group(function () {

@@ -37,11 +37,6 @@ const goToShop = () => {
     <div class="app-navbar flex-shrink-0">
         <!--begin::Shop button-->
         <div class="app-navbar-item ms-1 ms-md-4 me-md-3">
-        <router-link to="/dashboard/kasir">
-        <button class="btn btn-primary">
-            <KTIcon icon-name="shopping-cart" icon-class="me-1" /> SHOP
-        </button>
-        </router-link>
     </div>
 
         <!--end::Shop button-->

@@ -1,8 +1,10 @@
 <template>
-  <div class="chart-card">
-    <h4>{{ title }}</h4>
-    <div class="chart-container">
-      <canvas id="reservationChart"></canvas>
+  <div class="card mb-4">
+    <div class="card-body">
+      <h4 class="card-title">{{ title }}</h4>
+      <div class="chart-container">
+        <canvas id="reservationChart"></canvas>
+      </div>
     </div>
   </div>
 </template>
@@ -59,15 +61,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.chart-card {
-  flex: 1;
-  background: #ffffff;
-  padding: 5px;
-  border-radius: 8px;
-  box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.418);
-  margin: 10px 0;
-}
-
 .chart-container {
   position: relative;
   height: 300px;
