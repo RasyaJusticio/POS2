@@ -99,7 +99,7 @@ const currentLangugeLocale = computed(() => {
                 <!--begin::Username-->
                 <div class="d-flex flex-column">
                     <div class="fw-bold d-flex align-items-center fs-5">
-                        AON
+                        Siam Spice Co.
                         <span
                             class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2"
                         > Admin
@@ -108,7 +108,7 @@ const currentLangugeLocale = computed(() => {
                     <a
                         href="#" 
                         class="fw-semibold text-muted text-hover-primary fs-7" 
-                    >aoncashier@gmail.com
+                    >siamspiceco@gmail.com
                     </a>
                 </div>
                 <!--end::Username-->

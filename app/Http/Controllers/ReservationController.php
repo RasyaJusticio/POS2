@@ -6,9 +6,15 @@ use App\Models\Reservation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB; // Import DB for raw queries
+use App\Exports\ReservationsExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReservationController extends Controller
 {
+    public function export()
+    {
+    return Excel::download(new ReservationsExport, 'reservations.xlsx');
+    }   
     // Menyimpan data reservasi
     public function store(Request $request)
     {

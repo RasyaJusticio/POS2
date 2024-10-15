@@ -2,6 +2,26 @@
   <VForm class="form card mb-10" @submit="submit" id="form-reservation" ref="formRef">
     <div class="card-header align-items-center">
       <h2 class="mb-0">Reservations List</h2>
+
+      <!-- Button for printing the reservations list -->
+      <button
+        type="button"
+        class="btn btn-sm btn-success ms-auto"
+        @click="printReservations"
+      >
+        Print
+        <i class="la la-print"></i>
+      </button>
+
+      <!-- Button for exporting the reservations list to Excel -->
+      <button
+        type="button"
+        class="btn btn-sm btn-success ms-2"
+        @click="exportReservations"
+      >
+        Export Excel
+        <i class="la la-file-excel"></i>
+      </button>
     </div>
 
     <!-- Filter, Sort and Total section -->
@@ -158,6 +178,80 @@ const getReservationClass = (reservation: any) => {
 // Function to return reservation status as 'Active' or 'Ended'
 const getReservationStatus = (reservation: any) => {
   return isReservationEnded(reservation) ? 'Reservation Ended' : 'Active';
+};
+
+// Function to print reservations
+const printReservations = () => {
+  const printContent = `
+    <h1>Reservations List</h1>
+    <table border="1" style="border-collapse: collapse; width: 100%;">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Date</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Guests</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${filteredReservations.value.map(reservation => `
+                <tr>
+                    <td>${reservation.id}</td>
+                    <td>${reservation.name}</td>
+                    <td>${reservation.phone}</td>
+                    <td>${reservation.date}</td>
+                    <td>${reservation.start_time}</td>
+                    <td>${reservation.end_time}</td>
+                    <td>${reservation.guests}</td>
+                    <td>${getReservationStatus(reservation)}</td>
+                </tr>
+            `).join('')}
+        </tbody>
+    </table>
+  `;
+
+  const newWindow = window.open('', '_blank');
+  if (newWindow) {
+    newWindow.document.write(printContent);
+    newWindow.document.close();
+    newWindow.print();
+    newWindow.close();
+  } else {
+    console.error("Failed to open a new window.");
+  }
+};
+
+// Function to export reservations to Excel
+// Function to export reservations to Excel
+const exportReservations = async () => {
+  try {
+    const response = await axios({
+      url: 'http://localhost:8000/api/reservations/export', // Ensure this matches your API route
+      method: 'GET',
+      responseType: 'blob', // Important for file download
+    });
+
+    // Create a URL for the blob response
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+
+    // Create a link element and trigger the download
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'reservations.xlsx'); // File name
+    document.body.appendChild(link);
+    link.click();
+
+    // Clean up
+    if (link.parentNode) {
+      link.parentNode.removeChild(link);
+    }
+  } catch (error) {
+    console.error("Error downloading the Excel file:", error);
+  }
 };
 
 // Fetch reservations when component mounts (only once)

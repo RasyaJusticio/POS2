@@ -17,13 +17,13 @@ class SettingSeeder extends Seeder
         DB::table('settings')->truncate();
 
         Setting::create([
-            'app' => 'AON Cashier',
-            'description' =>  'Aplikasi AON Cashier',
+            'app' => 'Siam Spice Co.',
+            'description' =>  'Aplikasi Siam Spice Co.',
             'logo' =>  '/LOGO.png',
             'bg_auth' =>  '/media/misc/bg-auth.jpg',
             'banner' =>  '/media/misc/banner.jpg',
-            'pemerintah' =>  'Pemerintah Provinsi Jawa Timur',
-            'dinas' =>  'Dinas Lingkungan Hidup',
+            'pemerintah' =>  '-',
+            'dinas' =>  '-',
             'alamat' =>  '',
             'telepon' =>  '',
             'email' =>  '',

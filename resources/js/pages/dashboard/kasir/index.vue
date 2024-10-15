@@ -83,7 +83,7 @@
       </aside>
   
       <footer class="pos-footer">
-        <p>&copy; {{ new Date().getFullYear() }} AON Cashier</p>
+        <p>&copy; {{ new Date().getFullYear() }} Siam Spice Co.</p>
       </footer>
     
   </template>

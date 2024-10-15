@@ -28,17 +28,20 @@
       </div>
 
       <div class="charts">
-        <ChartCard title="Sales Over Time">
-          <canvas id="salesChart"></canvas>
-        </ChartCard>
-        <ChartCard title="Top Selling Items">
-          <canvas id="topItemsChart"></canvas>
-        </ChartCard>
-      </div>
+    <!-- Sales Over Time Chart -->
+    <ChartCard title="Customer Over Time">
+      <canvas id="salesChart"></canvas>
+    </ChartCard>
+
+    <!-- Top Selling Items Chart -->
+    <ChartCard title="Top Selling Items">
+      <canvas id="topItemsChart"></canvas>
+    </ChartCard>
+  </div>
 
       <!-- Menampilkan Total Reservations -->
       <div>
-
+        <!-- Anda dapat menambahkan komponen lain di sini jika diperlukan -->
       </div>
     </div>
   </main>
@@ -52,71 +55,30 @@ import ChartCard from './ChartCard.vue';
 import Chart from 'chart.js/auto';
 import axios from 'axios'; // Import axios untuk API call
 
-const router = useRouter();  // Inisialisasi router
+// Inisialisasi router
+const router = useRouter();
+
+// Reactive state untuk total penjualan, item, pelanggan, profit, dan reservasi
 const totalSales = ref(0);
-const totalItems = ref(0); // Number of reservations from the API
-const totalCustomers = ref(0); // Ini adalah state untuk total customers
+const totalItems = ref(0); // Jumlah reservasi dari API
+const totalCustomers = ref(0); // Jumlah pelanggan
 const profit = ref(0);
+const totalReservations = ref(0); // Total reservasi
 
-const navigateToReservation = () => {
-  router.push({ name: 'dashboard.inventori.reservation' });  // Arahkan ke halaman reservasi
-};
-// Reactive state untuk total reservations
-const totalReservations = ref(0);
-
-// Fetch totalItems (reservations count) dari API
-const fetchTotalItems = async () => {
-  try {
-    const response = await fetch('http://localhost:8000/api/reservations/count');
-    if (!response.ok) {
-      throw new Error('Failed to fetch reservation count');
-    }
-    const data = await response.json();
-    totalItems.value = data.totalItems;
-  } catch (error) {
-    console.error('Error fetching reservation count:', error);
-  }
-};
-
-// Fetch totalReservations dari API (menampilkan total reservasi)
-const fetchTotalReservations = async () => {
-  try {
-    const response = await axios.get('http://localhost:8000/api/reservations/count');
-    totalReservations.value = response.data.totalItems;
-  } catch (error) {
-    console.error('Error fetching total reservations:', error);
-  }
-};
-
-// Fetch totalCustomers dari API (menampilkan total customers)
-const fetchTotalCustomers = async () => {
-  try {
-    const response = await axios.get('http://localhost:8000/api/total-customers');
-    totalCustomers.value = response.data.total_customers;
-  } catch (error) {
-    console.error('Error fetching total customers:', error);
-  }
-};
-
-// Memanggil fungsi saat komponen dimuat
+// Fungsi inisialisasi saat komponen dimuat
 onMounted(() => {
+  initializeSalesChart();
+  initializeTopItemsChart(); // Inisialisasi chart produk terlaris
   fetchTotalItems();
   fetchTotalReservations();
-  fetchTotalCustomers(); // Tambahkan ini untuk mengambil total customer
-  initializeCharts();
+  fetchTotalCustomers(); // Menambahkan ini untuk mengambil total pelanggan
 });
 
-// Format currency to Rupiah
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-  }).format(value);
-};
-
-// Fungsi untuk menginisialisasi charts
-const initializeCharts = () => {
+// Fungsi untuk inisialisasi chart 'Sales Over Time'
+const initializeSalesChart = () => {
   const salesCtx = document.getElementById('salesChart')?.getContext('2d');
+  if (!salesCtx) return; // Tambahkan pengecekan untuk menghindari error jika elemen tidak ada
+
   new Chart(salesCtx, {
     type: 'line',
     data: {
@@ -138,32 +100,97 @@ const initializeCharts = () => {
       }
     }
   });
+};
 
-  const topItemsCtx = document.getElementById('topItemsChart')?.getContext('2d');
-  new Chart(topItemsCtx, {
-    type: 'bar',
-    data: {
-      labels: ['Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5'],
-      datasets: [{
-        label: 'Top Selling Items',
-        data: [12, 19, 3, 5, 2],
-        backgroundColor: 'rgba(153, 102, 255, 0.2)',
-        borderColor: 'rgba(153, 102, 255, 1)',
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: {
-          beginAtZero: true
+// Fungsi untuk inisialisasi chart 'Top Selling Items'
+const initializeTopItemsChart = async () => {
+  try {
+    const response = await axios.get('http://localhost:8000/api/top-selling-items');
+    console.log(response.data);  // Debugging line to check the response
+
+    const topItems = response.data;
+    const labels = topItems.map(item => item.name);  // Gunakan nama produk sebagai label
+    const data = topItems.map(item => item.total_sold);  // Gunakan jumlah terjual untuk data
+
+    const topItemsCtx = document.getElementById('topItemsChart')?.getContext('2d');
+    if (!topItemsCtx) return;
+
+    new Chart(topItemsCtx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Top Selling Items',
+          data: data,
+          backgroundColor: 'rgba(153, 102, 255, 0.2)',
+          borderColor: 'rgba(153, 102, 255, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true
+          }
         }
       }
-    }
-  });
+    });
+  } catch (error) {
+    console.error('Error fetching top selling items:', error);
+  }
 };
-</script>
 
+
+// Fungsi untuk fetch total items (reservations count) dari API
+const fetchTotalItems = async () => {
+  try {
+    const response = await fetch('http://localhost:8000/api/reservations/count');
+    if (!response.ok) {
+      throw new Error('Failed to fetch reservation count');
+    }
+    const data = await response.json();
+    totalItems.value = data.totalItems;
+  } catch (error) {
+    console.error('Error fetching reservation count:', error);
+  }
+};
+
+// Fungsi untuk fetch total reservasi dari API
+const fetchTotalReservations = async () => {
+  try {
+    const response = await axios.get('http://localhost:8000/api/reservations/count');
+    totalReservations.value = response.data.totalItems;
+  } catch (error) {
+    console.error('Error fetching total reservations:', error);
+  }
+};
+
+// Fungsi untuk fetch total pelanggan dari API
+const fetchTotalCustomers = async () => {
+  try {
+    const response = await axios.get('http://localhost:8000/api/total-customers');
+    totalCustomers.value = response.data.total_customers;
+  } catch (error) {
+    console.error('Error fetching total customers:', error);
+  }
+};
+
+// Format currency to Rupiah
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+  }).format(value);
+};
+
+// Fungsi untuk navigasi ke halaman reservasi
+const navigateToReservation = () => {
+  router.push({ name: 'dashboard.inventori.reservation' });
+};
+
+
+</script>
 
 <style scoped>
 .container {

@@ -443,7 +443,7 @@
             <a href="https://www.instagram.com/whozviaa?igsh=emp5YnBpZzI3MzNi" target="_blank" class="btn btn-outline-success1 mx-2">
                 <i class="fab fa-instagram"></i> Instagram
             </a>
-            <a href="https://wa.me/qr/STA2YM5YISFCF1" target="_blank" class="btn btn-outline-success2 mx-2">
+            <a href="https://wa.me/qr/STA2YM5YISFCF1 " target="_blank" class="btn btn-outline-success2 mx-2">
                 <i class="fab fa-whatsapp "></i> WhatsApp
             </a>
             <a href="https://facebook.com/yourrestaurant" target="_blank" class="btn btn-outline-success3 mx-2">
