@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Models\Reservation; 
+use App\Models\Reservation;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -11,6 +11,8 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class ReservationsExport implements FromCollection, WithHeadings, WithMapping, WithStyles, ShouldAutoSize
 {
@@ -50,15 +52,44 @@ class ReservationsExport implements FromCollection, WithHeadings, WithMapping, W
     public function styles(Worksheet $sheet)
     {
         // Header styles
-        $sheet->getStyle('A1:H1')->getFont()->setBold(true);
-        $sheet->getStyle('A1:H1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('A1:H1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
-        $sheet->getStyle('A1:H1')->getFill()->getStartColor()->setARGB('FFDDDDDD');
+        $headerStyle = [
+            'font' => [
+                'bold' => true,
+                'size' => 12,
+                'color' => ['argb' => Color::COLOR_WHITE],
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER,
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['argb' => 'FF0070C0'], // Warna biru
+            ],
+        ];
+
+        // Apply header style
+        $sheet->getStyle('A1:H1')->applyFromArray($headerStyle);
 
         // Apply borders to all data cells
-        $sheet->getStyle('A1:H' . ($sheet->getHighestRow()))->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+        $sheet->getStyle('A1:H' . ($sheet->getHighestRow()))->applyFromArray([
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => Color::COLOR_BLACK],
+                ],
+            ],
+        ]);
 
-        // Set the column widths
+        // Set alignment for all data cells
+        $sheet->getStyle('A1:H' . ($sheet->getHighestRow()))->applyFromArray([
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER,
+            ],
+        ]);
+
+        // Set auto width for columns
         return [
             'A' => ['width' => 10],
             'B' => ['width' => 30],

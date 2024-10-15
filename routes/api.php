@@ -15,6 +15,9 @@ use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\ItempembelianController;
 use App\Models\Reservation;
 
+
+Route::post('/inventori/laporan', [TransactionReportController::class, 'printTransaction']); // Endpoint untuk mencetak
+Route::get('/inventori/laporan/export', [TransactionReportController::class, 'exportToExcel']);
 Route::get('/master/users/export', [UserController::class, 'export'])->name('users.export');
 Route::get('/master/users/print', [UserController::class, 'print']);
 Route::get('reservations/export', [ReservationController::class, 'export']);
@@ -146,7 +149,7 @@ Route::prefix('inventori')->group(function () {
             Route::post('/', [TransactionReportController::class, 'index']);
             Route::delete('/{id}', [TransactionReportController::class, 'destroy']);
             Route::post('/midtrans/callback', [TransactionReportController::class, 'handleMidtransCallback']);
-            Route::get('/midtrans/status/{orderId}', [TransactionReportController::class, 'getTransactionStatus']); // Rute baru untuk mendapatkan status transaksi
+            Route::post('/midtrans/status/{orderId}', [TransactionReportController::class, 'getTransactionStatus']); // Rute baru untuk mendapatkan status transaksi
         });
     });
     

@@ -13,8 +13,9 @@ class ReservationController extends Controller
 {
     public function export()
     {
-    return Excel::download(new ReservationsExport, 'reservations.xlsx');
+        return Excel::download(new ReservationsExport, 'reservations.xlsx');
     }   
+
     // Menyimpan data reservasi
     public function store(Request $request)
     {

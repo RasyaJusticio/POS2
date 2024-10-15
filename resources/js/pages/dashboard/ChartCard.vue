@@ -2,11 +2,9 @@
   <div class="card mb-4">
     <div class="card-body">
       <h4 class="card-title">{{ title }}</h4>
-      <div class="chart-container">
         <canvas id="reservationChart"></canvas>
       </div>
     </div>
-  </div>
 </template>
 
 <script setup lang="ts">
@@ -61,8 +59,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.chart-container {
-  position: relative;
-  height: 300px;
+.card-body {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.473); /* Add box shadow here */
 }
 </style>

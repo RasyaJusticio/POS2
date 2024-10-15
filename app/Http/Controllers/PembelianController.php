@@ -46,7 +46,7 @@ class PembelianController extends Controller
 
         // Simpan laporan transaksi
         TransactionReport::create([
-            'pembelian_id' => $pembelian->uuid, // Menggunakan UUID untuk referensi pembelian
+            'pembelian_id' => $pembelian->id, // Menggunakan UUID untuk referensi pembelian
             'status' => 'pending', // Status awal
             'total_price' => $request->total_price,
         ]);

@@ -3,7 +3,7 @@
     <div class="card-body">
       <div class="card-title d-flex justify-content-center align-items-center">
         <i :class="[iconClass, 'large-icon', 'text-secondary-emphasis', 'me-10']"></i>
-        <span class="value fw-bold fs-2 mb-0">{{ value }}</span>
+        <span class="value fw-bold fs-1 mb-0">{{ value }}</span>
       </div>
         <h3 class="">{{ title }}</h3>
     </div>
@@ -29,15 +29,19 @@ defineProps({
 }
 
 .large-icon {
-  font-size: 5rem; /* Ukuran ikon */
+  font-size: 6rem; /* Ukuran ikon */
   color: #000000; /* Warna ikon */
   margin-right: 100px; /* Jarak antara ikon dan nilai */
   margin-left: 10px; /* Jarak ke kiri untuk memberi ruang di pojok */
 }
 
+/* .card-body{
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.473); /* Add box shadow here */
+
+
 
 .value {
-  font-size: 2.5rem; /* Sesuaikan ukuran untuk nilai */
+  font-size: 3rem; /* Sesuaikan ukuran untuk nilai */
   font-weight: bold;
   margin-left: 10px; /* Jarak antara ikon dan nilai */
 }

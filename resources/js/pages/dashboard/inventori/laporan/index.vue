@@ -11,6 +11,115 @@ const paginateRef = ref<any>(null);
 const transactions = ref<TransactionReport[]>([]); // Menyimpan data transaksi
 const selectedTransaction = ref<TransactionReport | null>(null);
 
+// Mendapatkan data transaksi saat komponen dimuat
+onMounted(async () => {
+    try {
+        const response = await axios.post('/inventori/laporan');
+        transactions.value = response.data; 
+    } catch (error) {
+        console.error('Error fetching transactions:', error);
+    }
+});
+
+
+// Fungsi untuk mencetak laporan transaksi
+const printTransaction = async () => {
+    try {
+        const response = await axios.post('/inventori/laporan');
+        const transactions = response.data.data; // Pastikan mengambil data dari respons yang benar
+
+        // Memformat data transaksi
+        const printContent = `
+            <html>
+            <head>
+                <title>Laporan Transaksi</title>
+                <style>
+                    table {
+                        border-collapse: collapse;
+                        width: 100%;
+                    }
+                    th, td {
+                        border: 1px solid black;
+                        padding: 8px;
+                        text-align: center;
+                    }
+                    th {
+                        background-color: #0070C0;
+                        color: white;
+                    }
+                </style>
+            </head>
+            <body>
+                <h1 style="text-align: center;">Laporan Transaksi</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>ID Pembelian</th>
+                            <th>Status Pembayaran</th>
+                            <th>Total</th>
+                            <th>Tanggal Pesanan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${transactions.map((transaction, index) => `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${transaction.pembelian_id}</td>
+                                <td>${transaction.status}</td>
+                                <td>${formatRupiah(transaction.total_price)}</td>
+                                <td>${new Date(transaction.created_at).toLocaleDateString("id-ID")}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </body>
+            </html>
+        `;
+
+        // Debug log untuk melihat isi printContent
+        console.log(printContent);
+
+        // Membuka jendela baru untuk pencetakan
+        const newWindow = window.open('', '_blank');
+        if (newWindow) {
+            newWindow.document.write(printContent);
+            newWindow.document.close();
+            newWindow.print();
+            newWindow.close();
+        } else {
+            console.error("Gagal membuka jendela baru.");
+        }
+
+    } catch (error) {
+        console.error("Error fetching transactions for printing:", error);
+    }
+};
+
+
+
+
+
+// Fungsi untuk mengekspor laporan transaksi ke Excel
+const exportTransaction = async () => {
+    try {
+        const response = await axios.get('/inventori/laporan/export', {
+            responseType: 'blob', // Untuk mendownload blob
+        });
+
+        // Membuat URL untuk blob
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'laporan_transaksi.xlsx'); // Nama file
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link); // Menghapus link setelah klik
+    } catch (error) {
+        console.error("Error downloading the Excel file:", error);
+    }
+};
+
 
 const { delete: deleteTransactionReport } = useDelete({
     onSuccess: () => paginateRef.value.refetch(),
@@ -81,6 +190,27 @@ const refresh = () => paginateRef.value.refetch();
     <div class="card">
         <div class="card-header align-items-center">
             <h2 class="mb-0">Laporan Transaksi</h2>
+
+            <!-- Button for printing the reservations list -->
+      <button
+        type="button"
+        class="btn btn-sm btn-success ms-auto"
+        @click="printTransaction"
+      >
+        Print
+        <i class="la la-print"></i>
+      </button>
+
+      <!-- Button for exporting the reservations list to Excel -->
+      <button
+        type="button"
+        class="btn btn-sm btn-success ms-2"
+        @click="exportTransaction"
+      >
+        Export Excel
+        <i class="la la-file-excel"></i>
+      </button>
+
         </div>
         <div class="card-body">
             <paginate
