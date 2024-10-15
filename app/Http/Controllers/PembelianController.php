@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pembelian;
+use App\Models\Product;
+use App\Models\TransactionReport;
 use Illuminate\Http\Request;
 
 class PembelianController extends Controller
@@ -14,8 +16,8 @@ class PembelianController extends Controller
         ]);
 
 
-        $Pembelian = Pembelian::create($validate);
-        $Pembelian->items()->sync($request->products_id);
+        $pembelian = Pembelian::create($validate);
+        $pembelian->items()->sync($request->products_id);
 
         \Midtrans\Config::$serverKey = config('midtrans.server_key');
         \Midtrans\Config::$isProduction = false;
@@ -25,7 +27,7 @@ class PembelianController extends Controller
         // Siapkan parameter transaksi
         $params = [
             'transaction_details' => [
-                'order_id' => $Pembelian->id, // Pastikan order_id menggunakan UUID
+                'order_id' => $pembelian->id, // Pastikan order_id menggunakan UUID
                 'gross_amount' => $request->total_price,
             ],
         ];
@@ -33,9 +35,16 @@ class PembelianController extends Controller
         // Dapatkan Snap Token dari Midtrans
         $snapToken = \Midtrans\Snap::getSnapToken($params);
 
+        // Simpan laporan transaksi
+        TransactionReport::create([
+            'pembelian_id' => $pembelian->id,
+            'status' => 'pending', // Status awal
+            'items' => json_encode($request->products_id), // Simpan produk dalam format JSON
+        ]);
+
         return response()->json([
             'success' => true,
-            'Pembelian' => $Pembelian,
+            'Pembelian' => $pembelian,
             'payment_url' => $snapToken
         ]);
 

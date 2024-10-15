@@ -212,9 +212,9 @@ function submit(items: any) {
   const formDataToSubmit = new FormData();
   formDataToSubmit.append('total_price', valueTotal.value);
   items.map((item) => {
-    // console.log(item.id)
-    formDataToSubmit.append('products_id[]', item.id)
-  })
+    formDataToSubmit.append('products_id[]', item.id);
+    formDataToSubmit.append('product_names[]', item.name); // Menambahkan nama produk
+  });
 
 
   axios({

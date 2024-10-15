@@ -10,6 +10,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ItempembelianController;
 use App\Http\Controllers\PembelianController;
+use App\Http\Controllers\TransactionReportController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -92,6 +93,7 @@ Route::prefix('orders')->group(function () {
 
 Route::post('/itempembelian/submit', [PembelianController::class, 'store']);
 Route::get('/itempembelian/products', [ItempembelianController::class, 'getProducts']);
+Route::get('/itempembelian/products', [ItempembelianController::class, 'index']);
 
 
 Route::prefix('orders')->group(function () {
@@ -116,7 +118,16 @@ Route::prefix('inventori')->group(function () {
                 Route::post('/toggle-sold-out', [ProductController::class, 'toggleSoldOut']);
             });
         });
+
+        // Rute untuk Laporan Transaksi
+        Route::group(['prefix' => 'laporan'], function () {
+            Route::post('/', [TransactionReportController::class, 'index']); // Mendapatkan semua laporan transaksi
+            Route::post('/midtrans/callback', [TransactionReportController::class, 'handleMidtransCallback'])->withoutMiddleware('auth');
+        });
+    });
+
+
         // Route::apiResource('produk', ProductController::class)
         //     ->except(['index', 'store'])->scoped(['product' => 'id']);
-    });
+    
 });
