@@ -2,14 +2,18 @@
 import { h, ref, onMounted } from "vue";
 import { useDelete } from "@/libs/hooks";
 import { createColumnHelper } from "@tanstack/vue-table";
-import type { TransactionReport } from "@/types/laporan"; // Ganti dengan path yang sesuai
+import type { Pembelian } from "@/types/laporan"; // Ganti dengan path yang sesuai
 import axios from "@/libs/axios";
 import { formatRupiah } from "@/libs/utilss";
 
-const column = createColumnHelper<TransactionReport>();
+const column = createColumnHelper<Pembelian>();
 const paginateRef = ref<any>(null);
-const transactions = ref<TransactionReport[]>([]); // Menyimpan data transaksi
-const selectedTransaction = ref<TransactionReport | null>(null);
+const transactions = ref<Pembelian[]>([]); // Menyimpan data transaksi
+const selectedTransaction = ref<Pembelian | null>(null);
+
+const { delete: deletePembelian } = useDelete({
+    onSuccess: () => paginateRef.value.refetch(),
+})
 
 // Mendapatkan data transaksi saat komponen dimuat
 onMounted(async () => {
@@ -121,10 +125,6 @@ const exportTransaction = async () => {
 };
 
 
-const { delete: deleteTransactionReport } = useDelete({
-    onSuccess: () => paginateRef.value.refetch(),
-});
-
 // Mendapatkan data transaksi saat komponen dimuat
 onMounted(async () => {
     try {
@@ -139,11 +139,15 @@ onMounted(async () => {
 
 
 const columns = [
-    column.accessor("id", {
+    column.display({
         header: "No",
+        cell: (cell) => {
+            return cell.row.index + 1; // Menggunakan indeks baris sebagai nomor urut
+        },
     }),
-    column.accessor("pembelian_id", {
+    column.accessor("id", {
         header: "ID Pembelian",
+        cell: (cell) => cell.getValue().toString().padStart(3, '0'), // Memastikan minimal 3 digit dengan padding '0'
     }),
     column.accessor("status", {
         header: "Status Pembayaran",
@@ -175,7 +179,7 @@ const columns = [
                     {
                         class: "btn btn-sm btn-icon btn-danger",
                         onClick: () =>
-                            deleteTransactionReport(`/inventori/laporan/${cell.getValue()}`),
+                            deletePembelian(`/inventori/laporan/${cell.getValue()}`),
                     },
                     h("i", { class: "la la-trash fs-2" })
                 ),

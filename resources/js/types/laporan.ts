@@ -1,4 +1,4 @@
-export interface TransactionReport {
+export interface Pembelian {
     id: number; // Menggunakan number karena id di Laravel biasanya integer
     pembelian_id: number; // Sesuaikan dengan foreignId yang menggunakan integer
     status: string; // Menggunakan union type untuk status

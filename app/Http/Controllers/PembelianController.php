@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Pembelian;
 use App\Models\Product;
-use App\Models\TransactionReport;
 use Illuminate\Http\Request;
 
 class PembelianController extends Controller
@@ -20,7 +19,7 @@ class PembelianController extends Controller
         ]);
 
         // Buat pembelian baru
-        $pembelian = Pembelian::create($validate);
+        $pembelian = Pembelian::create($validate); // Status awal di sini
         $pembelian->items()->syncWithoutDetaching($request->products_id); // Menyinkronkan produk
 
         // Konfigurasi Midtrans
@@ -32,7 +31,7 @@ class PembelianController extends Controller
         // Siapkan parameter transaksi untuk Midtrans
         $params = [
             'transaction_details' => [
-                'order_id' => $pembelian->uuid, // Menggunakan UUID sebagai order_id
+                'order_id' => $pembelian->id, // Menggunakan UUID sebagai order_id
                 'gross_amount' => $request->total_price,
             ],
         ];
@@ -44,13 +43,6 @@ class PembelianController extends Controller
             return response()->json(['success' => false, 'message' => 'Gagal mendapatkan token pembayaran.'], 500);
         }
 
-        // Simpan laporan transaksi
-        TransactionReport::create([
-            'pembelian_id' => $pembelian->id, // Menggunakan UUID untuk referensi pembelian
-            'status' => 'pending', // Status awal
-            'total_price' => $request->total_price,
-        ]);
-
         return response()->json([
             'success' => true,
             'Pembelian' => $pembelian,
@@ -58,27 +50,58 @@ class PembelianController extends Controller
         ]);
     }
 
-    public function updateTransactionStatus(Request $request)
+    // Fungsi callback untuk menangani notifikasi dari Midtrans
+    public function callback(Request $request)
     {
-        // Validasi data yang diterima dari Midtrans
-        $request->validate([
-            'order_id' => 'required',
-            'transaction_status' => 'required',
-        ]);
+        $notification = $request->all();
 
-        // Temukan pembelian berdasarkan UUID
-        $transactionReport = TransactionReport::where('pembelian_id', $request->order_id)->first();
+        // Contoh bagaimana menangani notifikasi status pembayaran
+        $transactionStatus = $notification['transaction_status'];
+        $orderId = $notification['order_id'];
 
-        if ($transactionReport) {
-            // Update status transaksi
-            $transactionReport->update([
-                'status' => $request->transaction_status,
-            ]);
+        // Cari pembelian berdasarkan order_id (UUID)
+        $pembelian = Pembelian::where('id', $orderId)->first();
 
-            return response()->json(['success' => true, 'message' => 'Status transaksi berhasil diperbarui.']);
+        if (!$pembelian) {
+            return response()->json(['message' => 'Pembelian tidak ditemukan'], 404);
         }
 
-        return response()->json(['success' => false, 'message' => 'Transaksi tidak ditemukan.'], 404);
+        // Perbarui status berdasarkan status transaksi dari Midtrans
+        if ($transactionStatus === 'capture' || $transactionStatus === 'settlement') {
+            $pembelian->status = 'Paid';
+        } elseif ($transactionStatus === 'pending') {
+            $pembelian->status = 'Unpaid';
+        } elseif ($transactionStatus === 'deny' || $transactionStatus === 'expire' || $transactionStatus === 'cancel') {
+            $pembelian->status = 'Unpaid';
+        }
+
+        // Simpan perubahan status
+        $pembelian->save();
+
+        return response()->json(['message' => 'Notifikasi pembayaran telah diproses']);
+    }
+
+    public function index(Request $request)
+    {
+        // Ambil semua pembelian
+        $pembelians = Pembelian::paginate(10);
+
+        return response()->json($pembelians);
+    }
+
+    public function destroy($id)
+    {
+        // Cari pembelian berdasarkan ID
+        $pembelian = Pembelian::find($id);
+
+        if (!$pembelian) {
+            return response()->json(['message' => 'Pembelian tidak ditemukan'], 404);
+        }
+
+        // Hapus pembelian
+        $pembelian->delete();
+
+        return response()->json(['message' => 'Pembelian berhasil dihapus']);
     }
 
 }

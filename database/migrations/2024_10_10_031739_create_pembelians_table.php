@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->nullable();
             $table->integer('total_price');
+            $table->string('status')->default('pending'); // Menambahkan kolom status
             $table->timestamps();
         });
     }

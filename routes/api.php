@@ -146,17 +146,19 @@ Route::prefix('inventori')->group(function () {
 
         // Rute untuk Laporan Transaksi
         Route::group(['prefix' => 'laporan'], function () {
-            Route::post('/', [TransactionReportController::class, 'index']);
-            Route::delete('/{id}', [TransactionReportController::class, 'destroy']);
-            Route::post('/midtrans/callback', [TransactionReportController::class, 'handleMidtransCallback']);
-            Route::post('/midtrans/status/{orderId}', [TransactionReportController::class, 'getTransactionStatus']); // Rute baru untuk mendapatkan status transaksi
+            Route::post('/', [PembelianController::class, 'index']);
+            Route::delete('/{id}', [PembelianController::class, 'destroy']);
+            // Route::post('/midtrans/callback', [TransactionReportController::class, 'callback']);
+            // Route::post('/midtrans/status/{orderId}', [TransactionReportController::class, 'getTransactionStatus']); // Rute baru untuk mendapatkan status transaksi
         });
     });
     
-    Route::post('/midtrans/callback', [PembelianController::class, 'updateTransactionStatus']);
+    
 
 
         // Route::apiResource('produk', ProductController::class)
         //     ->except(['index', 'store'])->scoped(['product' => 'id']);
     
 });
+
+Route::post('/midtrans-callback', [PembelianController::class, 'callback']);
