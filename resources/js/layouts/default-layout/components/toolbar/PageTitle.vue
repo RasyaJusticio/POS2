@@ -17,7 +17,7 @@
         class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
         <!--begin::Item-->
         <li class="breadcrumb-item text-muted">
-          <router-link to="/" class="text-muted text-hover-primary">AON Cashier</router-link>
+          <router-link to="/" class="text-muted text-hover-primary">Siam Spice Co.</router-link>
         </li>
         <!--end::Item-->
         <template v-for="(item, i) in breadcrumbs" :key="i">

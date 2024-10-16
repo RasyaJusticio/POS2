@@ -95,6 +95,8 @@ const formatCurrency = (value: number) => {
 
 const initializeCharts = () => {
   const salesCtx = document.getElementById('salesChart')?.getContext('2d');
+  if (!salesCtx) return; // Tambahkan pengecekan untuk menghindari error jika elemen tidak ada
+
   new Chart(salesCtx, {
     type: 'line',
     data: {
@@ -117,9 +119,48 @@ const initializeCharts = () => {
     }
   });
 };
+
+// Fungsi untuk inisialisasi chart 'Top Selling Items'
+const initializeTopItemsChart = async () => {
+  try {
+    const response = await axios.get('http://localhost:8000/api/top-selling-items');
+    console.log(response.data);  // Debugging line to check the response
+
+    const topItems = response.data;
+    const labels = topItems.map(item => item.name);  // Gunakan nama produk sebagai label
+    const data = topItems.map(item => item.total_sold);  // Gunakan jumlah terjual untuk data
+
+    const topItemsCtx = document.getElementById('topItemsChart')?.getContext('2d');
+    if (!topItemsCtx) return;
+
+    new Chart(topItemsCtx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Top Selling Items',
+          data: data,
+          backgroundColor: 'rgba(153, 102, 255, 0.2)',
+          borderColor: 'rgba(153, 102, 255, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching top selling items:', error);
+  }
+};
+
+
 </script>
-
-
 
 <style scoped>
 .container {

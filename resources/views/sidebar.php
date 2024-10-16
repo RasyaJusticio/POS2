@@ -3,7 +3,7 @@
     <!-- Brand -->
     <div class="sidebar-logo">
       <a href="/" class="sidebar-brand">
-        <img src="/ann.jpeg" alt="DANO Logo" />
+        <img src="/public/media/" alt="DANO Logo" />
       </a>
     </div>
 
