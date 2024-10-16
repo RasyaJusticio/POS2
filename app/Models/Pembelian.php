@@ -24,26 +24,26 @@ class Pembelian extends Model
      * Relationship to the User model
      * A 'pembelian' belongs to a user.
      */
-    /**
-     * Relasi dengan model User
-     * Sebuah 'pembelian' dimiliki oleh seorang pengguna.
-     */
-
-    public function getProductsIdAttribute(){
-        return $this->items()->pluck('products_id');
-    }
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
     /**
-     * Definisikan relasi dengan model Itempembelian
-     * Sebuah 'pembelian' dapat memiliki banyak item yang terkait dengannya.
+     * Relasi dengan model Product
+     * Sebuah 'pembelian' dapat memiliki banyak produk yang terkait dengannya.
      */
     public function items()
     {
-        return $this->belongsToMany(Product::class, 'itempembelians');
-        return $this->belongsToMany(Item::class)->withPivot('quantity'); 
+        // Relasi dengan Product menggunakan pivot table 'itempembelians'
+        return $this->belongsToMany(Product::class, 'itempembelians')->withPivot('quantity');
+    }
+
+    /**
+     * Custom attribute untuk mengambil ID produk dari relasi items
+     */
+    public function getProductsIdAttribute()
+    {
+        return $this->items()->pluck('id'); // Pluck 'id' dari relasi Product
     }
 }

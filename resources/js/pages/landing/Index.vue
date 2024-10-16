@@ -242,12 +242,12 @@
 
           <h3 v-if="visibleDescription === 'thaitea'">THAI TEA</h3>
           <p v-if="visibleDescription === 'thaitea'">
-            A delightful blend of strong brewed tea and creamy milk, sweetened to perfection. Its rich, aromatic flavors are enhanced with a hint of spices, making it a favorite refreshment. Served over ice, this drink is both satisfying and refreshing on a warm day.
+            A delightful blend of strong brewed tea and creamy milk, sweetened to perfection. Its rich, aromatic flavors are enhanced with a hint of spices, making it a favorite refreshment. Served over ice, this minuman is both satisfying and refreshing on a warm day.
           </p>
 
           <h3 v-if="visibleDescription === 'paor'">P AOR</h3>
           <p v-if="visibleDescription === 'paor'">
-            A savory noodle soup that features tender meat and a rich, flavorful broth. Infused with aromatic herbs, each bowl is a comforting experience. It’s a beloved dish that captures the essence of Thai comfort food, perfect for any time of day.
+            A savory noodle soup that features tender meat and a rich, flavorful broth. Infused with aromatic herbs, each bowl is a comforting experience. It’s a beloved dish that captures the essence of Thai comfort makanan, perfect for any time of day.
           </p>
 
           <h3 v-if="visibleDescription === 'padthai'">Pad Thai</h3>
@@ -322,7 +322,7 @@
 
           <h3 v-if="visibleDescription === 'savoey'">Savoey</h3>
           <p v-if="visibleDescription === 'savoey'">
-            A popular Thai dish known for its savory flavors, often incorporating seafood or meat with a variety of spices.
+            A popular Thai dish known for its savory flavors, often incorporating seamakanan or meat with a variety of spices.
           </p>
         </div>
       </section>
@@ -342,7 +342,7 @@
 
   <p class="custom-margin">Dining with us is about creating memorable experiences in a warm atmosphere with attentive service, whether you’re celebrating or enjoying a casual meal.</p>
 
-  <p class="custom-margin">We prioritize sustainability, minimizing our environmental footprint and supporting local farmers. Together, we can savor delicious food while caring for our planet.</p>
+  <p class="custom-margin">We prioritize sustainability, minimizing our environmental footprint and supporting local farmers. Together, we can savor delicious makanan while caring for our planet.</p>
 
   <p class="custom-margin">Join us on this culinary journey and make lasting memories with family and friends over our signature dishes, each telling a unique story.</p>
 

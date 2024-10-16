@@ -231,7 +231,7 @@ export default defineComponent({
         name: "Brian Cox",
         image: getAssetPath("media/avatars/300-25.jpg"),
         time: "2 mins",
-        text: "Company BBQ to celebrate the last quater achievements and goals. Food and drinks provided",
+        text: "Company BBQ to celebrate the last quater achievements and goals. makanan and drinks provided",
       },
     ]);
 
