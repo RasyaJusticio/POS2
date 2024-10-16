@@ -15,7 +15,8 @@ use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\ItempembelianController;
 use App\Models\Reservation;
 
-
+Route::put('/inventori/laporan/{id}', [TransactionReportController::class, 'updateStatus']);
+Route::get('/transaction/{id}', [TransactionReportController::class, 'show']);
 Route::post('/inventori/laporan', [TransactionReportController::class, 'printTransaction']); // Endpoint untuk mencetak
 Route::get('/inventori/laporan/export', [TransactionReportController::class, 'exportToExcel']);
 Route::get('/master/users/export', [UserController::class, 'export'])->name('users.export');

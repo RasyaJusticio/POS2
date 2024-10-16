@@ -14,7 +14,8 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 class TransactionReportExport implements FromCollection, WithHeadings, WithStyles
-{
+{   
+    
     /**
      * Mengembalikan koleksi data yang akan diekspor.
      */
