@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\TransactionReportExport;
 use App\Models\Pembelian;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PembelianController extends Controller
 {
@@ -16,10 +19,36 @@ class PembelianController extends Controller
             'total_price' => 'required',
             'products_id' => 'required|array', // Validasi produk ID
             'products_id.*' => 'exists:products,id', // Validasi setiap ID produk
+            'name' => 'required|array',
+            'name.*' => 'required|string',
+            'product_quantity' => 'required|array', // Validasi kuantitas
+            'product_quantity.*' => 'integer|min:1', // Validasi kuantitas harus integer dan lebih dari 0
         ]);
 
-        // Buat pembelian baru
-        $pembelian = Pembelian::create($validate); // Status awal di sini
+        // Pastikan panjang array products_id dan product_quantity sesuai
+        if (count($request->products_id) !== count($request->product_quantity)) {
+            return response()->json(['message' => 'Jumlah produk dan kuantitas tidak sesuai.'], 400);
+        }
+
+       // Inisialisasi string untuk menyimpan item
+       $items = '';
+       foreach ($request->products_id as $index => $productId) {
+           $product = Product::find($productId);
+           if ($product) {
+               // Format nama produk dan kuantitas menjadi string, pisahkan dengan koma jika lebih dari satu
+               $items .= $product->name . ': ' . $request->product_quantity[$index] . "\n";
+               
+           }
+       }
+
+       // Hapus koma terakhir dan spasi ekstra
+    //    $items = rtrim($items, ', ');
+
+       // Simpan pembelian dengan produk dalam satu kolom string biasa
+       $pembelian = Pembelian::create(array_merge($validate, [
+           'items' => $items, // Simpan array produk dan kuantitas sebagai string biasa
+       ]));
+        
         $pembelian->items()->syncWithoutDetaching($request->products_id); // Menyinkronkan produk
 
         // Konfigurasi Midtrans
@@ -31,7 +60,7 @@ class PembelianController extends Controller
         // Siapkan parameter transaksi untuk Midtrans
         $params = [
             'transaction_details' => [
-                'order_id' => $pembelian->id, // Menggunakan UUID sebagai order_id
+                'order_id' => $pembelian->uuid, // Menggunakan UUID sebagai order_id
                 'gross_amount' => $request->total_price,
             ],
         ];
@@ -40,7 +69,7 @@ class PembelianController extends Controller
             // Dapatkan Snap Token dari Midtrans
             $snapToken = \Midtrans\Snap::getSnapToken($params);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Gagal mendapatkan token pembayaran.'], 500);
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
 
         return response()->json([
@@ -60,7 +89,7 @@ class PembelianController extends Controller
         $orderId = $notification['order_id'];
 
         // Cari pembelian berdasarkan order_id (UUID)
-        $pembelian = Pembelian::where('id', $orderId)->first();
+        $pembelian = Pembelian::where('uuid', $orderId)->first();
 
         if (!$pembelian) {
             return response()->json(['message' => 'Pembelian tidak ditemukan'], 404);
@@ -102,6 +131,34 @@ class PembelianController extends Controller
         $pembelian->delete();
 
         return response()->json(['message' => 'Pembelian berhasil dihapus']);
+    }
+
+
+
+    public function exportToExcel()
+    {
+        return Excel::download(new TransactionReportExport, 'laporan_transaksi.xlsx');
+    }
+
+    // Fungsi untuk mencetak laporan transaksi
+    
+    
+    // Fungsi untuk mencetak laporan transaksi
+    public function printTransaction(Request $request)
+    {
+        $data = Pembelian::select('id', 'uuid', 'items', 'total_price', 'status', 'created_at')
+            ->when($request->search, function (Builder $query, string $search) {
+                $query->where('uuid', 'like', "%$search%")
+                    ->orWhere('items', 'like', "%$search%")
+                    ->orWhere('total_price', 'like', "%$search%")
+                    ->orWhere('status', 'like', "%$search%")
+                    ->orWhereDate('created_at', '=', $search); // Atur pencarian tanggal sesuai kebutuhan
+            })->get();
+    
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+        ]);
     }
 
 }

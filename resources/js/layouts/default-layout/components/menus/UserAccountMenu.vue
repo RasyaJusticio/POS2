@@ -108,7 +108,7 @@ const currentLangugeLocale = computed(() => {
                     <a
                         href="#" 
                         class="fw-semibold text-muted text-hover-primary fs-7" 
-                    >siamspiceco@gmail.com
+                    >siam@gmail.com
                     </a>
                 </div>
                 <!--end::Username-->

@@ -25,12 +25,11 @@ onMounted(async () => {
     }
 });
 
-
 // Fungsi untuk mencetak laporan transaksi
 const printTransaction = async () => {
     try {
         const response = await axios.post('/inventori/laporan');
-        const transactions = response.data.data; // Pastikan mengambil data dari respons yang benar
+        const transactions = response.data.data;
 
         // Memformat data transaksi
         const printContent = `
@@ -81,10 +80,6 @@ const printTransaction = async () => {
             </html>
         `;
 
-        // Debug log untuk melihat isi printContent
-        console.log(printContent);
-
-        // Membuka jendela baru untuk pencetakan
         const newWindow = window.open('', '_blank');
         if (newWindow) {
             newWindow.document.write(printContent);
@@ -100,25 +95,20 @@ const printTransaction = async () => {
     }
 };
 
-
-
-
-
 // Fungsi untuk mengekspor laporan transaksi ke Excel
 const exportTransaction = async () => {
     try {
         const response = await axios.get('/inventori/laporan/export', {
-            responseType: 'blob', // Untuk mendownload blob
+            responseType: 'blob',
         });
 
-        // Membuat URL untuk blob
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'laporan_transaksi.xlsx'); // Nama file
+        link.setAttribute('download', 'laporan_transaksi.xlsx');
         document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link); // Menghapus link setelah klik
+        document.body.removeChild(link);
     } catch (error) {
         console.error("Error downloading the Excel file:", error);
     }
@@ -129,14 +119,25 @@ const exportTransaction = async () => {
 onMounted(async () => {
     try {
         const response = await axios.post('/inventori/laporan');
-        console.log("Response data:", response.data);
-        transactions.value = response.data; 
+        transactions.value = response.data;
         paginateRef.value.refetch(); 
     } catch (error) {
         console.error('Error fetching transactions:', error);
     }
 });
 
+const markAsProcessed = async (transaction: Pembelian) => {
+    // Simpan status pesanan ke backend
+    transaction.created = true; // Mark as processed
+    try {
+        await axios.put(`/inventori/laporan/${transaction.id}`, {
+            created: transaction.created,
+        });
+        paginateRef.value.refetch();
+    } catch (error) {
+        console.error('Error updating transaction status:', error);
+    }
+};
 
 const columns = [
     column.display({
@@ -149,18 +150,25 @@ const columns = [
         header: "ID Pembelian",
         cell: (cell) => cell.getValue().toString().padStart(3, '0'), // Memastikan minimal 3 digit dengan padding '0'
     }),
-    column.accessor("status", {
-        header: "Status Pembayaran",
+    column.accessor("items", {
+        header: "Produk yang Dibeli",
     }),
-    column.accessor("total_price", {
+       column.accessor("total_price", {
         header: "Total",
         cell: (cell) => formatRupiah(cell.getValue()),
+    }),
+    column.accessor("status", {
+        header: "Status Pembayaran",
     }),
     column.accessor("created_at", {
         header: "Tanggal Pesanan",
         cell: (cell) => {
-            return new Date(cell.getValue()).toLocaleDateString("id-ID"); // Format tanggal sesuai locale
+            return new Date(cell.getValue()).toLocaleDateString("id-ID");
         },
+    }),
+       column.accessor("created", {
+        header: "Pesanan Dibuat",
+        cell: (cell) => cell.getValue() ? "On Process" : "Procces",
     }),
     column.accessor("id", {
         header: "Aksi",
@@ -177,6 +185,16 @@ const columns = [
                 h(
                     "button",
                     {
+                        class: "btn btn-sm btn-icon btn-success",
+                        disabled: cell.row.original.created, // Disable if already processed
+                        onClick: () => markAsProcessed(cell.row.original),
+                    },
+                    h("i", { class: "fa fa-check fs-2" }) // Font Awesome check icon
+                    
+                ),
+                h(
+                    "button",
+                    {
                         class: "btn btn-sm btn-icon btn-danger",
                         onClick: () =>
                             deletePembelian(`/inventori/laporan/${cell.getValue()}`),
@@ -187,58 +205,133 @@ const columns = [
     }),
 ];
 
+
 const refresh = () => paginateRef.value.refetch();
 </script>
 
+
+
+
 <template>
     <div class="card">
-        <div class="card-header align-items-center">
-            <h2 class="mb-0">Laporan Transaksi</h2>
-
-            <!-- Button for printing the reservations list -->
-      <button
-        type="button"
-        class="btn btn-sm btn-success ms-auto"
-        @click="printTransaction"
-      >
-        Print
-        <i class="la la-print"></i>
-      </button>
-
-      <!-- Button for exporting the reservations list to Excel -->
-      <button
-        type="button"
-        class="btn btn-sm btn-success ms-2"
-        @click="exportTransaction"
-      >
-        Export Excel
-        <i class="la la-file-excel"></i>
-      </button>
-
-        </div>
-        <div class="card-body">
-            <paginate
-                ref="paginateRef"
-                id="table-transactions"
-                url="/inventori/laporan"
-                :columns="columns"
-                :data="transactions"
-            ></paginate>
-        </div>
+      <div class="card-header align-items-center">
+        <h2 class="mb-0">Laporan Transaksi</h2>
+  
+        <!-- Button for printing the reservations list -->
+        <button
+          type="button"
+          class="btn btn-sm btn-success ms-auto"
+          @click="printTransaction"
+        >
+          Print
+          <i class="la la-print"></i>
+        </button>
+  
+        <!-- Button for exporting the reservations list to Excel -->
+        <button
+          type="button"
+          class="btn btn-sm btn-success ms-2"
+          @click="exportTransaction"
+        >
+          Export Excel
+          <i class="la la-file-excel"></i>
+        </button>
+      </div>
+  
+      <div class="card-body">
+        <paginate
+          ref="paginateRef"
+          id="table-transactions"
+          url="/inventori/laporan"
+          :columns="columns"
+          :data="transactions"
+        ></paginate>
+      </div>
     </div>
-
-    <!-- Detail Transaksi -->
-    <div v-if="selectedTransaction" class="card mt-4">
-        <div class="card-header">
-            <h5>Detail Transaksi</h5>
+  
+    <!-- Detail Transaksi Modal -->
+    <div v-if="selectedTransaction" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5>Detail Transaksi</h5>
+          <button class="modal-close" @click="selectedTransaction = null">
+            &times;
+          </button>
         </div>
-        <div class="card-body">
-            <p><strong>ID Pembelian:</strong> {{ selectedTransaction?.pembelian_id }}</p>
-            <p><strong>Status Pembayaran:</strong> {{ selectedTransaction?.status }}</p>
-            <p><strong>Total Harga:</strong> {{ formatRupiah(selectedTransaction?.total_price) }}</p>
-            <p><strong>Tanggal Transaksi:</strong> {{ new Date(selectedTransaction?.created_at).toLocaleDateString("id-ID") }}</p>
-            <button class="btn btn-secondary" @click="selectedTransaction = null">Tutup Detail</button>
+  
+        <div class="modal-body">
+          <p><strong>ID Pembelian:</strong> {{ selectedTransaction?.pembelian_id }}</p>
+          <p><strong>Status Pembayaran:</strong> {{ selectedTransaction?.status }}</p>
+          <p><strong>Total Harga:</strong> {{ formatRupiah(selectedTransaction?.total_price) }}</p>
+          <p><strong>Tanggal Transaksi:</strong> {{ new Date(selectedTransaction?.created_at).toLocaleDateString("id-ID") }}</p>
+  
+          <p><strong>Status Pesanan Dibuat:</strong> {{ selectedTransaction?.created ? 'On Process' : 'Procces' }}</p>
         </div>
+  
+        <button class="btn btn-secondary" @click="selectedTransaction = null">
+          Tutup Detail
+        </button>
+      </div>
     </div>
-</template>
+  </template>
+  
+  
+  
+  <style scoped>
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
 
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-close {
+  cursor: pointer;
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+}
+
+.modal-body {
+  margin-top: 20px;
+}
+
+.card-body {
+    padding: 0; /* Mengurangi padding di dalam card-body */
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0; /* Menghapus margin */
+}
+
+th, td {
+    border: 1px solid black;
+    padding: 8px; /* Atur padding sesuai kebutuhan */
+    margin: 0; /* Pastikan tidak ada margin */
+}
+</style>
+
+  

@@ -11,6 +11,34 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class TransactionReportController extends Controller
 {
+
+    public function updateStatus(Request $request, $id)
+{
+    // Validasi data yang diterima
+    $request->validate([
+        'created' => 'required|boolean', // Pastikan data yang diterima valid
+    ]);
+
+    // Temukan laporan transaksi berdasarkan ID
+    $report = TransactionReport::find($id);
+
+    // Cek apakah laporan ditemukan
+    if ($report) {
+        try {
+            // Update status
+            $report->created = $request->created; // Menyimpan status baru
+            $report->save(); // Simpan perubahan
+
+            return response()->json(['success' => true, 'message' => 'Status transaksi diperbarui.', 'data' => $report]);
+        } catch (\Exception $e) {
+            Log::error('Error updating transaction report: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Gagal memperbarui status.'], 500);
+        }
+    } else {
+        return response()->json(['success' => false, 'message' => 'Laporan transaksi tidak ditemukan.'], 404);
+    }
+}
+
     public function exportToExcel()
     {
         return Excel::download(new TransactionReportExport, 'laporan_transaksi.xlsx');

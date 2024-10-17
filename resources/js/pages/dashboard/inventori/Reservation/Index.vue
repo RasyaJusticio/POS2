@@ -1,27 +1,27 @@
 <template>
-  <VForm class="form card mb-10" @submit="submit" id="form-reservation" ref="formRef">
+  <VForm class="form card mb-10" id="form-reservation" ref="formRef">
     <div class="card-header align-items-center">
       <h2 class="mb-0">Reservations List</h2>
 
-      <!-- Button for printing the reservations list -->
-      <button
-        type="button"
-        class="btn btn-sm btn-success ms-auto"
-        @click="printReservations"
-      >
-        Print
-        <i class="la la-print"></i>
-      </button>
+      <!-- Button Container for Print and Export -->
+      <div class="d-flex ms-auto">
+        <button
+          type="button"
+          class="btn btn-sm btn-success me-2"
+          @click="printReservations"
+        >
+          <i class="la la-print me-1 fs-4"></i> Print
+        </button>
 
-      <!-- Button for exporting the reservations list to Excel -->
-      <button
-        type="button"
-        class="btn btn-sm btn-success ms-2"
-        @click="exportReservations"
-      >
-        Export Excel
-        <i class="la la-file-excel"></i>
-      </button>
+        <button
+          type="button"
+          class="btn btn-sm btn-success"
+          @click="exportReservations"
+        >
+          <i class="la la-file-excel me-1 fs-4"></i> Export Excel
+        </button>
+
+      </div>
     </div>
 
     <!-- Filter, Sort and Total section -->
@@ -30,7 +30,9 @@
         <!-- Filter by Date -->
         <div class="col-md-4">
           <div class="fv-row">
-            <label class="form-label fw-bold fs-6 required" for="reservation-date">Filter by Date</label>
+            <label class="form-label fw-bold fs-6 required" for="reservation-date">
+              <i class="la la-calendar"></i> Filter by Date
+            </label>
             <input
               type="date"
               id="reservation-date"
@@ -44,7 +46,9 @@
         <!-- Sort by Date -->
         <div class="col-md-4">
           <div class="fv-row">
-            <label class="form-label fw-bold fs-6 required" for="sort-date">Sort by Date</label>
+            <label class="form-label fw-bold fs-6 required" for="sort-date">
+              <i class="la la-sort"></i> Sort by Date
+            </label>
             <select
               id="sort-date"
               v-model="sortOrder"
@@ -57,8 +61,27 @@
           </div>
         </div>
 
+        <!-- Sort by Status -->
+        <div class="col-md-4">
+          <div class="fv-row">
+            <label class="form-label fw-bold fs-6 required" for="sort-status">
+              <i class="la la-toggle-on"></i> Sort by Status
+            </label>
+            <select
+              id="sort-status"
+              v-model="sortStatus"
+              @change="sortReservations"
+              class="form-control form-control-lg form-control-solid"
+            >
+              <option value="">All</option>
+              <option value="active">Active</option>
+              <option value="ended">Reservation Ended</option>
+            </select>
+          </div>
+        </div>
+
         <!-- Total Reservations and Guests -->
-        <div class="col-md-4 text-center">
+        <div class="col-md-4 text-center my-4">
           <div class="d-flex justify-content-center">
             <h5 class="mb-0 me-3">
               Total Reservations: <span class="badge bg-primary fs-5 text-white">{{ totalReservations }}</span>
@@ -116,6 +139,7 @@ const reservations = ref<any[]>([]);
 const filteredReservations = ref<any[]>([]);
 const selectedDate = ref('');
 const sortOrder = ref('asc'); // Sorting order
+const sortStatus = ref(''); 
 const totalReservations = ref(0);
 const totalGuests = ref(0);
 
@@ -146,8 +170,18 @@ const filterByDate = () => {
   calculateTotals();  // Calculate total reservations and guests
 };
 
-// Function to sort reservations by date
 const sortReservations = () => {
+  // Filter by status first if a status is selected
+  if (sortStatus.value) {
+    filteredReservations.value = reservations.value.filter(reservation => 
+      (sortStatus.value === 'active' && !isReservationEnded(reservation)) || 
+      (sortStatus.value === 'ended' && isReservationEnded(reservation))
+    );
+  } else {
+    filteredReservations.value = [...reservations.value];
+  }
+
+  // Then sort by date
   filteredReservations.value.sort((a: any, b: any) => {
     const dateA = new Date(a.date);
     const dateB = new Date(b.date);
@@ -156,6 +190,7 @@ const sortReservations = () => {
 
   calculateTotals();  // Recalculate total reservations and guests after sorting
 };
+
 
 // Function to calculate total reservations and guests
 const calculateTotals = () => {
@@ -182,6 +217,9 @@ const getReservationStatus = (reservation: any) => {
 
 // Function to print reservations
 const printReservations = () => {
+  const totalReservationsText = `<h3>Total Reservations: ${totalReservations.value}</h3>`;
+  const totalGuestsText = `<h3>Total Guests: ${totalGuests.value}</h3>`;
+  
   const printContent = `
     <h1>Reservations List</h1>
     <table border="1" style="border-collapse: collapse; width: 100%;">
@@ -212,6 +250,8 @@ const printReservations = () => {
             `).join('')}
         </tbody>
     </table>
+    ${totalReservationsText}
+    ${totalGuestsText}
   `;
 
   const newWindow = window.open('', '_blank');
@@ -225,46 +265,83 @@ const printReservations = () => {
   }
 };
 
-// Function to export reservations to Excel
-// Function to export reservations to Excel
-const exportReservations = async () => {
-  try {
-    const response = await axios({
-      url: 'http://localhost:8000/api/reservations/export', // Ensure this matches your API route
-      method: 'GET',
-      responseType: 'blob', // Important for file download
-    });
-
-    // Create a URL for the blob response
-    const url = window.URL.createObjectURL(new Blob([response.data]));
-
-    // Create a link element and trigger the download
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'reservations.xlsx'); // File name
-    document.body.appendChild(link);
-    link.click();
-
-    // Clean up
-    if (link.parentNode) {
-      link.parentNode.removeChild(link);
-    }
-  } catch (error) {
-    console.error("Error downloading the Excel file:", error);
-  }
+// Function to export reservations to Excel (dummy function)
+const exportReservations = () => {
+  alert('Export to Excel feature not yet implemented.');
 };
- 
-// Fetch reservations when component mounts (only once)
-onMounted(() => {
-  fetchReservations();
-});
+
+// Call fetchReservations when the component is mounted
+onMounted(fetchReservations);
 </script>
 
 <style scoped>
-h5 {
-  font-size: 1.25rem; /* Adjust font size as needed */
+.form-label {
+  margin-bottom: 0.5rem; /* Spacing between label and input */
 }
-.text-white {
-  color: white; /* Set text color to white for numbers */
+
+.form-control {
+  margin-bottom: 1rem; /* Spacing between form controls */
+}
+
+.card-body {
+  padding: 1.5rem; /* Add padding to improve spacing */
+}
+
+.card-header {
+  padding: 1rem 1.5rem; /* Align with card-body padding */
+  display: flex; /* Align header items horizontally */
+  justify-content: space-between; /* Space between title and buttons */
+}
+
+.card-header h2 {
+  font-size: 1.75rem; /* Slightly larger heading */
+  font-weight: bold;
+}
+
+button {
+  font-size: 1.1rem; /* Smaller font for buttons */
+  padding: 0.5rem 1rem; /* Consistent button padding */
+}
+
+.btn i {
+  font-size: 2rem; /* Ukuran ikon lebih besar */
+}
+
+.btn-success {
+  background-color: #28a745;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f2f2f2; /* Light gray hover effect */
+}
+
+.table th, .table td {
+  text-align: center; /* Center align the table data */
+  vertical-align: middle; /* Vertical center align */
+}
+
+.table th {
+  background-color: #343a40;
+  color: white; /* Dark header with white text */
+}
+
+.table-bordered {
+  border: 1px solid #dee2e6; /* Border around the table */
+}
+
+.badge {
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .card-header h2 {
+    font-size: 1.5rem; /* Smaller heading on small screens */
+  }
+  button {
+    font-size: 0.75rem; /* Adjust button size for smaller screens */
+  }
+  .table th, .table td {
+    font-size: 0.875rem; /* Reduce table font size */
+  }
 }
 </style>

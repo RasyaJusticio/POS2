@@ -242,12 +242,12 @@
 
           <h3 v-if="visibleDescription === 'thaitea'">THAI TEA</h3>
           <p v-if="visibleDescription === 'thaitea'">
-            A delightful blend of strong brewed tea and creamy milk, sweetened to perfection. Its rich, aromatic flavors are enhanced with a hint of spices, making it a favorite refreshment. Served over ice, this minuman is both satisfying and refreshing on a warm day.
+            A delightful blend of strong brewed tea and creamy milk, sweetened to perfection. Its rich, aromatic flavors are enhanced with a hint of spices, making it a favorite refreshment. Served over ice, this drink is both satisfying and refreshing on a warm day.
           </p>
 
           <h3 v-if="visibleDescription === 'paor'">P AOR</h3>
           <p v-if="visibleDescription === 'paor'">
-            A savory noodle soup that features tender meat and a rich, flavorful broth. Infused with aromatic herbs, each bowl is a comforting experience. It’s a beloved dish that captures the essence of Thai comfort makanan, perfect for any time of day.
+            A savory noodle soup that features tender meat and a rich, flavorful broth. Infused with aromatic herbs, each bowl is a comforting experience. It’s a beloved dish that captures the essence of Thai comfort Food, perfect for any time of day.
           </p>
 
           <h3 v-if="visibleDescription === 'padthai'">Pad Thai</h3>
@@ -342,7 +342,7 @@
 
   <p class="custom-margin">Dining with us is about creating memorable experiences in a warm atmosphere with attentive service, whether you’re celebrating or enjoying a casual meal.</p>
 
-  <p class="custom-margin">We prioritize sustainability, minimizing our environmental footprint and supporting local farmers. Together, we can savor delicious makanan while caring for our planet.</p>
+  <p class="custom-margin">We prioritize sustainability, minimizing our environmental footprint and supporting local farmers. Together, we can savor delicious food while caring for our planet.</p>
 
   <p class="custom-margin">Join us on this culinary journey and make lasting memories with family and friends over our signature dishes, each telling a unique story.</p>
 
@@ -440,7 +440,7 @@
         <p class="lead mb-4">We're here to serve you! For inquiries, feedback, or reservations, please reach out.</p>
                  
         <div class="social-icons mb-4">
-            <a href="https://www.instagram.com/whozviaa?igsh=emp5YnBpZzI3MzNi" target="_blank" class="btn btn-outline-success1 mx-2">
+            <a href="https://www.instagram.com/noflabs?igsh=MW52OTBuNHg4OHR4ZQ==" target="_blank" class="btn btn-outline-success1 mx-2">
                 <i class="fab fa-instagram"></i> Instagram
             </a>
             <a href="https://wa.me/qr/STA2YM5YISFCF1 " target="_blank" class="btn btn-outline-success2 mx-2">
@@ -614,13 +614,13 @@ const submitReservation = async () => {
     };
 
     // Tampilkan pesan sukses menggunakan SweetAlert2
-    Swal.fire({
-      title: 'Reservation Successful!',
-      text: 'Your reservation has been successfully created.',
-      icon: 'success',
-      confirmButtonText: 'OK',
-      confirmButtonColor: '#28a745',
-    });
+      Swal.fire({
+        title: 'Reservation Successful!',
+        text: 'Your reservation has been successfully created.',
+        icon: 'success',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#28a745',
+      });
   } catch (error) {
     // Tangani error jika ada
     if (error.response && error.response.data.status === 'error') {

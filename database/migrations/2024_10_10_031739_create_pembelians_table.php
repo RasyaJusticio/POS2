@@ -10,17 +10,18 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::create('pembelians', function (Blueprint $table) {
-            $table->id();
-            $table->uuid()->unique();
-            $table->unsignedBigInteger('user_id')->nullable();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->nullable();
-            $table->integer('total_price');
-            $table->string('status')->default('pending'); // Menambahkan kolom status
-            $table->timestamps();
-        });
-    }
+{
+    Schema::create('pembelians', function (Blueprint $table) {
+        $table->id();
+        $table->uuid()->unique();
+        $table->unsignedBigInteger('user_id')->nullable();
+        $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->nullable();
+        $table->integer('total_price');
+        $table->string('status')->default('pending');
+        $table->string('items'); // Simpan produk dan kuantitas dalam satu kolom JSON
+        $table->timestamps();
+    });
+}
 
     /**
      * Reverse the migrations.

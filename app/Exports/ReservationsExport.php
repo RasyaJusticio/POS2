@@ -18,7 +18,36 @@ class ReservationsExport implements FromCollection, WithHeadings, WithMapping, W
 {
     public function collection()
     {
-        return Reservation::select('id', 'name', 'phone', 'date', 'start_time', 'end_time', 'guests')->get();
+        $reservations = Reservation::select('id', 'name', 'phone', 'date', 'start_time', 'end_time', 'guests')->get();
+    
+        // Calculate totals
+        $totalGuests = $reservations->sum('guests');
+        $totalReservations = $reservations->count();
+    
+        // Add a row for totals at the end
+        $reservations->push((object) [
+            'id' => '',
+            'name' => 'Total Reservations',
+            'phone' => '',
+            'date' => '',
+            'start_time' => '',
+            'end_time' => '',
+            'guests' => $totalReservations,
+            'status' => ''
+        ]);
+    
+        $reservations->push((object) [
+            'id' => '',
+            'name' => 'Total Guests',
+            'phone' => '',
+            'date' => '',
+            'start_time' => '',
+            'end_time' => '',
+            'guests' => $totalGuests,
+            'status' => ''
+        ]);
+    
+        return $reservations;
     }
 
     public function headings(): array
@@ -80,6 +109,15 @@ class ReservationsExport implements FromCollection, WithHeadings, WithMapping, W
                 ],
             ],
         ]);
+
+            // Apply styles for totals row
+    $highestRow = $sheet->getHighestRow();
+    $sheet->getStyle('A' . $highestRow . ':H' . $highestRow)
+          ->applyFromArray([
+              'font' => ['bold' => true],
+              'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT],
+          ]);
+          
 
         // Set alignment for all data cells
         $sheet->getStyle('A1:H' . ($sheet->getHighestRow()))->applyFromArray([

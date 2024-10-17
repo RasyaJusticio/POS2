@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Models\TransactionReport;
+use App\Models\Pembelian;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
@@ -14,13 +14,14 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 class TransactionReportExport implements FromCollection, WithHeadings, WithStyles
-{
+{   
+    
     /**
      * Mengembalikan koleksi data yang akan diekspor.
      */
     public function collection()
     {
-        return TransactionReport::select('id', 'pembelian_id', 'status', 'total_price', 'created_at')->get();
+        return Pembelian::select('id', 'uuid', 'items', 'total_price', 'status', 'created_at')->get();
     }
 
     /**
@@ -29,7 +30,7 @@ class TransactionReportExport implements FromCollection, WithHeadings, WithStyle
     public function headings(): array
     {
         return [
-            ['No', 'ID Pembelian', 'Status Pembayaran', 'Total', 'Tanggal Pesanan']
+            ['No', 'ID Pembelian', 'Pesanan', 'Total', 'Status Pembayaran', 'Tanggal Pesanan']
         ];
     }
 
@@ -64,7 +65,7 @@ class TransactionReportExport implements FromCollection, WithHeadings, WithStyle
         }
 
         // Set alignment for all data rows
-        $sheet->getStyle('A2:E' . (TransactionReport::count() + 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A2:E' . (Pembelian::count() + 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         // Style for data rows
         $dataStyle = [
@@ -74,18 +75,18 @@ class TransactionReportExport implements FromCollection, WithHeadings, WithStyle
         ];
 
         // Apply data style to the whole table
-        $sheet->getStyle('A2:E' . (TransactionReport::count() + 1))->applyFromArray($dataStyle);
+        $sheet->getStyle('A2:E' . (Pembelian::count() + 1))->applyFromArray($dataStyle);
 
         // Format the total_price column (D) to currency
-        $sheet->getStyle('D2:D' . (TransactionReport::count() + 1))
+        $sheet->getStyle('D2:D' . (Pembelian::count() + 1))
             ->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
 
         // Format the created_at column (E) to date format
-        $sheet->getStyle('E2:E' . (TransactionReport::count() + 1))
+        $sheet->getStyle('E2:E' . (Pembelian::count() + 1))
             ->getNumberFormat()->setFormatCode('DD/MM/YYYY');
 
         // Border for the entire table (header + data)
-        $sheet->getStyle('A1:E' . (TransactionReport::count() + 1))->applyFromArray([
+        $sheet->getStyle('A1:E' . (Pembelian::count() + 1))->applyFromArray([
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => Border::BORDER_THIN,
