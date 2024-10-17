@@ -217,12 +217,86 @@ const getReservationStatus = (reservation: any) => {
 
 // Function to print reservations
 const printReservations = () => {
-  const totalReservationsText = `<h3>Total Reservations: ${totalReservations.value}</h3>`;
-  const totalGuestsText = `<h3>Total Guests: ${totalGuests.value}</h3>`;
-  
+  // Cek apakah filteredReservations, totalReservations, dan totalGuests terdefinisi
+  if (!filteredReservations || !totalReservations || !totalGuests) {
+    console.error("Reservations data not found");
+    return;
+  }
+
+  const totalReservationsText = `<h3 style="font-weight: normal; color: #4A90E2;">Total Reservations: ${totalReservations.value}</h3>`;
+  const totalGuestsText = `<h3 style="font-weight: normal; color: #4A90E2;">Total Guests: ${totalGuests.value}</h3>`;
+
+  // Path ke gambar logo, pastikan logo bisa diakses
+  const logoPath = "{{ asset('media/avatars/spice.png') }}";
+
   const printContent = `
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        color: #333;
+        background-color: #f9f9f9;
+      }
+      h1, h3 {
+        color: #4A90E2;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #ddd;
+      }
+      th, td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+        text-align: center;
+      }
+      th {
+        background-color: #4A90E2;
+        color: white;
+        font-weight: 600;
+      }
+      td {
+        background-color: #fff;
+        color: #333;
+      }
+      tr:nth-child(even) td {
+        background-color: #f3f7fa;
+      }
+      tr:hover td {
+        background-color: #e8f0fe;
+      }
+      table th:first-child, table td:first-child {
+        border-radius: 8px 0 0 8px;
+      }
+      table th:last-child, table td:last-child {
+        border-radius: 0 8px 8px 0;
+      }
+      .totals {
+        color: #4A90E2;
+        font-weight: bold;
+        margin-top: 20px;
+        text-align: right;
+      }
+      /* Styling untuk logo */
+      .logo {
+        float: right;
+        width: 100px;
+        height: auto;
+        margin-bottom: 10px;
+      }
+    </style>
+
+    <!-- Logo di sisi kanan -->
+    <img src="${logoPath}" alt="Logo" class="logo" />
     <h1>Reservations List</h1>
-    <table border="1" style="border-collapse: collapse; width: 100%;">
+
+    <table>
         <thead>
             <tr>
                 <th>#</th>
@@ -250,8 +324,11 @@ const printReservations = () => {
             `).join('')}
         </tbody>
     </table>
-    ${totalReservationsText}
-    ${totalGuestsText}
+
+    <div class="totals">
+      ${totalReservationsText}
+      ${totalGuestsText}
+    </div>
   `;
 
   const newWindow = window.open('', '_blank');
@@ -265,9 +342,29 @@ const printReservations = () => {
   }
 };
 
+
+
+
+
 // Function to export reservations to Excel (dummy function)
-const exportReservations = () => {
-  alert('Export to Excel feature not yet implemented.');
+const exportReservations = async () => {
+  try {
+    const response = await axios({
+      url: 'http://localhost:8000/api/reservations/export', // API endpoint
+      method: 'GET',
+      responseType: 'blob' // Penting untuk men-download file
+    });
+
+    // Buat URL sementara untuk file
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'reservations.xlsx'); // Nama file yang di-download
+    document.body.appendChild(link);
+    link.click(); // Klik otomatis untuk men-download
+  } catch (error) {
+    console.error('Error exporting reservations:', error);
+  }
 };
 
 // Call fetchReservations when the component is mounted

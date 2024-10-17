@@ -28,8 +28,64 @@ const printUser = async () => {
 
         // Format the data for printing
         const printContent = `
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    padding: 20px;
+                    color: #333;
+                    background-color: #f9f9f9;
+                }
+                h1 {
+                    color: #4A90E2;
+                    text-align: center;
+                    font-size: 24px;
+                    margin-bottom: 20px;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-bottom: 20px;
+                    background-color: #fff;
+                    border-radius: 8px;
+                    overflow: hidden;
+                }
+                th, td {
+                    padding: 14px;
+                    border-bottom: 1px solid #ddd;
+                    text-align: left;
+                }
+                th {
+                    background-color: #4A90E2;
+                    color: white;
+                    font-weight: 600;
+                    text-align: center;
+                }
+                td {
+                    background-color: #fff;
+                    color: #333;
+                }
+                tr:nth-child(even) td {
+                    background-color: #f3f7fa;
+                }
+                tr:hover td {
+                    background-color: #e8f0fe;
+                }
+                th:first-child, td:first-child {
+                    border-radius: 8px 0 0 8px;
+                }
+                th:last-child, td:last-child {
+                    border-radius: 0 8px 8px 0;
+                }
+                footer {
+                    margin-top: 20px;
+                    text-align: center;
+                    font-size: 14px;
+                    color: #777;
+                }
+            </style>
+
             <h1>Daftar Pengguna</h1>
-            <table border="1" style="border-collapse: collapse; width: 100%;">
+            <table>
                 <thead>
                     <tr>
                         <th>No</th>
@@ -49,6 +105,9 @@ const printUser = async () => {
                     `).join('')}
                 </tbody>
             </table>
+            <footer>
+                Dicetak pada ${new Date().toLocaleString()}
+            </footer>
         `;
 
         const newWindow = window.open('', '_blank');
@@ -65,6 +124,8 @@ const printUser = async () => {
         console.error("Error fetching users for printing:", error);
     }
 };
+
+
 
 const { delete: deleteUser } = useDelete({
     onSuccess: () => paginateRef.value.refetch(),
@@ -180,7 +241,7 @@ watch(openForm, (val) => {
                 v-if="!openForm"
                 @click="printUser"
             >
-                Cetak
+                Print
                 <i class="la la-print"></i>
             </button>
 
