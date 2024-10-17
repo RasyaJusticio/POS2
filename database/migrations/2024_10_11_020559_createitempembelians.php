@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('product_id');
             $table->foreign('product_id')->references('id')->on('products')->nullable();
             $table->unsignedBigInteger('pembelian_id');
-            $table->foreign('pembelian_id')->references('id')->on('pembelians')->nullable();
+            $table->foreign('pembelian_id')->references('id')->on('pembelians')->nullable()->onDelete('cascade');
             $table->timestamps();
         });
     }

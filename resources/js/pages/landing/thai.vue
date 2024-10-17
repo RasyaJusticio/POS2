@@ -213,7 +213,9 @@ function submit(items: any) {
   formDataToSubmit.append('total_price', valueTotal.value);
   items.map((item) => {
     formDataToSubmit.append('products_id[]', item.id);
-    formDataToSubmit.append('product_price[]', item.price); 
+    formDataToSubmit.append('product_price[]', item.price);
+    formDataToSubmit.append('name[]', item.name); 
+    formDataToSubmit.append('product_quantity[]', item.quantity); 
   });
 
 
@@ -508,7 +510,7 @@ const closeCart = () => {
   align-items: center;
 }
 
-.quantity-cntrols {
+.quantity-controls {
   font-weight: 600;
   display: flex;
   align-items: center;

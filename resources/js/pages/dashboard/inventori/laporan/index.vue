@@ -2,14 +2,18 @@
 import { h, ref, onMounted } from "vue";
 import { useDelete } from "@/libs/hooks";
 import { createColumnHelper } from "@tanstack/vue-table";
-import type { TransactionReport } from "@/types/laporan"; // Ganti dengan path yang sesuai
+import type { Pembelian } from "@/types/laporan"; // Ganti dengan path yang sesuai
 import axios from "@/libs/axios";
 import { formatRupiah } from "@/libs/utilss";
 
-const column = createColumnHelper<TransactionReport>();
+const column = createColumnHelper<Pembelian>();
 const paginateRef = ref<any>(null);
-const transactions = ref<TransactionReport[]>([]); // Menyimpan data transaksi
-const selectedTransaction = ref<TransactionReport | null>(null);
+const transactions = ref<Pembelian[]>([]); // Menyimpan data transaksi
+const selectedTransaction = ref<Pembelian | null>(null);
+
+const { delete: deletePembelian } = useDelete({
+    onSuccess: () => paginateRef.value.refetch(),
+})
 
 // Mendapatkan data transaksi saat komponen dimuat
 onMounted(async () => {
@@ -110,9 +114,6 @@ const exportTransaction = async () => {
     }
 };
 
-const { delete: deleteTransactionReport } = useDelete({
-    onSuccess: () => paginateRef.value.refetch(),
-});
 
 // Mendapatkan data transaksi saat komponen dimuat
 onMounted(async () => {
@@ -125,7 +126,7 @@ onMounted(async () => {
     }
 });
 
-const markAsProcessed = async (transaction: TransactionReport) => {
+const markAsProcessed = async (transaction: Pembelian) => {
     // Simpan status pesanan ke backend
     transaction.created = true; // Mark as processed
     try {
@@ -139,18 +140,25 @@ const markAsProcessed = async (transaction: TransactionReport) => {
 };
 
 const columns = [
-    column.accessor("id", {
+    column.display({
         header: "No",
+        cell: (cell) => {
+            return cell.row.index + 1; // Menggunakan indeks baris sebagai nomor urut
+        },
     }),
-    column.accessor("pembelian_id", {
+    column.accessor("id", {
         header: "ID Pembelian",
+        cell: (cell) => cell.getValue().toString().padStart(3, '0'), // Memastikan minimal 3 digit dengan padding '0'
+    }),
+    column.accessor("items", {
+        header: "Produk yang Dibeli",
+    }),
+       column.accessor("total_price", {
+        header: "Total",
+        cell: (cell) => formatRupiah(cell.getValue()),
     }),
     column.accessor("status", {
         header: "Status Pembayaran",
-    }),
-    column.accessor("total_price", {
-        header: "Total",
-        cell: (cell) => formatRupiah(cell.getValue()),
     }),
     column.accessor("created_at", {
         header: "Tanggal Pesanan",
@@ -158,9 +166,9 @@ const columns = [
             return new Date(cell.getValue()).toLocaleDateString("id-ID");
         },
     }),
-    column.accessor("created", {
+       column.accessor("created", {
         header: "Pesanan Dibuat",
-        cell: (cell) => cell.getValue() ? "On Process" : "Waiting",
+        cell: (cell) => cell.getValue() ? "On Process" : "Procces",
     }),
     column.accessor("id", {
         header: "Aksi",
@@ -182,19 +190,21 @@ const columns = [
                         onClick: () => markAsProcessed(cell.row.original),
                     },
                     h("i", { class: "fa fa-check fs-2" }) // Font Awesome check icon
+                    
                 ),
                 h(
                     "button",
                     {
                         class: "btn btn-sm btn-icon btn-danger",
                         onClick: () =>
-                            deleteTransactionReport(`/inventori/laporan/${cell.getValue()}`),
+                            deletePembelian(`/inventori/laporan/${cell.getValue()}`),
                     },
                     h("i", { class: "la la-trash fs-2" })
                 ),
             ]),
     }),
 ];
+
 
 const refresh = () => paginateRef.value.refetch();
 </script>
@@ -253,15 +263,7 @@ const refresh = () => paginateRef.value.refetch();
           <p><strong>Total Harga:</strong> {{ formatRupiah(selectedTransaction?.total_price) }}</p>
           <p><strong>Tanggal Transaksi:</strong> {{ new Date(selectedTransaction?.created_at).toLocaleDateString("id-ID") }}</p>
   
-          <p><strong>Status Pesanan Dibuat:</strong> {{ selectedTransaction?.created ? 'On Process' : 'Waiting' }}</p>
-  
-          <h6>Detail Pesanan:</h6>
-          <ul v-if="selectedTransaction?.items && selectedTransaction.items.length">
-            <li v-for="item in selectedTransaction.items" :key="item.id">
-              {{ item.product_name }} - {{ item.quantity }} x {{ formatRupiah(item.price) }} = {{ formatRupiah(item.quantity * item.price) }}
-            </li>
-          </ul>
-          <p v-else>Tidak ada detail pesanan.</p>
+          <p><strong>Status Pesanan Dibuat:</strong> {{ selectedTransaction?.created ? 'On Process' : 'Procces' }}</p>
         </div>
   
         <button class="btn btn-secondary" @click="selectedTransaction = null">
@@ -311,6 +313,22 @@ const refresh = () => paginateRef.value.refetch();
 
 .modal-body {
   margin-top: 20px;
+}
+
+.card-body {
+    padding: 0; /* Mengurangi padding di dalam card-body */
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0; /* Menghapus margin */
+}
+
+th, td {
+    border: 1px solid black;
+    padding: 8px; /* Atur padding sesuai kebutuhan */
+    margin: 0; /* Pastikan tidak ada margin */
 }
 </style>
 

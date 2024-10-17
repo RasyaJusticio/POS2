@@ -18,6 +18,7 @@ class Pembelian extends Model
     protected $fillable = [
         'user_id',
         'total_price',
+        'items' // Tambahkan kolom baru
     ];
 
     /**
