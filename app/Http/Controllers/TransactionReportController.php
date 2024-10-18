@@ -15,7 +15,7 @@ class TransactionReportController extends Controller
         // Ambil data dari callback
         $data = $request->all();
 
-        // Tambahkan logging untuk memeriksa data yang diterima
+        // Tambahkan logging untuk memeriksa data yang diterima   
         Log::info('Midtrans Callback Data: ', $data);
 
         // Validasi data yang diterima

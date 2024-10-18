@@ -8,12 +8,15 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReservationController;
-use App\Http\Controllers\TransactionReportController;
 use App\Models\Pembelian;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\ItempembelianController;
 use App\Models\Reservation;
+use App\Http\Controllers\TransactionReportController;
+
+Route::get('/api/reservations/export', [TransactionReportController::class, 'export']);
+
 
 Route::get('/master/users/export', [UserController::class, 'export'])->name('users.export');
 Route::get('/master/users/print', [UserController::class, 'print']);
