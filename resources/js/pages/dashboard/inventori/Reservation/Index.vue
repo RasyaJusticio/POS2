@@ -7,7 +7,7 @@
       <div class="d-flex ms-auto">
         <button
           type="button"
-          class="btn btn-sm btn-success me-2"
+          class="btn btn-sm btn-secondary me-2"
           @click="printReservations"
         >
           <i class="la la-print me-1 fs-4"></i> Print
@@ -15,7 +15,7 @@
 
         <button
           type="button"
-          class="btn btn-sm btn-success"
+          class="btn btn-sm btn-secondary"
           @click="exportReservations"
         >
           <i class="la la-file-excel me-1 fs-4"></i> Export Excel
@@ -223,9 +223,6 @@ const printReservations = () => {
     return;
   }
 
-  const totalReservationsText = `<h3 style="font-weight: normal; color: #4A90E2;">Total Reservations: ${totalReservations.value}</h3>`;
-  const totalGuestsText = `<h3 style="font-weight: normal; color: #4A90E2;">Total Guests: ${totalGuests.value}</h3>`;
-
   // Path ke gambar logo, pastikan logo bisa diakses
   const logoPath = "{{ asset('media/avatars/spice.png') }}";
 
@@ -237,7 +234,7 @@ const printReservations = () => {
         color: #333;
         background-color: #f9f9f9;
       }
-      h1, h3 {
+      h1 {
         color: #4A90E2;
         font-weight: 600;
         margin-bottom: 10px;
@@ -247,8 +244,6 @@ const printReservations = () => {
         border-collapse: collapse;
         margin-top: 20px;
         background-color: #fff;
-        border-radius: 8px;
-        overflow: hidden;
         border: 1px solid #ddd;
       }
       th, td {
@@ -277,13 +272,14 @@ const printReservations = () => {
       table th:last-child, table td:last-child {
         border-radius: 0 8px 8px 0;
       }
-      .totals {
-        color: #4A90E2;
+      tfoot td {
         font-weight: bold;
-        margin-top: 20px;
+        background-color: #f9f9f9;
+        color: #4A90E2;
         text-align: right;
+        padding: 15px;
+        border-top: 2px solid #ddd;
       }
-      /* Styling untuk logo */
       .logo {
         float: right;
         width: 100px;
@@ -323,12 +319,13 @@ const printReservations = () => {
                 </tr>
             `).join('')}
         </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="5" style="text-align: left;">Total Reservations: ${totalReservations.value}</td>
+                <td colspan="3" style="text-align: left;">Total Guests: ${totalGuests.value}</td>
+            </tr>
+        </tfoot>
     </table>
-
-    <div class="totals">
-      ${totalReservationsText}
-      ${totalGuestsText}
-    </div>
   `;
 
   const newWindow = window.open('', '_blank');
@@ -341,7 +338,6 @@ const printReservations = () => {
     console.error("Failed to open a new window.");
   }
 };
-
 
 
 
@@ -359,7 +355,7 @@ const exportReservations = async () => {
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', 'reservations.xlsx'); // Nama file yang di-download
+    link.setAttribute('download', 'DATA RESERVASI SIAM.xlsx'); // Nama file yang di-download
     document.body.appendChild(link);
     link.click(); // Klik otomatis untuk men-download
   } catch (error) {

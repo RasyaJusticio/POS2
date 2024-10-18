@@ -10,10 +10,25 @@ const column = createColumnHelper<Pembelian>();
 const paginateRef = ref<any>(null);
 const transactions = ref<Pembelian[]>([]); // Menyimpan data transaksi
 const selectedTransaction = ref<Pembelian | null>(null);
+const filteredReservations = ref<any[]>([]);
+
 
 const { delete: deletePembelian } = useDelete({
     onSuccess: () => paginateRef.value.refetch(),
 })
+
+const filterByDate = () => {
+  if (selectedDate.value) {
+    filteredReservations.value = transactions.value.filter(
+      (reservation: any) => reservation.date === selectedDate.value
+    );
+  } else {
+    filteredReservations.value = [...reservations.value]; // If no date is selected, show all
+  }
+  
+  sortReservations(); // Apply sorting after filtering
+  calculateTotals();  // Calculate total reservations and guests
+};
 
 // Mendapatkan data transaksi saat komponen dimuat
 onMounted(async () => {
@@ -37,23 +52,44 @@ const printTransaction = async () => {
             <head>
                 <title>Laporan Transaksi</title>
                 <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 20px;
+                    }
+                    h1 {
+                        text-align: center;
+                        color: #0070C0;
+                    }
                     table {
                         border-collapse: collapse;
                         width: 100%;
+                        margin-top: 20px;
                     }
                     th, td {
                         border: 1px solid black;
-                        padding: 8px;
+                        padding: 10px;
                         text-align: center;
+                        font-size: 14px;
                     }
                     th {
+                        background-color: #0070C0;
+                        color: white;
+                    }
+                    tr:nth-child(even) {
+                        background-color: #f2f2f2;
+                    }
+                    tr:hover {
+                        background-color: #ddd;
+                    }
+                    tfoot {
+                        font-weight: bold;
                         background-color: #0070C0;
                         color: white;
                     }
                 </style>
             </head>
             <body>
-                <h1 style="text-align: center;">Laporan Transaksi</h1>
+                <h1>Laporan Transaksi</h1>
                 <table>
                     <thead>
                         <tr>
@@ -75,6 +111,11 @@ const printTransaction = async () => {
                             </tr>
                         `).join('')}
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="5">Total Transaksi: ${transactions.length}</td>
+                        </tr>
+                    </tfoot>
                 </table>
             </body>
             </html>
@@ -95,6 +136,7 @@ const printTransaction = async () => {
     }
 };
 
+
 // Fungsi untuk mengekspor laporan transaksi ke Excel
 const exportTransaction = async () => {
     try {
@@ -105,7 +147,7 @@ const exportTransaction = async () => {
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'laporan_transaksi.xlsx');
+        link.setAttribute('download', 'DATA TRANSAKSI SIAM   .xlsx');
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -182,16 +224,16 @@ const columns = [
                     },
                     h("i", { class: "la la-eye fs-2" })
                 ),
-                h(
-                    "button",
-                    {
-                        class: "btn btn-sm btn-icon btn-success",
-                        disabled: cell.row.original.created, // Disable if already processed
-                        onClick: () => markAsProcessed(cell.row.original),
-                    },
-                    h("i", { class: "fa fa-check fs-2" }) // Font Awesome check icon
+                // h(
+                //     "button",
+                //     {
+                //         class: "btn btn-sm btn-icon btn-success",
+                //         disabled: cell.row.original.created, // Disable if already processed
+                //         onClick: () => markAsProcessed(cell.row.original),
+                //     },
+                //     h("i", { class: "fa fa-check fs-2" }) // Font Awesome check icon
                     
-                ),
+                // ),
                 h(
                     "button",
                     {
@@ -211,14 +253,14 @@ const refresh = () => paginateRef.value.refetch();
 
 
 <template>
-    <div class="card">
-      <div class="card-header align-items-center">
+    <div class="card mb-4">
+      <div class="card-header d-flex align-items-center">
         <h2 class="mb-0">Laporan Transaksi</h2>
   
         <!-- Button for printing the reservations list -->
         <button
           type="button"
-          class="btn btn-sm btn-success ms-auto"
+          class="btn btn-sm btn-secondary ms-auto"
           @click="printTransaction"
         >
           Print
@@ -228,7 +270,7 @@ const refresh = () => paginateRef.value.refetch();
         <!-- Button for exporting the reservations list to Excel -->
         <button
           type="button"
-          class="btn btn-sm btn-success ms-2"
+          class="btn btn-sm btn-secondary ms-2"
           @click="exportTransaction"
         >
           Export Excel
@@ -237,6 +279,20 @@ const refresh = () => paginateRef.value.refetch();
       </div>
   
       <div class="card-body">
+        <!-- Filter by Date -->
+        <div class="col-md-4 mb-4">
+          <label class="form-label fw-bold fs-6 required" for="reservation-date">
+            <i class="la la-calendar"></i> Filter by Date
+          </label>
+          <input
+            type="date"
+            id="reservation-date"
+            v-model="selectedDate"
+            @change="filterByDate"
+            class="form-control form-control-lg form-control-solid"
+          />
+        </div>
+  
         <paginate
           ref="paginateRef"
           id="table-transactions"
@@ -262,7 +318,6 @@ const refresh = () => paginateRef.value.refetch();
           <p><strong>Status Pembayaran:</strong> {{ selectedTransaction?.status }}</p>
           <p><strong>Total Harga:</strong> {{ formatRupiah(selectedTransaction?.total_price) }}</p>
           <p><strong>Tanggal Transaksi:</strong> {{ new Date(selectedTransaction?.created_at).toLocaleDateString("id-ID") }}</p>
-  
           <p><strong>Status Pesanan Dibuat:</strong> {{ selectedTransaction?.created ? 'On Process' : 'Procces' }}</p>
         </div>
   
@@ -276,60 +331,119 @@ const refresh = () => paginateRef.value.refetch();
   
   
   <style scoped>
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  width: 90%;
-  max-width: 600px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.modal-close {
-  cursor: pointer;
-  font-size: 1.5rem;
-  background: none;
-  border: none;
-}
-
-.modal-body {
-  margin-top: 20px;
-}
-
-.card-body {
-    padding: 0; /* Mengurangi padding di dalam card-body */
-}
-
-table {
+  /* CARD STYLING */
+  .card {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    padding: 16px;
+  }
+  
+  .card-body {
+    padding: 16px;
+  }
+  
+  /* FORM INPUT */
+  .form-control {
+    max-width: 300px;
+  }
+  
+  /* MODAL STYLING */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .modal-close {
+    cursor: pointer;
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+  }
+  
+  .modal-body {
+    margin-top: 20px;
+  }
+  
+  /* TABLE STYLING */
+  table {
     border-collapse: collapse;
     width: 100%;
-    margin: 0; /* Menghapus margin */
-}
-
-th, td {
+    margin: 0;
+    table-layout: auto; /* Ensure table adapts based on content */
+  }
+  
+  th,
+  td {
     border: 1px solid black;
-    padding: 8px; /* Atur padding sesuai kebutuhan */
-    margin: 0; /* Pastikan tidak ada margin */
-}
-</style>
+    padding: 8px;
+    text-align: center;
+  }
+  
+  th {
+    background-color: #0070C0;
+    color: white;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  tr:hover {
+    background-color: #ddd;
+  }
+  
+  tfoot {
+    font-weight: bold;
+    background-color: #0070C0;
+    color: white;
+  }
+  
+  /* BUTTON STYLING */
+  .btn {
+    transition: background-color 0.3s ease;
+  }
+  
+  .btn:hover {
+    background-color: #0062a0;
+  }
+  
+  @media (max-width: 768px) {
+    .card-body {
+      padding: 8px;
+    }
+  
+    .form-control {
+      max-width: 100%;
+    }
+  }
+  </style>
 
   

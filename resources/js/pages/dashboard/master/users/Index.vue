@@ -191,7 +191,7 @@ const exportUsers = async () => {
         // Buat elemen link dan klik untuk memicu unduhan
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'users.xlsx'); // Nama file
+        link.setAttribute('download', 'DATA USER SIAM.xlsx'); // Nama file
         document.body.appendChild(link);
         link.click();
 
@@ -237,7 +237,7 @@ watch(openForm, (val) => {
             <!-- Tombol untuk mencetak daftar pengguna -->
             <button
                 type="button"
-                class="btn btn-sm btn-success ms-2"
+                class="btn btn-sm btn-secondary ms-2"
                 v-if="!openForm"
                 @click="printUser"
             >
@@ -248,7 +248,7 @@ watch(openForm, (val) => {
             <!-- Tombol untuk export data pengguna ke Excel -->
             <button
             type="button"
-            class="btn btn-sm btn-success ms-2"
+            class="btn btn-sm btn-secondary ms-2"
             v-if="!openForm"
             @click="exportUsers"
         >

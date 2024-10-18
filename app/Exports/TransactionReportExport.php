@@ -15,7 +15,6 @@ use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 class TransactionReportExport implements FromCollection, WithHeadings, WithStyles
 {   
-    
     /**
      * Mengembalikan koleksi data yang akan diekspor.
      */
@@ -30,7 +29,7 @@ class TransactionReportExport implements FromCollection, WithHeadings, WithStyle
     public function headings(): array
     {
         return [
-            ['No', 'ID Pembelian', 'Pesanan', 'Total', 'Status Pembayaran', 'Tanggal Pesanan']
+            'No', 'ID Pembelian', 'Pesanan', 'Total', 'Status Pembayaran', 'Tanggal Pesanan'
         ];
     }
 
@@ -43,7 +42,8 @@ class TransactionReportExport implements FromCollection, WithHeadings, WithStyle
         $headerStyle = [
             'font' => [
                 'bold' => true,
-                'size' => 12,
+                'size' => 14, // Mengubah ukuran font untuk header
+                'name' => 'Calibri', // Mengubah jenis font header dengan huruf "C" besar
                 'color' => ['argb' => Color::COLOR_WHITE],
             ],
             'alignment' => [
@@ -56,37 +56,38 @@ class TransactionReportExport implements FromCollection, WithHeadings, WithStyle
             ],
         ];
 
-        // Apply style to the header row
-        $sheet->getStyle('A1:E1')->applyFromArray($headerStyle);
+        // Terapkan style ke baris header (baris pertama)
+        $sheet->getStyle('A1:F1')->applyFromArray($headerStyle);
 
         // Set auto width for columns
-        foreach (range('A', 'E') as $columnID) {
+        foreach (range('A', 'F') as $columnID) {
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }
 
         // Set alignment for all data rows
-        $sheet->getStyle('A2:E' . (Pembelian::count() + 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A2:F' . (Pembelian::count() + 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // Style for data rows
+        // Style untuk data baris
         $dataStyle = [
             'font' => [
-                'size' => 11,
+                'size' => 12, // Mengubah ukuran font untuk data
+                'name' => 'Calibri', // Mengubah jenis font untuk data
             ],
         ];
 
-        // Apply data style to the whole table
-        $sheet->getStyle('A2:E' . (Pembelian::count() + 1))->applyFromArray($dataStyle);
+        // Terapkan gaya untuk seluruh tabel data (A2 hingga akhir)
+        $sheet->getStyle('A2:F' . (Pembelian::count() + 1))->applyFromArray($dataStyle);
 
-        // Format the total_price column (D) to currency
+        // Format kolom total_price (D) ke format mata uang Rupiah
         $sheet->getStyle('D2:D' . (Pembelian::count() + 1))
-            ->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+            ->getNumberFormat()->setFormatCode('Rp #,##0');
 
-        // Format the created_at column (E) to date format
-        $sheet->getStyle('E2:E' . (Pembelian::count() + 1))
+        // Format kolom created_at (F) ke format tanggal
+        $sheet->getStyle('F2:F' . (Pembelian::count() + 1))
             ->getNumberFormat()->setFormatCode('DD/MM/YYYY');
 
-        // Border for the entire table (header + data)
-        $sheet->getStyle('A1:E' . (Pembelian::count() + 1))->applyFromArray([
+        // Border untuk seluruh tabel (header + data)
+        $sheet->getStyle('A1:F' . (Pembelian::count() + 1))->applyFromArray([
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => Border::BORDER_THIN,

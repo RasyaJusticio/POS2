@@ -134,7 +134,7 @@ const exportExcel = async () => {
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement("a");
         link.href = url;
-        link.setAttribute("download", "produk.xlsx"); // Nama file yang akan di-download
+        link.setAttribute("download", "DATA PRODUK SIAM.xlsx"); // Nama file yang akan di-download
         document.body.appendChild(link);
         link.click();
     } catch (error) {
@@ -318,7 +318,7 @@ watch(selectedCategory, (newCategory) => {
             <!-- Tombol Export Excel -->
             <button
                 type="button"
-                class="btn btn-sm btn-success ms-2"
+                class="btn btn-sm btn-secondary ms-2"
                 v-if="!openForm"
                 @click="exportExcel"
             >
