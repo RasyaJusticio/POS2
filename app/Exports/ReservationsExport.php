@@ -13,6 +13,7 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Font;
 
 class ReservationsExport implements FromCollection, WithHeadings, WithMapping, WithStyles, ShouldAutoSize
 {
@@ -20,11 +21,11 @@ class ReservationsExport implements FromCollection, WithHeadings, WithMapping, W
     {
         $reservations = Reservation::select('id', 'name', 'phone', 'date', 'start_time', 'end_time', 'guests')->get();
     
-        // Calculate totals
+        // Menghitung total
         $totalGuests = $reservations->sum('guests');
         $totalReservations = $reservations->count();
     
-        // Add a row for totals at the end
+        // Menambahkan baris total di akhir
         $reservations->push((object) [
             'id' => '',
             'name' => 'Total Reservations',
@@ -60,7 +61,7 @@ class ReservationsExport implements FromCollection, WithHeadings, WithMapping, W
             'Start Time',
             'End Time',
             'Guests',
-            'Status', // New Status heading
+            'Status',
         ];
     }
 
@@ -74,17 +75,18 @@ class ReservationsExport implements FromCollection, WithHeadings, WithMapping, W
             $reservation->start_time,
             $reservation->end_time,
             $reservation->guests,
-            $this->getReservationStatus($reservation), // Get status for each reservation
+            $this->getReservationStatus($reservation),
         ];
     }
 
     public function styles(Worksheet $sheet)
     {
-        // Header styles
+        // Gaya untuk header yang lebih modern
         $headerStyle = [
             'font' => [
                 'bold' => true,
                 'size' => 12,
+                'name' => 'Calibri',
                 'color' => ['argb' => Color::COLOR_WHITE],
             ],
             'alignment' => [
@@ -93,14 +95,14 @@ class ReservationsExport implements FromCollection, WithHeadings, WithMapping, W
             ],
             'fill' => [
                 'fillType' => Fill::FILL_SOLID,
-                'startColor' => ['argb' => 'FF0070C0'], // Warna biru
+                'startColor' => ['argb' => 'FF2E75B6'], // Warna biru lembut modern
             ],
         ];
 
-        // Apply header style
+        // Terapkan gaya header
         $sheet->getStyle('A1:H1')->applyFromArray($headerStyle);
 
-        // Apply borders to all data cells
+        // Gaya border untuk semua data
         $sheet->getStyle('A1:H' . ($sheet->getHighestRow()))->applyFromArray([
             'borders' => [
                 'allBorders' => [
@@ -110,24 +112,28 @@ class ReservationsExport implements FromCollection, WithHeadings, WithMapping, W
             ],
         ]);
 
-            // Apply styles for totals row
-    $highestRow = $sheet->getHighestRow();
-    $sheet->getStyle('A' . $highestRow . ':H' . $highestRow)
-          ->applyFromArray([
-              'font' => ['bold' => true],
-              'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT],
-          ]);
-          
+        // Terapkan gaya untuk baris total
+        $highestRow = $sheet->getHighestRow();
+        $sheet->getStyle('A' . $highestRow . ':H' . $highestRow)
+              ->applyFromArray([
+                  'font' => ['bold' => true, 'name' => 'Calibri'],
+                  'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT],
+              ]);
 
-        // Set alignment for all data cells
+        // Gaya untuk data agar lebih modern
         $sheet->getStyle('A1:H' . ($sheet->getHighestRow()))->applyFromArray([
             'alignment' => [
                 'horizontal' => Alignment::HORIZONTAL_CENTER,
                 'vertical' => Alignment::VERTICAL_CENTER,
             ],
+            'font' => [
+                'name' => 'Calibri',
+                'size' => 11,
+                'color' => ['argb' => Color::COLOR_BLACK],
+            ],
         ]);
 
-        // Set auto width for columns
+        // Atur lebar kolom secara otomatis
         return [
             'A' => ['width' => 10],
             'B' => ['width' => 30],
@@ -136,7 +142,7 @@ class ReservationsExport implements FromCollection, WithHeadings, WithMapping, W
             'E' => ['width' => 15],
             'F' => ['width' => 15],
             'G' => ['width' => 10],
-            'H' => ['width' => 20], // New width for Status column
+            'H' => ['width' => 20],
         ];
     }
 

@@ -1,14 +1,14 @@
 <template>
   <div class="payment-page">
     <video autoplay muted loop class="background-video">
-      <source src="@/assets/images/asik.mp4" type="video/mp4">
+      <source src="@/assets/images/asiks.mp4" type="video/mp4">
       Your browser does not support the video tag.
     </video>
-    <h1 class="title" :style="{ color: blueColor }">Transaksi Pembayaran</h1>
+    <h1 class="title" :style="{ color: '#091057' }"></h1>
     <img src="@/assets/images/spice.png" alt="Logo" class="logo" /> <!-- Tambahkan Logo di sini -->
 
     <router-link to="/landing/PAGE">
-              <button class="btn btn-lg btn-primary">BACK</button>
+              <button class="btn btn-lg btn-primary" style="font-weight: bold;">BACK</button>
             </router-link>
 
             <button @click="generatePDF" class="btn btn-lg btn-primary">Download PDF</button>
@@ -215,6 +215,7 @@ function generateQRCode() {
 </script>
 
 <style>
+
 body {
   margin: 0; /* Menghilangkan margin default */
   font-family: 'Arial', sans-serif;
@@ -234,9 +235,8 @@ body {
   margin: auto;
   text-align: center;
   padding: 20px;
-  background: #fdf2f2;
-  border-radius: 20px;
-  box-shadow: 0 6px 1000px rgba(0, 0, 0, 0.2);
+  background: #ffffff;
+  border-radius: 10px;
 }
 
 .title {

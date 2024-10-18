@@ -13,6 +13,135 @@ const selected = ref<number | undefined>(undefined);
 const openForm = ref<boolean>(false);
 const selectedCategory = ref<string>("");
 
+// Fungsi Print
+const printProducts = () => {
+    // Get the table data from your existing component
+    const productsTable = document.getElementById('table-produk');
+    if (!productsTable) {
+        console.error('Table element not found');
+        return;
+    }
+
+    // Create a new window for printing
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+        console.error('Failed to open print window');
+        return;
+    }
+
+    // Build the printable HTML structure with modern styles
+    const printContent = `
+        <html>
+            <head>
+                <title>Print Products</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 20px;
+                        background-color: #f4f4f4;
+                        color: #333;
+                    }
+                    h2 {
+                        text-align: center;
+                        margin-bottom: 20px;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                        background-color: #fff;
+                    }
+                    table, th, td {
+                        border: 1px solid #ddd;
+                    }
+                    th, td {
+                        padding: 12px;
+                        text-align: left;
+                    }
+                    th {
+                        background-color: #007BFF; /* Bootstrap primary color */
+                        color: white;
+                        font-weight: bold;
+                    }
+                    tr:nth-child(even) {
+                        background-color: #f2f2f2;
+                    }
+                    tr:hover {
+                        background-color: #e9ecef;
+                    }
+                    img {
+                        max-width: 50px; /* Adjust as needed */
+                        height: auto;
+                    }
+                </style>
+            </head>
+            <body>
+                <h2>Product List</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Description</th>
+                            <th>Image</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${Array.from(productsTable.querySelectorAll('tbody tr')).map((row, index) => {
+                            const cells = row.querySelectorAll('td');
+                            return `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${cells[1]?.innerText || ''}</td>
+                                    <td>${cells[2]?.innerText || ''}</td>
+                                    <td>${cells[3]?.innerText || ''}</td>
+                                    <td>${cells[4]?.innerText || ''}</td>
+                                    <td>${cells[5]?.innerHTML || ''}</td> <!-- Assuming image is in the 6th cell -->
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </body>
+        </html>
+    `;
+
+    // Write content to the new window
+    printWindow.document.write(printContent);
+
+    // Close the document to ensure it's fully loaded before printing
+    printWindow.document.close();
+
+    // Wait for the content to load before printing
+    printWindow.onload = () => {
+        printWindow.print();
+        printWindow.close();
+    };
+};
+
+
+
+// Fungsi Export Excel
+const exportExcel = async () => {
+    try {
+        const response = await axios.get("/inventori/produk/export-excel", {
+            responseType: "blob", // Mendapatkan file Excel sebagai binary blob
+        });
+        
+        // Buat link download
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "produk.xlsx"); // Nama file yang akan di-download
+        document.body.appendChild(link);
+        link.click();
+    } catch (error) {
+        console.error("Error exporting Excel file:", error);
+    }
+};
+
 const { delete: deleteProduct } = useDelete({
     onSuccess: () => paginateRef.value.refetch(),
 });
@@ -174,6 +303,29 @@ watch(selectedCategory, (newCategory) => {
                 Add Product
                 <i class="la la-plus"></i>
             </button>
+
+             <!-- Tombol Print Produk -->
+             <button
+                type="button"
+                class="btn btn-sm btn-secondary ms-2"
+                v-if="!openForm"
+                @click="printProducts"
+            >
+                Print
+                <i class="la la-print"></i>
+            </button>
+
+            <!-- Tombol Export Excel -->
+            <button
+                type="button"
+                class="btn btn-sm btn-success ms-2"
+                v-if="!openForm"
+                @click="exportExcel"
+            >
+                Export Excel
+                <i class="la la-file-excel"></i>
+            </button>
+
         </div>
 
         <div class="card-body">

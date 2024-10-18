@@ -15,6 +15,8 @@ use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\ItempembelianController;
 use App\Models\Reservation;
 
+Route::get('/products/print', [ProductController::class, 'print']);
+Route::get('/inventori/produk/export-excel', [ProductController::class, 'exportExcel']);
 // Route::put('/inventori/laporan/{id}', [PembelianController::class, 'updateStatus']);
 Route::get('/transaction/{id}', [PembelianController::class, 'show']);
 Route::post('/inventori/laporan', [PembelianController::class, 'printTransaction']); // Endpoint untuk mencetak

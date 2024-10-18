@@ -9,9 +9,56 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Exports\ProductExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProductController extends Controller
 {
+      public function print(Request $request)
+    {
+        // Validate request parameters for printing, if any
+        $validator = Validator::make($request->all(), [
+            'search' => 'string|nullable',
+            'category' => 'string|nullable',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Invalid input data',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $validated = $validator->validated();
+        $search = $validated['search'] ?? null;
+        $category = $validated['category'] ?? null;
+
+        // Query products based on search and category filters
+        $query = Product::query()
+            ->when($search, function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('description', 'like', '%' . $search . '%');
+            })
+            ->when($category, function ($q) use ($category) {
+                $q->where('category', $category);
+            });
+
+        $products = $query->get();
+
+        // Format data for printing (could be HTML, JSON, etc.)
+        $html = view('products.print', compact('products'))->render();
+
+        // Return the view or print PDF as needed
+        return response()->json([
+            'message' => 'Products retrieved successfully for printing.',
+            'data' => $html,
+        ]);
+    }
+    public function exportExcel()
+    {
+        return Excel::download(new ProductExport, 'produk.xlsx');
+    }
+
     public function index(Request $request)
     {
         $validator = Validator::make($request->all(), [
