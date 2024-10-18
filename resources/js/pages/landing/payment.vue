@@ -11,6 +11,8 @@
               <button class="btn btn-lg btn-primary">BACK</button>
             </router-link>
 
+            <button @click="generatePDF" class="btn btn-lg btn-primary">Download PDF</button>
+
 
     <div v-if="receiptVisible" class="receipt">
       <h2>Struk Pembayaran</h2>
@@ -67,6 +69,61 @@ const orderId = ref(""); // This should be dynamically generated
 const totalAmount = ref(0);
 const snapToken = '{{ $snapToken }}';
 const blueColor = '#0000FF';  // Atau warna biru hex atau nama warna
+
+
+const pembelian = ref({
+  uuid: '',
+  items: [],
+  status: ''
+});
+
+
+const generatePDF = () => {
+  if (!pembelian.value || !pembelian.value.uuid) {
+    console.error('Data pembelian tidak tersedia');
+    return;
+  }
+
+  const doc = new jsPDF();
+
+  // Tambahkan judul
+  doc.setFontSize(20);
+  doc.text('Struk Pembelian', 10, 10);
+
+  // Informasi dasar
+  doc.setFontSize(12);
+  doc.text(`ID Pembelian: ${pembelian.value.uuid}`, 10, 20);
+  doc.text(`Tanggal: ${new Date().toLocaleDateString()}`, 10, 30);
+
+  // Tambahkan tabel produk
+  let startY = 40;
+  doc.text('Produk', 10, startY);
+  doc.text('Kuantitas', 120, startY);
+
+  // Hitung total harga berdasarkan items
+  let totalPrice = 0;
+  pembelian.value.items.forEach((item: any) => {
+    startY += 10;
+    doc.text(item.name, 10, startY);
+    doc.text(item.quantity.toString(), 120, startY);
+    
+    totalPrice += item.quantity * item.price;  // Misalnya jika `item.price` adalah harga per produk
+  });
+
+  // Tambahkan total harga
+  startY += 20;
+  doc.setFontSize(14);
+  doc.text(`Total Harga: Rp ${totalPrice}`, 10, startY);
+
+  // Tambahkan status pembayaran
+  startY += 10;
+  doc.text(`Status Pembayaran: ${pembelian.value.status}`, 10, startY);
+
+  // Download PDF
+  doc.save('struk_pembelian.pdf');
+};
+
+
 
 
 
