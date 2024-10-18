@@ -182,16 +182,16 @@ const columns = [
                     },
                     h("i", { class: "la la-eye fs-2" })
                 ),
-                h(
-                    "button",
-                    {
-                        class: "btn btn-sm btn-icon btn-success",
-                        disabled: cell.row.original.created, // Disable if already processed
-                        onClick: () => markAsProcessed(cell.row.original),
-                    },
-                    h("i", { class: "fa fa-check fs-2" }) // Font Awesome check icon
+                // h(
+                //     "button",
+                //     {
+                //         class: "btn btn-sm btn-icon btn-success",
+                //         disabled: cell.row.original.created, // Disable if already processed
+                //         onClick: () => markAsProcessed(cell.row.original),
+                //     },
+                //     h("i", { class: "fa fa-check fs-2" }) // Font Awesome check icon
                     
-                ),
+                // ),
                 h(
                     "button",
                     {

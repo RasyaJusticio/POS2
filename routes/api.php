@@ -26,6 +26,7 @@ Route::get('/master/users/print', [UserController::class, 'print']);
 Route::get('reservations/export', [ReservationController::class, 'export']);
 
 Route::post('/pembelian', [PembelianController::class, 'store']);
+Route::get('/pembelian/{uuid}/pdf', [PembelianController::class, 'generatePDF']);
 Route::get('/top-selling-items', [PembelianController::class, 'topSellingItems']);
 // Add other routes as necessary
 

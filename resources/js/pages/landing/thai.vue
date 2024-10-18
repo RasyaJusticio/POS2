@@ -232,13 +232,11 @@ function submit(items: any) {
       console.log(pembelian.value)
       toast.success("Produk berhasil disimpan");
       // formRef.value.resetForm();
-      router.push({
-        name: 'landingcheck',
-        // params: {pembelian_id: pembelian.value.id}
-      })
+      
       if (window.snap) {
         window.snap.pay(data.data.payment_url, {
           onSuccess: (result) => {
+            window.location.href = `/landing/payment/${pembelian.value.uuid}`
             console.log("Pembayaran berhasil:", result);
           }
         });
