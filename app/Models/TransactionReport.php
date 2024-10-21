@@ -13,6 +13,7 @@ class TransactionReport extends Model
         'pembelian_id',
         'status',
         'total_price',
+        'items',
     ];
 
     /**

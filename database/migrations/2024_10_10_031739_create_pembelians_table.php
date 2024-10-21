@@ -17,9 +17,13 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->nullable();
             $table->integer('total_price');
+            $table->string('status')->default('pending');
+            $table->string('items'); // Simpan produk dan kuantitas dalam satu kolom JSON
+            $table->string('customer_name'); // Tambahkan kolom customer_name
             $table->timestamps();
         });
     }
+    
 
     /**
      * Reverse the migrations.

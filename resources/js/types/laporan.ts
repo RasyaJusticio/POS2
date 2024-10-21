@@ -1,7 +1,10 @@
-export interface TransactionReport {
-    id: number; // Menggunakan number karena id di Laravel biasanya integer
-    pembelian_id: number; // Sesuaikan dengan foreignId yang menggunakan integer
-    status: string; // Menggunakan union type untuk status
-    total_price: number; // Tambahkan kolom total_price
+
+
+export interface Pembelian {
+    id: number;
+    pembelian_id: number;
+    status: string;
+    total_price: number;
     created_at: string;
+    items: string; // Menambahkan items untuk daftar produk yang dibeli
 }

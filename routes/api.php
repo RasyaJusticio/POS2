@@ -18,6 +18,12 @@ use App\Http\Controllers\TransactionReportController;
 Route::get('/api/reservations/export', [TransactionReportController::class, 'export']);
 
 
+Route::get('/products/print', [ProductController::class, 'print']);
+Route::get('/inventori/produk/export-excel', [ProductController::class, 'exportExcel']);
+// Route::put('/inventori/laporan/{id}', [PembelianController::class, 'updateStatus']);
+Route::get('/transaction/{id}', [PembelianController::class, 'show']);
+Route::post('/inventori/laporan', [PembelianController::class, 'printTransaction']); // Endpoint untuk mencetak
+Route::get('/inventori/laporan/export', [PembelianController::class, 'exportToExcel']);
 Route::get('/master/users/export', [UserController::class, 'export'])->name('users.export');
 Route::get('/master/users/print', [UserController::class, 'print']);
 Route::get('reservations/export', [ReservationController::class, 'export']);
@@ -146,17 +152,19 @@ Route::prefix('inventori')->group(function () {
 
         // Rute untuk Laporan Transaksi
         Route::group(['prefix' => 'laporan'], function () {
-            Route::post('/', [TransactionReportController::class, 'index']);
-            Route::delete('/{id}', [TransactionReportController::class, 'destroy']);
-            Route::post('/midtrans/callback', [TransactionReportController::class, 'handleMidtransCallback']);
-            Route::get('/midtrans/status/{orderId}', [TransactionReportController::class, 'getTransactionStatus']); // Rute baru untuk mendapatkan status transaksi
+            Route::post('/', [PembelianController::class, 'index']);
+            Route::delete('/{id}', [PembelianController::class, 'destroy']);
+            // Route::post('/midtrans/callback', [TransactionReportController::class, 'callback']);
+            // Route::post('/midtrans/status/{orderId}', [TransactionReportController::class, 'getTransactionStatus']); // Rute baru untuk mendapatkan status transaksi
         });
     });
     
-    Route::post('/midtrans/callback', [PembelianController::class, 'updateTransactionStatus']);
+    
 
 
         // Route::apiResource('produk', ProductController::class)
         //     ->except(['index', 'store'])->scoped(['product' => 'id']);
     
 });
+
+Route::post('/midtrans-callback', [PembelianController::class, 'callback']);

@@ -36,7 +36,7 @@ class ProductSeeder extends Seeder
             [
                 'uuid' => Str::uuid(),
                 'name' => 'Som Tam',
-                'category'=> 'makanan',
+                'category'=> '',
                 'price' => 70000,
                 'description' => 'Spicy green papaya salad with shredded papaya, tomatoes, and a tangy dressing.',
                 'image_url' => '/storage/produk/somtam.jpg', // Ganti dengan link gambar yang sesuai
@@ -126,7 +126,7 @@ class ProductSeeder extends Seeder
                 'name' => 'Tamarind Juice',
                 'category'=> 'minuman',
                 'price' => 20000,
-                'description' => 'Tangy drink made from tamarind pulp, often sweetened and chilled.',
+                'description' => 'Tangy minuman made from tamarind pulp, often sweetened and chilled.',
                 'image_url' => '/storage/produk/tamarind.jpg', // Ganti dengan link gambar yang sesuai
             ],
             [
@@ -134,7 +134,7 @@ class ProductSeeder extends Seeder
                 'name' => 'Thai Iced Tea',
                 'category'=> 'minuman',
                 'price' => 30000,
-                'description' => 'Sweet nd creamy drink made from black tea and sweetened.',
+                'description' => 'Sweet nd creamy minuman made from black tea and sweetened.',
                 'image_url' => '/storage/produk/thai.jpg', // Ganti dengan link gambar yang sesuai
             ],
             [

@@ -247,7 +247,7 @@
 
           <h3 v-if="visibleDescription === 'paor'">P AOR</h3>
           <p v-if="visibleDescription === 'paor'">
-            A savory noodle soup that features tender meat and a rich, flavorful broth. Infused with aromatic herbs, each bowl is a comforting experience. It’s a beloved dish that captures the essence of Thai comfort food, perfect for any time of day.
+            A savory noodle soup that features tender meat and a rich, flavorful broth. Infused with aromatic herbs, each bowl is a comforting experience. It’s a beloved dish that captures the essence of Thai comfort Food, perfect for any time of day.
           </p>
 
           <h3 v-if="visibleDescription === 'padthai'">Pad Thai</h3>
@@ -322,7 +322,7 @@
 
           <h3 v-if="visibleDescription === 'savoey'">Savoey</h3>
           <p v-if="visibleDescription === 'savoey'">
-            A popular Thai dish known for its savory flavors, often incorporating seafood or meat with a variety of spices.
+            A popular Thai dish known for its savory flavors, often incorporating seamakanan or meat with a variety of spices.
           </p>
         </div>
       </section>
@@ -440,7 +440,7 @@
         <p class="lead mb-4">We're here to serve you! For inquiries, feedback, or reservations, please reach out.</p>
                  
         <div class="social-icons mb-4">
-            <a href="https://www.instagram.com/whozviaa?igsh=emp5YnBpZzI3MzNi" target="_blank" class="btn btn-outline-success1 mx-2">
+            <a href="https://www.instagram.com/noflabs?igsh=MW52OTBuNHg4OHR4ZQ==" target="_blank" class="btn btn-outline-success1 mx-2">
                 <i class="fab fa-instagram"></i> Instagram
             </a>
             <a href="https://wa.me/qr/STA2YM5YISFCF1 " target="_blank" class="btn btn-outline-success2 mx-2">
@@ -614,13 +614,13 @@ const submitReservation = async () => {
     };
 
     // Tampilkan pesan sukses menggunakan SweetAlert2
-    Swal.fire({
-      title: 'Reservation Successful!',
-      text: 'Your reservation has been successfully created.',
-      icon: 'success',
-      confirmButtonText: 'OK',
-      confirmButtonColor: '#28a745',
-    });
+      Swal.fire({
+        title: 'Reservation Successful!',
+        text: 'Your reservation has been successfully created.',
+        icon: 'success',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#28a745',
+      });
   } catch (error) {
     // Tangani error jika ada
     if (error.response && error.response.data.status === 'error') {

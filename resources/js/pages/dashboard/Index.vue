@@ -3,37 +3,43 @@
     <div class="container">
       <h1 class="title">Graphic</h1>
 
-      <div class="stats"> 
-        <StatCard 
-          title="Total Sales" 
-          :value="formatCurrency(totalSales)" 
-          iconClass="fas fa-dollar-sign"  
-        /> 
-        <StatCard  
-          title="Total Reservation" 
-          :value="totalReservations" 
-          iconClass="fas fa-box" 
-          @click="navigateToReservation"
-        />
-        <StatCard 
-          title="Total Customers" 
-          :value="totalCustomers" 
-          iconClass="fas fa-users" 
-        />
+      <div class="stats row mb-4">
+        <div class="col-md-4">
+          <StatCard 
+            title="Total Sales" 
+            :value="formatCurrency(totalSales)" 
+            iconClass="fas fa-dollar-sign"  
+            class="stat-card-custom"
+          /> 
+        </div>
+        <div class="col-md-4">
+          <StatCard  
+            title="Total Reservations" 
+            :value="totalReservations" 
+            iconClass="fas fa-box" 
+            @click="navigateToReservation"
+            class="stat-card-custom"
+          />
+        </div>
+        <div class="col-md-4">
+          <StatCard 
+            title="Total Customers" 
+            :value="totalCustomers" 
+            iconClass="fas fa-users"
+            class="stat-card-custom" 
+          />
+        </div>
       </div>
 
-      <div class="charts">
-        <ChartCard title="Sales Over Time">
+      <div class="chart-card">
+        <ChartCard title="Customer Over Time">
           <canvas id="salesChart"></canvas>
-        </ChartCard>  
+        </ChartCard>
+       
       </div>
-
-      <!-- Menampilkan Total Reservations -->
-      <div></div>
     </div>
   </main>
 </template>
-
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
@@ -95,7 +101,7 @@ const formatCurrency = (value: number) => {
 
 const initializeCharts = () => {
   const salesCtx = document.getElementById('salesChart')?.getContext('2d');
-  if (!salesCtx) return; // Tambahkan pengecekan untuk menghindari error jika elemen tidak ada
+  if (!salesCtx) return;
 
   new Chart(salesCtx, {
     type: 'line',
@@ -118,17 +124,17 @@ const initializeCharts = () => {
       }
     }
   });
+
+  initializeTopItemsChart(); // Call this function to initialize the top items chart
 };
 
-// Fungsi untuk inisialisasi chart 'Top Selling Items'
+// Function for initializing the 'Top Selling Items' chart
 const initializeTopItemsChart = async () => {
   try {
     const response = await axios.get('http://localhost:8000/api/top-selling-items');
-    console.log(response.data);  // Debugging line to check the response
-
     const topItems = response.data;
-    const labels = topItems.map(item => item.name);  // Gunakan nama produk sebagai label
-    const data = topItems.map(item => item.total_sold);  // Gunakan jumlah terjual untuk data
+    const labels = topItems.map(item => item.name);
+    const data = topItems.map(item => item.total_sold);
 
     const topItemsCtx = document.getElementById('topItemsChart')?.getContext('2d');
     if (!topItemsCtx) return;
@@ -158,8 +164,6 @@ const initializeTopItemsChart = async () => {
     console.error('Error fetching top selling items:', error);
   }
 };
-
-
 </script>
 
 <style scoped>
@@ -171,74 +175,35 @@ const initializeTopItemsChart = async () => {
   margin-bottom: 20px;
 }
 
-.stats {
-  display: flex;
-  gap: 10px;
+/* Add box shadow to the stat card */
+.stat-card-custom {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.137); /* Add box shadow */
+  border-radius: 10px; /* Optional: Match the card corners */
+}
+
+/* Adjusting the styles to fit Bootstrap grid */
+/* .stats {
   margin-bottom: 20px;
-  
-  background: var(--card-bg);
-  color: var(--text-color);
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: 2px 4px 4px hsla(0, 0%, 10%, 0.461);
-  flex: 1;
-  transition: background 0.3s ease, color 0.3s ease;
-}
+} */
 
-.charts {
-  background: transparent; /* Membuat background chart transparan */
-  border: none; /* Menghilangkan border */
-  flex: 1;
-}
+/* .charts { 
+  margin-top: 20px; */
+/* } 
 
-.large-icon {
-  font-size: 10rem; /* Ukuran lebih besar untuk ikon */
-  color: var(--text-color); /* Menggunakan variabel untuk warna */
-  margin-bottom: 10px; /* Jarak antara ikon dan teks */
-}
-
-:root {
-  --card-bg: #ffffff; /* Background untuk mode terang */
-  --card-bg-dark: #1a202c; /* Background untuk mode gelap */
-  --text-color: #000000; /* Warna teks untuk mode terang */
-  --text-color-dark: #ffffff; /* Warna teks untuk mode gelap */
-  --chart-bg: rgba(255, 255, 255, 0.5); /* Background chart transparan untuk mode terang */
-  --chart-bg-dark: rgba(0, 0, 0, 0.5); /* Background chart transparan untuk mode gelap */
-}
-
-.stat-card {
-  background: var(--card-bg);
-  color: var(--text-color);
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: 2px 4px 4px hsla(0, 0%, 10%, 0.461);
-  flex: 1;
-  transition: background 0.3s ease, color 0.3s ease;
-}
-
-.stat-card h3 {
-  margin-left: 10px;
-  color: var(--text-color);
-}
-
-/* Dark mode styles */
-.dark .stat-card {
-  background: var(--card-bg-dark);
-  color: var(--text-color-dark);
-}
-
-.dark .stat-card h3 {
-  color: var(--text-color-dark);
-}
-
+/* Ensuring chart cards take full width */
 .chart-card {
-  background: transparent; /* Membuat background chart transparan */
-  border: none; /* Menghilangkan border */
-  flex: 1;
-  transition: background 0.3s ease;
+  width: 100%; /* Full width for chart cards */
 }
 
-.dark .chart-card {
-  background: var(--chart-bg-dark); /* Transparan untuk dark mode */
+.chart-card canvas {
+  max-width: 100%; /* Ensure canvas scales correctly */
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .stats {
+    flex-direction: column; /* Stack columns on smaller screens */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.473); /* Add box shadow here */
+  }
 }
 </style>

@@ -25,7 +25,7 @@
         "apexcharts": "^3.41.1",
         "bootstrap": "^5.3.3",
         "bootstrap-icons": "^1.9.1",
-        "chart.js": "^3.9.1",
+        "chart.js": "^4.4.4",
         "ckeditor5-custom-build": "file:ckeditor",
         "clipboard": "^2.0.6",
         "core-js": "^3.8.3",
