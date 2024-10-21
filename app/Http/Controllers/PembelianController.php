@@ -50,7 +50,7 @@ class PembelianController extends Controller
            'items' => $items, // Simpan array produk dan kuantitas sebagai string biasa
        ]));
         
-        $pembelian->items()->syncWithoutDetaching($request->products_id); // Menyinkronkan produk
+        $pembelian->item()->syncWithoutDetaching($request->products_id); // Menyinkronkan produk
 
         // Konfigurasi Midtrans
         \Midtrans\Config::$serverKey = config('midtrans.server_key');

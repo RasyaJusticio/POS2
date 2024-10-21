@@ -27,7 +27,21 @@
     <!-- Filter, Sort and Total section -->
     <div class="card-body">
       <div class="row align-items-center mb-4">
-        <!-- Filter by Date -->
+<!-- Filter by Date using Datepicker -->
+<div class="col-md-4">
+  <div class="fv-row">
+    <label class="form-label fw-bold fs-6 required" for="reservation-date">
+      <i class="la la-calendar"></i> Filter by Date
+    </label>
+    <!-- Replace with Datepicker -->
+    <Datepicker 
+      v-model="selectedDate" 
+      @change="filterByDate"
+      :format="'yyyy-MM-dd'"
+      :input-class="'form-control form-control-lg form-control-solid'"
+    />
+  </div>
+</div>
         <div class="col-md-4">
           <div class="fv-row">
             <label class="form-label fw-bold fs-6 required" for="reservation-date">
@@ -131,8 +145,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted } from 'vue'; // Keep this import
 import axios from 'axios';
+import Datepicker from 'vue3-datepicker';
+import 'vue3-datepicker/dist/style.css'; // Make sure to import the styles
+
+
+// Register the component
+
 
 // State variables
 const reservations = ref<any[]>([]);
