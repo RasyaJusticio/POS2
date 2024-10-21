@@ -40,6 +40,22 @@ onMounted(async () => {
     }
 });
 
+
+// Function to format date to 'DD Month YYYY'
+const formatTanggal = (dateString) => {
+    const months = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ];
+    
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const monthIndex = date.getMonth();
+    const year = date.getFullYear();
+    
+    return `${day} ${months[monthIndex]} ${year}`;
+};
+
 // Fungsi untuk mencetak laporan transaksi
 const printTransaction = async () => {
     try {
@@ -203,11 +219,12 @@ const columns = [
         header: "Status Pembayaran",
     }),
     column.accessor("created_at", {
-        header: "Tanggal Pesanan",
-        cell: (cell) => {
-            return new Date(cell.getValue()).toLocaleDateString("id-ID");
-        },
-    }),
+    header: "Tanggal Pesanan",
+    cell: (cell) => {
+        return formatTanggal(cell.getValue()); // Use the formatTanggal function
+    },
+}),
+  
        column.accessor("created", {
         header: "Pesanan Dibuat",
         cell: (cell) => cell.getValue() ? "On Process" : "Procces",
@@ -317,7 +334,7 @@ const refresh = () => paginateRef.value.refetch();
           <p><strong>ID Pembelian:</strong> {{ selectedTransaction?.pembelian_id }}</p>
           <p><strong>Status Pembayaran:</strong> {{ selectedTransaction?.status }}</p>
           <p><strong>Total Harga:</strong> {{ formatRupiah(selectedTransaction?.total_price) }}</p>
-          <p><strong>Tanggal Transaksi:</strong> {{ new Date(selectedTransaction?.created_at).toLocaleDateString("id-ID") }}</p>
+          <p><strong>Tanggal Transaksi:</strong> {{ formatTanggal(selectedTransaction?.created_at) }}</p> <!-- Updated line -->
           <p><strong>Status Pesanan Dibuat:</strong> {{ selectedTransaction?.created ? 'On Process' : 'Procces' }}</p>
         </div>
   

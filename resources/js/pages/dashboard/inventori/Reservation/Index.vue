@@ -27,21 +27,7 @@
     <!-- Filter, Sort and Total section -->
     <div class="card-body">
       <div class="row align-items-center mb-4">
-<!-- Filter by Date using Datepicker -->
-<div class="col-md-4">
-  <div class="fv-row">
-    <label class="form-label fw-bold fs-6 required" for="reservation-date">
-      <i class="la la-calendar"></i> Filter by Date
-    </label>
-    <!-- Replace with Datepicker -->
-    <Datepicker 
-      v-model="selectedDate" 
-      @change="filterByDate"
-      :format="'yyyy-MM-dd'"
-      :input-class="'form-control form-control-lg form-control-solid'"
-    />
-  </div>
-</div>
+        <!-- Filter by Date -->
         <div class="col-md-4">
           <div class="fv-row">
             <label class="form-label fw-bold fs-6 required" for="reservation-date">
@@ -132,7 +118,7 @@
             <td>{{ reservation.id }}</td>
             <td>{{ reservation.name }}</td>
             <td>{{ reservation.phone }}</td>
-            <td>{{ reservation.date }}</td>
+            <td>{{ formatDate(reservation.date) }}</td>
             <td>{{ reservation.start_time }}</td>
             <td>{{ reservation.end_time }}</td>
             <td>{{ reservation.guests }}</td>
@@ -145,14 +131,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'; // Keep this import
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import Datepicker from 'vue3-datepicker';
-import 'vue3-datepicker/dist/style.css'; // Make sure to import the styles
-
-
-// Register the component
-
 
 // State variables
 const reservations = ref<any[]>([]);
@@ -162,6 +142,15 @@ const sortOrder = ref('asc'); // Sorting order
 const sortStatus = ref(''); 
 const totalReservations = ref(0);
 const totalGuests = ref(0);
+
+
+// Function to format the date to 'DD Month YYYY'
+const formatDate = (dateString: string) => {
+  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+  const date = new Date(dateString);
+  return date.toLocaleDateString('id-ID', options); // Using 'id-ID' for Indonesian format
+};
+
 
 // Fetch reservations only once when the component mounts
 const fetchReservations = async () => {
