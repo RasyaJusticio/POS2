@@ -10,7 +10,6 @@ const column = createColumnHelper<Pembelian>();
 const paginateRef = ref<any>(null);
 const transactions = ref<Pembelian[]>([]); // Menyimpan data transaksi
 const selectedTransaction = ref<Pembelian | null>(null);
-const filteredReservations = ref<any[]>([]);
 
 const startDate = ref<string>('');
 const endDate = ref<string>('');
@@ -31,19 +30,6 @@ const filterByDate = async () => {
 const { delete: deletePembelian } = useDelete({
     onSuccess: () => paginateRef.value.refetch(),
 })
-
-const filterByDate = () => {
-  if (selectedDate.value) {
-    filteredReservations.value = transactions.value.filter(
-      (reservation: any) => reservation.date === selectedDate.value
-    );
-  } else {
-    filteredReservations.value = [...reservations.value]; // If no date is selected, show all
-  }
-  
-  sortReservations(); // Apply sorting after filtering
-  calculateTotals();  // Calculate total reservations and guests
-};
 
 // Mendapatkan data transaksi saat komponen dimuat
 onMounted(async () => {
@@ -122,7 +108,6 @@ const printTransaction = async () => {
                                 <td>${transaction.pembelian_id}</td>
                                 <td>${transaction.status}</td>
                                 <td>${formatRupiah(transaction.total_price)}</td>
-                                <td>${new Date(transaction.created_at).toLocaleDateString("id-ID")}</td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -207,6 +192,9 @@ const columns = [
         header: "ID Pembelian",
         cell: (cell) => cell.getValue().toString().padStart(3, '0'), // Memastikan minimal 3 digit dengan padding '0'
     }),
+    column.accessor("customer_name", {
+        header: "Nama",
+    }),
     column.accessor("items", {
         header: "Produk yang Dibeli",
     }),
@@ -271,14 +259,6 @@ const refresh = () => paginateRef.value.refetch();
     <div class="card mb-4">
       <div class="card-header d-flex align-items-center">
         <h2 class="mb-0">Laporan Transaksi</h2>
-
-        <div class="d-flex gap-2">
-            <input type="date" v-model="startDate" class="form-control" />
-            <input type="date" v-model="endDate" class="form-control" />
-            <button type="button" class="btn btn-sm btn-primary" @click="filterByDate">
-                Filter Tanggal
-            </button>
-        </div>
   
         <!-- Button for printing the reservations list -->
         <button
@@ -338,6 +318,7 @@ const refresh = () => paginateRef.value.refetch();
   
         <div class="modal-body">
           <p><strong>ID Pembelian:</strong> {{ selectedTransaction?.id }}</p>
+          <p><strong>Nama:</strong> {{ selectedTransaction?.customer_name }}</p>
           <p><strong>Pesanan:</strong> {{ selectedTransaction?.items }}</p>
           <p><strong>Total Harga:</strong> {{ formatRupiah(selectedTransaction?.total_price) }}</p>
           <p><strong>Status Pembayaran:</strong> {{ selectedTransaction?.status }}</p>
