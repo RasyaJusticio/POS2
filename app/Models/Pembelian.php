@@ -35,10 +35,10 @@ class Pembelian extends Model
      * Relasi dengan model Product
      * Sebuah 'pembelian' dapat memiliki banyak produk yang terkait dengannya.
      */
-    public function items()
+    public function item()
     {
         // Relasi dengan Product menggunakan pivot table 'itempembelians'
-        return $this->belongsToMany(Product::class, 'itempembelians')->withPivot('quantity');
+        return $this->belongsToMany(Product::class, 'itempembelians');
     }
 
     /**

@@ -8,6 +8,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Facades\Excel;
+use PDF;
 
 class PembelianController extends Controller
 {
@@ -50,7 +51,7 @@ class PembelianController extends Controller
            'items' => $items, // Simpan array produk dan kuantitas sebagai string biasa
        ]));
         
-        $pembelian->items()->syncWithoutDetaching($request->products_id); // Menyinkronkan produk
+        $pembelian->item()->syncWithoutDetaching($request->products_id); // Menyinkronkan produk
 
         // Konfigurasi Midtrans
         \Midtrans\Config::$serverKey = config('midtrans.server_key');
@@ -161,5 +162,31 @@ class PembelianController extends Controller
             'data' => $data,
         ]);
     }
+
+    public function generatePDF($uuid)
+{
+    // Cari pembelian berdasarkan UUID
+    $pembelian = Pembelian::with('item')->where('uuid', $uuid)->first();
+
+    if (!$pembelian) {
+        return response()->json(['error' => 'Pembelian tidak ditemukan'], 404);
+    }
+
+    try {
+        // Kirim data ke view untuk pembuatan PDF
+        $pdf = PDF::loadView('pdf.pembelian', [
+            'pembelian' => $pembelian,
+            'quantity' => $pembelian->item->count()
+        ]);
+
+        // Download PDF dengan nama file yang diinginkan
+        return $pdf->download('struk_pembelian_' . $pembelian->uuid . '.pdf');
+    } catch (\Exception $e) {
+        // Log error untuk debugging
+        \Log::error('Error generating PDF: ' . $e->getMessage());
+        return response()->json(['error' => 'Terjadi kesalahan saat menghasilkan PDF: ' . $e->getMessage()], 500);
+    }
+}
+
 
 }

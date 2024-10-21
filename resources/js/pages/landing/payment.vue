@@ -11,6 +11,8 @@
               <button class="btn btn-lg btn-primary" style="font-weight: bold;">BACK</button>
             </router-link>
 
+            <button @click="handleGeneratePDF" class="btn btn-lg btn-primary" style= "font-weight: bold;">Download PDF</button>
+
 
     <div v-if="receiptVisible" class="receipt">
       <h2>Struk Pembayaran</h2>
@@ -57,6 +59,9 @@ import QRCode from 'qrcode-generator';
 import jsPDF from 'jspdf';
 import axios from 'axios';
 
+
+
+const uuid = ref(); // UUID pembelian yang diambil dari transaksi
 const route = useRoute();
 const cart = ref([]);
 const selectedPayment = ref(null);
@@ -67,6 +72,92 @@ const orderId = ref(""); // This should be dynamically generated
 const totalAmount = ref(0);
 const snapToken = '{{ $snapToken }}';
 const blueColor = '#0000FF';  // Atau warna biru hex atau nama warna
+
+
+const handleGeneratePDF = async () => {
+  console.log(route.params); // Tambahkan log ini
+  if (uuid.value) {
+    try {
+      // Panggil API backend untuk menghasilkan PDF
+      const response = await axios.get(`/pembelian/${uuid.value}/pdf`, {
+        responseType: 'blob', // Agar response dianggap sebagai file
+      });
+
+      // Buat URL dari file PDF
+      const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+      
+      // Buat link untuk download
+      const fileLink = document.createElement('a');
+      fileLink.href = fileURL;
+      fileLink.setAttribute('download', `struk_pembelian_${uuid}.pdf`);
+
+      // Klik link secara otomatis untuk download
+      document.body.appendChild(fileLink);
+      fileLink.click();
+      document.body.removeChild(fileLink);
+    } catch (error) {
+      console.error('Gagal mengambil PDF:', error);
+    }
+  } else {
+    console.error('UUID pembelian tidak tersedia');
+  }
+};
+
+
+
+// const generatePDF = async (uuid: string) => {
+//   try {
+//     // Panggil API untuk mendapatkan data pembelian
+//     const response = await axios.get(`/api/pembelian/${uuid}`);
+
+//     if (response.data.success) {
+//       const pembelian = response.data.data;
+
+//       // Inisialisasi jsPDF
+//       const doc = new jsPDF();
+
+//       // Tambahkan judul
+//       doc.setFontSize(20);
+//       doc.text('Struk Pembelian', 10, 10);
+
+//       // Informasi dasar
+//       doc.setFontSize(12);
+//       doc.text(`ID Pembelian: ${pembelian.uuid}`, 10, 20);
+//       doc.text(`Tanggal: ${new Date(pembelian.created_at).toLocaleDateString()}`, 10, 30);
+
+//       // Tambahkan tabel produk
+//       let startY = 40;
+//       doc.text('Produk', 10, startY);
+//       doc.text('Kuantitas', 120, startY);
+
+//       // Data produk dan kuantitas
+//       const items = pembelian.items.split("\n"); // Misalkan item disimpan sebagai string terpisah oleh "\n"
+//       items.forEach((item: string, index: number) => {
+//         startY += 10;
+//         const [productName, quantity] = item.split(":");
+//         doc.text(productName.trim(), 10, startY);
+//         doc.text(quantity.trim(), 120, startY);
+//       });
+
+//       // Tambahkan total harga
+//       startY += 20;
+//       doc.setFontSize(14);
+//       doc.text(`Total Harga: Rp ${pembelian.total_price}`, 10, startY);
+
+//       // Tambahkan status pembayaran
+//       startY += 10;
+//       doc.text(`Status Pembayaran: ${pembelian.status}`, 10, startY);
+
+//       // Download PDF
+//       doc.save(`struk_pembelian_${pembelian.uuid}.pdf`);
+//     } else {
+//       console.error('Pembelian tidak ditemukan');
+//     }
+//   } catch (error) {
+//     console.error('Gagal mengambil data pembelian:', error);
+//   }
+// };
+
 
 
 
@@ -132,6 +223,7 @@ function reset() {
 
 onMounted(() => {
   const cartParam = route.query.cart;
+  uuid.value = route.params.uuid
   if (cartParam) {
     cart.value = JSON.parse(cartParam);
   }

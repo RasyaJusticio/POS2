@@ -18,6 +18,7 @@ use App\Http\Controllers\TransactionReportController;
 Route::get('/api/reservations/export', [TransactionReportController::class, 'export']);
 
 
+Route::put('/inventori/laporan/{id}', [PembelianController::class, 'updateStatus']);
 Route::get('/products/print', [ProductController::class, 'print']);
 Route::get('/inventori/produk/export-excel', [ProductController::class, 'exportExcel']);
 // Route::put('/inventori/laporan/{id}', [PembelianController::class, 'updateStatus']);
@@ -29,6 +30,7 @@ Route::get('/master/users/print', [UserController::class, 'print']);
 Route::get('reservations/export', [ReservationController::class, 'export']);
 
 Route::post('/pembelian', [PembelianController::class, 'store']);
+Route::get('/pembelian/{uuid}/pdf', [PembelianController::class, 'generatePDF']);
 Route::get('/top-selling-items', [PembelianController::class, 'topSellingItems']);
 // Add other routes as necessary
 
