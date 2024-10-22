@@ -7,6 +7,7 @@ import { toast } from "vue3-toastify";
 import { useDelete } from "@/libs/hooks";
 import { createColumnHelper } from "@tanstack/vue-table";
 import type { TransactionReport } from "@/types/laporan";
+import Flatpickr from "vue-flatpickr-component";
 
 const transaction = ref<TransactionReport>({} as TransactionReport);
 const transactions = ref<TransactionReport[]>([]);

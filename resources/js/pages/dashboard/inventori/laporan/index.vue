@@ -5,22 +5,23 @@ import { createColumnHelper } from "@tanstack/vue-table";
 import type { Pembelian } from "@/types/laporan"; // Ganti dengan path yang sesuai
 import axios from "@/libs/axios";
 import { formatRupiah } from "@/libs/utilss";
+import Datepicker from "vue3-datepicker"; // Import vue3-datepicker
 
 const column = createColumnHelper<Pembelian>();
 const paginateRef = ref<any>(null);
 const transactions = ref<Pembelian[]>([]); // Menyimpan data transaksi
 const selectedTransaction = ref<Pembelian | null>(null);
 
-const startDate = ref<string>('');
-const endDate = ref<string>('');
+const startDate = ref<Date | null>(null);
+const endDate = ref<Date | null>(null);
 
 const filterByDate = async () => {
     try {
         const response = await axios.post('/inventori/laporan', {
-            start_date: startdate.value,
-            end_date: endDate.value,
+            start_date: startDate.value ? startDate.value.toISOString().split('T')[0] : '',
+            end_date: endDate.value ? endDate.value.toISOString().split('T')[0] : '',
         });
-        transactions.value = response .data;
+        transactions.value = response.data;
         paginateRef.value.refetch();
     } catch (error) {
         console.error('Error fetching transactions', error);
@@ -35,7 +36,7 @@ const { delete: deletePembelian } = useDelete({
 onMounted(async () => {
     try {
         const response = await axios.post('/inventori/laporan');
-        transactions.value = response.data; 
+        transactions.value = response.data;
     } catch (error) {
         console.error('Error fetching transactions:', error);
     }
@@ -282,19 +283,20 @@ const refresh = () => paginateRef.value.refetch();
       </div>
   
       <div class="card-body">
-        <!-- Filter by Date -->
+      <!-- Hanya bagian ini yang diubah untuk menggunakan datepicker -->
+      <div class="row">
         <div class="col-md-4 mb-4">
-          <label class="form-label fw-bold fs-6 required" for="reservation-date">
-            <i class="la la-calendar"></i> Filter by Date
+          <label class="form-label fw-bold fs-6 required">
+            <i class="la la-calendar"></i> Filter By Date
           </label>
-          <input
-            type="date"
-            id="reservation-date"
-            v-model="selectedDate"
-            @change="filterByDate"
-            class="form-control form-control-lg form-control-solid"
-          />
+          <Datepicker v-model="startDate" class="form-control" />
         </div>
+        <div class="col-md-4 mb-4 d-flex align-items-end">
+          <button class="btn btn-primary" @click="filterByDate">
+            Filter
+          </button>
+        </div>
+      </div>
   
         <paginate
           ref="paginateRef"
