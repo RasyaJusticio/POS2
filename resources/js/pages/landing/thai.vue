@@ -64,6 +64,10 @@
   <aside v-if="isCartVisible" class="pos-cart">
     <button class="close-cart" @click="closeCart">x</button>
     <h2 class="cart-title">Shopping Cart</h2>
+    <div class="customer-name-container">
+      <label for="customerName">Nama</label>
+      <input type="text" v-model="customerName" id="customerName" placeholder="masukkan nama anda" />
+    </div>
     <ul class="cart-list">
       <li v-for="cartItem in cart" :key="cartItem.id" class="cart-item">
         <div class="cart-item-details">
@@ -158,6 +162,7 @@ const isCartVisible = ref(false);
 const router = useRouter();
 import Swal from 'sweetalert2'; // Import SweetAlert2
 const pembelian = ref();
+const customerName = ref('');
 
 const fetchProducts = async () => {
   try {
@@ -210,18 +215,9 @@ const filteredItems = computed(() => {
 
 
 function submit(items: any) {
-  if (!customerName.value) {
-    Swal.fire({
-      title: 'Nama Pelanggan Harus Diisi!',
-      text: 'Silakan masukkan nama pelanggan sebelum melanjutkan.',
-      icon: 'error',
-      confirmButtonText: 'OK',
-    });
-    return; // Jika nama kosong, hentikan proses submit
-  }
-
   const formDataToSubmit = new FormData();
   formDataToSubmit.append('total_price', valueTotal.value);
+  formDataToSubmit.append('customer_name', customerName.value);
   items.map((item) => {
     formDataToSubmit.append('products_id[]', item.id);
     formDataToSubmit.append('product_price[]', item.price);
@@ -483,6 +479,24 @@ const closeCart = () => {
   font-size: 1.5rem;
   font-weight: bold;
   color: #123352;
+}
+
+.customer-name-container {
+  margin-bottom: 15px;
+}
+
+.customer-name-container label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.customer-name-container input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
 }
 
 .cart-list {
