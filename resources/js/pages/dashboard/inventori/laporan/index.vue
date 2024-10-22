@@ -14,6 +14,16 @@ const selectedTransaction = ref<Pembelian | null>(null);
 const startDate = ref<string>('');
 const endDate = ref<string>('');
 
+
+const checkNameBeforeSubmit = () => {
+    if (!selectedTransaction.value?.customer_name) {
+        alert("Nama pembeli tidak boleh kosong. Silakan isi nama sebelum melanjutkan.");
+        return false; // Menghentikan proses jika nama kosong
+    }
+    return true; // Lanjutkan jika nama sudah terisi
+};
+
+
 const filterByDate = async () => {
     try {
         const response = await axios.post('/inventori/laporan', {
@@ -40,6 +50,22 @@ onMounted(async () => {
         console.error('Error fetching transactions:', error);
     }
 });
+
+
+// Function to format date to 'DD Month YYYY'
+const formatTanggal = (dateString) => {
+    const months = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ];
+    
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const monthIndex = date.getMonth();
+    const year = date.getFullYear();
+    
+    return `${day} ${months[monthIndex]} ${year}`;
+};
 
 // Fungsi untuk mencetak laporan transaksi
 const printTransaction = async () => {
@@ -196,9 +222,14 @@ const columns = [
         header: "Nama",
     }),
     column.accessor("items", {
-        header: "Produk yang Dibeli",
+        header: "Pesanan",
+        cell: (cell) => {
+            // Pisahkan setiap produk dengan <br /> untuk membuat jarak vertikal
+            const itemsList = cell.getValue().split("\n").map(item => `<div>${item}</div>`).join('');
+            return h('div', { innerHTML: itemsList }); // Gunakan innerHTML untuk render div dengan newline
+        }
     }),
-       column.accessor("total_price", {
+    column.accessor("total_price", {
         header: "Total",
         cell: (cell) => formatRupiah(cell.getValue()),
     }),
@@ -206,11 +237,12 @@ const columns = [
         header: "Status Pembayaran",
     }),
     column.accessor("created_at", {
-        header: "Tanggal Pesanan",
-        cell: (cell) => {
-            return new Date(cell.getValue()).toLocaleDateString("id-ID");
-        },
-    }),
+    header: "Tanggal Pesanan",
+    cell: (cell) => {
+        return formatTanggal(cell.getValue()); // Use the formatTanggal function
+    },
+}),
+  
        column.accessor("created", {
         header: "Pesanan Dibuat",
         cell: (cell) => cell.getValue() ? "On Process" : "Procces",
@@ -321,6 +353,7 @@ const refresh = () => paginateRef.value.refetch();
           <p><strong>Nama:</strong> {{ selectedTransaction?.customer_name }}</p>
           <p><strong>Pesanan:</strong> {{ selectedTransaction?.items }}</p>
           <p><strong>Total Harga:</strong> {{ formatRupiah(selectedTransaction?.total_price) }}</p>
+          <p><strong>Tanggal Transaksi:</strong> {{ formatTanggal(selectedTransaction?.created_at) }}</p> <!-- Updated line -->
           <p><strong>Status Pembayaran:</strong> {{ selectedTransaction?.status }}</p>
           <p><strong>Tanggal Transaksi:</strong> {{ new Date(selectedTransaction?.created_at).toLocaleDateString("id-ID") }}</p>
           <p><strong>Status Pesanan Dibuat:</strong> {{ selectedTransaction?.created ? 'On Process' : 'Procces' }}</p>

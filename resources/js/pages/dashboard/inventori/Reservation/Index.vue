@@ -118,7 +118,7 @@
             <td>{{ reservation.id }}</td>
             <td>{{ reservation.name }}</td>
             <td>{{ reservation.phone }}</td>
-            <td>{{ reservation.date }}</td>
+            <td>{{ formatDate(reservation.date) }}</td>
             <td>{{ reservation.start_time }}</td>
             <td>{{ reservation.end_time }}</td>
             <td>{{ reservation.guests }}</td>
@@ -142,6 +142,15 @@ const sortOrder = ref('asc'); // Sorting order
 const sortStatus = ref(''); 
 const totalReservations = ref(0);
 const totalGuests = ref(0);
+
+
+// Function to format the date to 'DD Month YYYY'
+const formatDate = (dateString: string) => {
+  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+  const date = new Date(dateString);
+  return date.toLocaleDateString('id-ID', options); // Using 'id-ID' for Indonesian format
+};
+
 
 // Fetch reservations only once when the component mounts
 const fetchReservations = async () => {
@@ -222,6 +231,13 @@ const printReservations = () => {
     console.error("Reservations data not found");
     return;
   }
+
+  // Fungsi untuk memformat tanggal dari 'YYYY-MM-DD' ke 'DD MMMM YYYY'
+  const formatDate = (dateStr) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const dateObj = new Date(dateStr);
+    return dateObj.toLocaleDateString('id-ID', options); // Format sesuai dengan lokal 'id-ID'
+  };
 
   // Path ke gambar logo, pastikan logo bisa diakses
   const logoPath = "{{ asset('media/avatars/spice.png') }}";
@@ -311,7 +327,7 @@ const printReservations = () => {
                     <td>${reservation.id}</td>
                     <td>${reservation.name}</td>
                     <td>${reservation.phone}</td>
-                    <td>${reservation.date}</td>
+                    <td>${formatDate(reservation.date)}</td> <!-- Format tanggal di sini -->
                     <td>${reservation.start_time}</td>
                     <td>${reservation.end_time}</td>
                     <td>${reservation.guests}</td>
@@ -338,6 +354,7 @@ const printReservations = () => {
     console.error("Failed to open a new window.");
   }
 };
+
 
 
 

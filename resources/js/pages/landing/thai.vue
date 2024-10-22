@@ -156,6 +156,7 @@ const selectedCategory = ref('All');
 const discount = ref(0);
 const isCartVisible = ref(false);
 const router = useRouter();
+import Swal from 'sweetalert2'; // Import SweetAlert2
 const pembelian = ref();
 
 const fetchProducts = async () => {
@@ -209,6 +210,16 @@ const filteredItems = computed(() => {
 
 
 function submit(items: any) {
+  if (!customerName.value) {
+    Swal.fire({
+      title: 'Nama Pelanggan Harus Diisi!',
+      text: 'Silakan masukkan nama pelanggan sebelum melanjutkan.',
+      icon: 'error',
+      confirmButtonText: 'OK',
+    });
+    return; // Jika nama kosong, hentikan proses submit
+  }
+
   const formDataToSubmit = new FormData();
   formDataToSubmit.append('total_price', valueTotal.value);
   items.map((item) => {
@@ -217,7 +228,6 @@ function submit(items: any) {
     formDataToSubmit.append('name[]', item.name); 
     formDataToSubmit.append('product_quantity[]', item.quantity); 
   });
-
 
   axios({
     method: "post",
@@ -228,24 +238,32 @@ function submit(items: any) {
     },
   })
     .then((data) => {
-      pembelian.value = data.data.Pembelian
-      console.log(pembelian.value)
-      toast.success("Produk berhasil disimpan");
-      // formRef.value.resetForm();
-      
-      if (window.snap) {
-        window.snap.pay(data.data.payment_url, {
-          onSuccess: (result) => {
-            window.location.href = `/landing/payment/${pembelian.value.uuid}`
-            console.log("Pembayaran berhasil:", result);
-          }
-        });
-      }
+      pembelian.value = data.data.Pembelian;
+      console.log(pembelian.value);
+      Swal.fire({
+        title: 'Berhasil!',
+        text: 'Produk berhasil disimpan. Melanjutkan ke pembayaran...',
+        icon: 'success',
+        confirmButtonText: 'OK',
+      }).then(() => {
+        if (window.snap) {
+          window.snap.pay(data.data.payment_url, {
+            onSuccess: (result) => {
+              window.location.href = `/landing/payment/${pembelian.value.uuid}`;
+              console.log("Pembayaran berhasil:", result);
+            }
+          });
+        }
+      });
     })
     .catch((err: any) => {
-      // formRef.value.setErrors(err.response.data.errors);
-      toast.error(err.response.data.message);
-    })
+      Swal.fire({
+        title: 'Error!',
+        text: err.response.data.message,
+        icon: 'error',
+        confirmButtonText: 'OK',
+      });
+    });
 }
 
 
