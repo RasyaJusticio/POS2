@@ -113,12 +113,25 @@ class PembelianController extends Controller
     }
 
     public function index(Request $request)
-    {
-        // Ambil semua pembelian
-        $pembelians = Pembelian::paginate(10);
+{
+    // Inisialisasi query untuk mendapatkan pembelian
+    $query = Pembelian::query();
 
-        return response()->json($pembelians);
+    // Cek apakah ada input tanggal
+    if ($request->has('date') && $request->input('date')) {
+        // Jika ada tanggal, filter berdasarkan tanggal tersebut
+        $query->whereDate('created_at', $request->input('date'));
     }
+
+    // Urutkan berdasarkan tanggal terbaru
+    $query->orderBy('created_at', 'desc');
+
+    // Ambil data pembelian dengan pagination sebelum menjadi Collection
+    $pembelians = $query->paginate(10);
+
+    return response()->json($pembelians);
+}
+
 
     public function destroy($id)
     {
