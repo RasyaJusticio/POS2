@@ -518,6 +518,47 @@
       />
     </div>
 
+    <!-- Menu Reservation -->
+<div class="J">
+  <label for="menu" class="form-label">Select Menu:</label>
+  <select2
+    :options="formattedMenuOptions"
+    v-model="selectedMenu"
+    class="form-control"
+    required
+    placeholder="Please select a menu"
+  />
+  <div class="input-group mt-2">
+    <input
+      type="number"
+      v-model.number="selectedQuantity"
+      min="1"
+      class="form-control"
+      placeholder="Quantity"
+      style="width: 80px"
+    />
+    <button type="button" @click="addMenu" class="btn btn-secondary">
+      Add Menu
+    </button>
+  </div>
+</div>
+
+<!-- Display selected menus and allow quantity input -->
+<div v-if="reservation.menus.length > 0" class="mt-3">
+  <h4>Selected Menus</h4>
+  <ul class="list-group">
+    <li v-for="(menu, index) in reservation.menus" :key="menu.id" class="list-group-item d-flex justify-content-between align-items-center">
+      <span>
+        {{ menu.name }} - Rp {{ formatRupiah(menu.price) }} x {{ menu.quantity }}
+      </span>
+      <button type="button" @click="removeMenu(index)" class="btn btn-danger btn-sm">
+        Remove
+      </button>
+    </li>
+  </ul>
+</div>
+
+
     <button type="submit" class="P">Reserve</button>
   </form>
 
@@ -540,18 +581,100 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
-import { toast } from "vue3-toastify"
 
-// Data reservasi
+// Define types for Product and SelectedMenu
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+}
+
+interface SelectedMenu extends Product {
+  quantity: number;
+}
+
+// State for selected menu and quantity
+const selectedMenu = ref<Product | null>(null);
+const selectedQuantity = ref<number>(1);  // Track quantity of the selected menu
+
+// Reservation model
 const reservation = ref({
   name: '',
   phone: '',
   date: '',
   start_time: '',
   end_time: '',
-  guests: 1
+  guests: 1,
+  menus: [] as SelectedMenu[]
+});
+
+// List of products (menu items)
+const products = ref<Product[]>([]);
+
+// Fetch menu items from the backend
+const fetchMenuItems = async () => {
+  try {
+    const response = await axios.get('http://localhost:8000/api/products/menu');
+    products.value = response.data.data;  // Set the menu data
+  } catch (error) {
+    console.error('Error fetching menu items:', error);
+  }
+};
+
+// Computed property to format menu options for Select2
+const formattedMenuOptions = computed(() => {
+  return products.value.map(product => ({
+    id: product.id,
+    text: `${product.name} - Rp ${formatRupiah(product.price)}`
+  }));
+});
+
+// Format currency in IDR
+const formatRupiah = (amount: number) => {
+  if (isNaN(amount)) return "Rp 0";  // Prevent NaN
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+  }).format(amount);
+};
+
+// Add the selected menu to the reservation with quantity
+const addMenu = () => {
+  if (selectedMenu.value && selectedQuantity.value > 0) {
+    const menuToAdd = products.value.find(menu => menu.id == selectedMenu.value);
+
+    if (menuToAdd) {
+      const existingMenu = reservation.value.menus.find(menu => menu.id === menuToAdd.id);
+
+      if (existingMenu) {
+        // If menu already exists, update the quantity
+        existingMenu.quantity += selectedQuantity.value;
+      } else {
+        // Add new menu with specified quantity
+        reservation.value.menus.push({
+          ...menuToAdd,
+          quantity: selectedQuantity.value  // Use the selected quantity
+        });
+      }
+
+      // Reset the selected menu and quantity
+      selectedMenu.value = null;
+      selectedQuantity.value = 1;
+    }
+  }
+};
+
+// Remove a menu from the selected list
+const removeMenu = (index: number) => {
+  // Remove the menu from the reservation by index
+  reservation.value.menus.splice(index, 1);
+};
+
+// Fetch the menu items on component mount
+onMounted(() => {
+  fetchMenuItems();
 });
 
 const reservationSuccess = ref(false);
@@ -603,6 +726,27 @@ const submitReservation = async () => {
     // Jika berhasil
     reservationSuccess.value = true;
 
+    // Tampilkan ringkasan reservasi
+    const reservationDetails = `
+      <strong>Name:</strong> ${reservation.value.name}<br>
+      <strong>Phone:</strong> ${reservation.value.phone}<br>
+      <strong>Date:</strong> ${reservation.value.date}<br>
+      <strong>Start Time:</strong> ${reservation.value.start_time}<br>
+      <strong>End Time:</strong> ${reservation.value.end_time}<br>
+      <strong>Guests:</strong> ${reservation.value.guests}<br>
+      <strong>Menus:</strong><br>
+      ${reservation.value.menus.map(menu => `${menu.name} (x${menu.quantity}) - Rp ${formatRupiah(menu.price)}`).join('<br>')}
+    `;
+
+    // Tampilkan pesan sukses dengan ringkasan reservasi menggunakan SweetAlert2
+    Swal.fire({
+      title: 'Reservation Successful!',
+      html: reservationDetails, // Menggunakan html untuk menampilkan detail
+      icon: 'success',
+      confirmButtonText: 'OK',
+      confirmButtonColor: '#28a745',
+    });
+
     // Reset form setelah berhasil
     reservation.value = {
       name: '',
@@ -610,17 +754,10 @@ const submitReservation = async () => {
       date: '',
       start_time: '',
       end_time: '',
-      guests: 1
+      guests: 1,
+      menus: [] as SelectedMenu[]
     };
 
-    // Tampilkan pesan sukses menggunakan SweetAlert2
-      Swal.fire({
-        title: 'Reservation Successful!',
-        text: 'Your reservation has been successfully created.',
-        icon: 'success',
-        confirmButtonText: 'OK',
-        confirmButtonColor: '#28a745',
-      });
   } catch (error) {
     // Tangani error jika ada
     if (error.response && error.response.data.status === 'error') {
@@ -694,9 +831,9 @@ onMounted(() => {
   window.addEventListener('mousemove', updateCardPosition);
 });
 
-onBeforeUnmount(() => {
-  window.removeEventListener('mousemove', updateCardPosition);
-});
+
+
+
 </script>
 
 

@@ -176,4 +176,42 @@ class ProductController extends Controller
         return response()->json(['message' => 'Product sold out status updated successfully.', 'product' => $product]);
     }
 
+    public function getMenuForReservation(Request $request)
+{
+    // Optional: validate category or search filters if needed
+    $validator = Validator::make($request->all(), [
+        'search' => 'string|nullable',
+        'category' => 'string|nullable',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'message' => 'Invalid input data',
+            'errors' => $validator->errors(),
+        ], 422);
+    }
+
+    $validated = $validator->validated();
+    $search = $validated['search'] ?? null;
+    $category = $validated['category'] ?? null;
+
+    // Query products based on search and category filters
+    $query = Product::query()
+        ->when($search, function ($q) use ($search) {
+            $q->where('name', 'like', '%' . $search . '%')
+              ->orWhere('description', 'like', '%' . $search . '%');
+        })
+        ->when($category, function ($q) use ($category) {
+            $q->where('category', $category);
+        });
+
+    $products = $query->get();
+
+    // Return products as a JSON response for use in the reservation menu
+    return response()->json([
+        'message' => 'Products retrieved successfully.',
+        'data' => $products,
+    ]);
+}
+
 }
