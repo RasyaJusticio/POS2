@@ -20,6 +20,7 @@ Route::get('/api/reservations/export', [TransactionReportController::class, 'exp
 
 Route::put('/inventori/laporan/{id}', [PembelianController::class, 'updateStatus']);
 Route::get('/products/print', [ProductController::class, 'print']);
+Route::get('products/menu', [ProductController::class, 'getMenuForReservation']);
 Route::get('/inventori/produk/export-excel', [ProductController::class, 'exportExcel']);
 // Route::put('/inventori/laporan/{id}', [PembelianController::class, 'updateStatus']);
 Route::get('/transaction/{id}', [PembelianController::class, 'show']);
