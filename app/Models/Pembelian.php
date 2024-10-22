@@ -18,9 +18,10 @@ class Pembelian extends Model
     protected $fillable = [
         'user_id',
         'total_price',
-        'items' // Tambahkan kolom baru
+        'items', // Tambahkan kolom baru
+        'customer_name', // Tambahkan kolom customer_name
     ];
-
+    
     /**
      * Relationship to the User model
      * A 'pembelian' belongs to a user.

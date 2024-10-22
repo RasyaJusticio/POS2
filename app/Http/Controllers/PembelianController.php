@@ -24,6 +24,7 @@ class PembelianController extends Controller
             'name.*' => 'required|string',
             'product_quantity' => 'required|array', // Validasi kuantitas
             'product_quantity.*' => 'integer|min:1', // Validasi kuantitas harus integer dan lebih dari 0
+            'customer_name' => 'required|string',
         ]);
 
         // Pastikan panjang array products_id dan product_quantity sesuai
