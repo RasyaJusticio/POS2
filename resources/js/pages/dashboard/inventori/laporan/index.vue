@@ -73,46 +73,19 @@ const printTransaction = async () => {
         const response = await axios.post('/inventori/laporan');
         const transactions = response.data.data;
 
-        // Memformat data transaksi
+        // Memformat data transaksi menjadi HTML yang dapat dicetak
         const printContent = `
             <html>
             <head>
                 <title>Laporan Transaksi</title>
                 <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        margin: 20px;
-                    }
-                    h1 {
-                        text-align: center;
-                        color: #0070C0;
-                    }
-                    table {
-                        border-collapse: collapse;
-                        width: 100%;
-                        margin-top: 20px;
-                    }
-                    th, td {
-                        border: 1px solid black;
-                        padding: 10px;
-                        text-align: center;
-                        font-size: 14px;
-                    }
-                    th {
-                        background-color: #0070C0;
-                        color: white;
-                    }
-                    tr:nth-child(even) {
-                        background-color: #f2f2f2;
-                    }
-                    tr:hover {
-                        background-color: #ddd;
-                    }
-                    tfoot {
-                        font-weight: bold;
-                        background-color: #0070C0;
-                        color: white;
-                    }
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    h1 { text-align: center; color: #0070C0; }
+                    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+                    th, td { border: 1px solid black; padding: 10px; text-align: center; font-size: 14px; }
+                    th { background-color: #0070C0; color: white; }
+                    tr:nth-child(even) { background-color: #f2f2f2; }
+                    tfoot { font-weight: bold; background-color: #0070C0; color: white; }
                 </style>
             </head>
             <body>
@@ -122,8 +95,10 @@ const printTransaction = async () => {
                         <tr>
                             <th>No</th>
                             <th>ID Pembelian</th>
-                            <th>Status Pembayaran</th>
+                            <th>Nama</th>
+                            <th>Pesanan</th>
                             <th>Total</th>
+                            <th>Status Pembayaran</th>
                             <th>Tanggal Pesanan</th>
                         </tr>
                     </thead>
@@ -131,15 +106,18 @@ const printTransaction = async () => {
                         ${transactions.map((transaction, index) => `
                             <tr>
                                 <td>${index + 1}</td>
-                                <td>${transaction.pembelian_id}</td>
-                                <td>${transaction.status}</td>
+                                <td>${transaction.id.toString().padStart(3, '0')}</td> <!-- Format ID menjadi 001, 002, dll -->
+                                <td>${transaction.customer_name}</td>
+                                <td>${transaction.items.replace(/\n/g, "<br>")}</td>
                                 <td>${formatRupiah(transaction.total_price)}</td>
+                                <td>${transaction.status}</td>
+                                <td>${formatTanggal(transaction.created_at)}</td>
                             </tr>
                         `).join('')}
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colspan="5">Total Transaksi: ${transactions.length}</td>
+                            <td colspan="7">Total Transaksi: ${transactions.length}</td>
                         </tr>
                     </tfoot>
                 </table>
@@ -147,20 +125,22 @@ const printTransaction = async () => {
             </html>
         `;
 
+        // Membuka jendela baru dan mencetak laporan
         const newWindow = window.open('', '_blank');
         if (newWindow) {
             newWindow.document.write(printContent);
             newWindow.document.close();
+            newWindow.focus();
             newWindow.print();
             newWindow.close();
         } else {
-            console.error("Gagal membuka jendela baru.");
+            console.error("Gagal membuka jendela baru untuk mencetak.");
         }
-
     } catch (error) {
         console.error("Error fetching transactions for printing:", error);
     }
 };
+
 
 
 // Fungsi untuk mengekspor laporan transaksi ke Excel
@@ -173,14 +153,16 @@ const exportTransaction = async () => {
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'DATA TRANSAKSI SIAM   .xlsx');
+        link.setAttribute('download', 'DATA TRANSAKSI SIAM.xlsx');
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     } catch (error) {
-        console.error("Error downloading the Excel file:", error);
+        console.error("Error downloading the Excel file:", error.response ? error.response.data : error.message);
     }
 };
+
+
 
 
 // Mendapatkan data transaksi saat komponen dimuat
@@ -294,13 +276,13 @@ const refresh = () => paginateRef.value.refetch();
   
         <!-- Button for printing the reservations list -->
         <button
-          type="button"
-          class="btn btn-sm btn-secondary ms-auto"
-          @click="printTransaction"
-        >
-          Print
-          <i class="la la-print"></i>
-        </button>
+        type="button"
+        class="btn btn-sm btn-secondary ms-auto"
+        @click="printTransaction"
+      >
+        Print
+        <i class="la la-print"></i>
+      </button>
   
         <!-- Button for exporting the reservations list to Excel -->
         <button

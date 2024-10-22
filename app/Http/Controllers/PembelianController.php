@@ -136,32 +136,34 @@ class PembelianController extends Controller
     }
 
 
-
+    
     public function exportToExcel()
     {
-        return Excel::download(new TransactionReportExport, 'laporan_transaksi.xlsx');
+        return Excel::download(new TransactionReportExport, 'LAPORAN PEMBELIAN SIAM.xlsx');
     }
+    
 
     // Fungsi untuk mencetak laporan transaksi
     
     
     // Fungsi untuk mencetak laporan transaksi
     public function printTransaction(Request $request)
-    {
-        $data = Pembelian::select('id', 'uuid', 'items', 'total_price', 'status', 'created_at')
-            ->when($request->search, function (Builder $query, string $search) {
-                $query->where('uuid', 'like', "%$search%")
-                    ->orWhere('items', 'like', "%$search%")
-                    ->orWhere('total_price', 'like', "%$search%")
-                    ->orWhere('status', 'like', "%$search%")
-                    ->orWhereDate('created_at', '=', $search); // Atur pencarian tanggal sesuai kebutuhan
-            })->get();
-    
-        return response()->json([
-            'success' => true,
-            'data' => $data,
-        ]);
-    }
+{
+    $data = Pembelian::select('id', 'uuid', 'customer_name', 'items', 'total_price', 'status', 'created_at') // Tambahkan kolom 'customer_name' dan 'items'
+        ->when($request->search, function (Builder $query, string $search) {
+            $query->where('uuid', 'like', "%$search%")
+                ->orWhere('items', 'like', "%$search%")
+                ->orWhere('total_price', 'like', "%$search%")
+                ->orWhere('status', 'like', "%$search%")
+                ->orWhereDate('created_at', '=', $search); // Atur pencarian tanggal sesuai kebutuhan
+        })->get();
+
+    return response()->json([
+        'success' => true,
+        'data' => $data,
+    ]);
+}
+
 
     public function generatePDF($uuid)
 {
