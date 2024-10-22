@@ -468,98 +468,110 @@
   <h2 class="Iya">Make a Reservation</h2>
 
   <form @submit.prevent="submitReservation" class="K">
-    <!-- Name -->
-    <div class="J">
-      <label for="name" class="form-label">Name:</label>
-      <input type="text" id="name" v-model="reservation.name" class="form-control" required />
+    <div class="row">
+      <!-- Left Column -->
+      <div class="left-column">
+        <!-- Name -->
+        <div class="J">
+          <label for="name" class="form-label">Name:</label>
+          <input type="text" id="name" v-model="reservation.name" class="form-control" required />
+        </div>
+
+        <!-- Phone -->
+        <div class="J">
+          <label for="phone" class="form-label">Phone:</label>
+          <input type="tel" id="phone" v-model="reservation.phone" class="form-control" required />
+        </div>
+
+        <!-- Date -->
+        <div class="J">
+          <label for="date" class="form-label">Date:</label>
+          <input 
+            type="date" 
+            id="date" 
+            v-model="reservation.date" 
+            class="form-control" 
+            required 
+            @change="fetchTotalReservations" 
+          />
+        </div>
+
+        <div class="time-container">
+          <!-- Start Time -->
+          <div class="Ji">
+            <label for="start-time" class="form-label">Start Time:</label>
+            <input type="time" id="start-time" v-model="reservation.start_time" class="form-control" required />
+          </div>
+
+          <!-- End Time -->
+          <div class="Ji">
+            <label for="end-time" class="form-label">End Time:</label>
+            <input type="time" id="end-time" v-model="reservation.end_time" class="form-control" required />
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div class="right-column">
+        <!-- Guests -->
+        <div class="J">
+          <label for="guests" class="form-label guests">Guests:</label>
+          <input 
+            type="number" 
+            id="guests" 
+            v-model="reservation.guests" 
+            class="form-control" 
+            min="1" 
+            required 
+          />
+        </div>
+
+        <!-- Menu Reservation -->
+        <div class="J">
+          <label for="menu" class="form-label menu">Select Menu:</label>
+          <select2
+            :options="formattedMenuOptions"
+            v-model="selectedMenu"
+            class="form-control"
+            required
+            placeholder="Please select a menu"
+          />
+        </div>
+
+        <div class="input-group mt-2">
+          <input
+            type="number"
+            v-model.number="selectedQuantity"
+            min="1"
+            class="form-control"
+            placeholder="Quantity"
+            style="width: 80px"
+          />
+          <button type="button" @click="addMenu" class="btn btn-secondary">
+            Add Menu
+          </button>
+        </div>
+
+        <!-- Display selected menus and allow quantity input -->
+        <div v-if="reservation.menus.length > 0" class="mt-3">
+          <h4>Selected Menus</h4>
+          <ul class="list-group">
+            <li v-for="(menu, index) in reservation.menus" :key="menu.id" class="list-group-item d-flex justify-content-between align-items-center">
+              <span>
+                {{ menu.name }} - Rp {{ formatRupiah(menu.price) }} x {{ menu.quantity }}
+              </span>
+              <button type="button" @click="removeMenu(index)" class="btn btn-danger btn-sm">
+                Remove
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
 
-    <!-- Phone -->
-    <div class="J">
-      <label for="phone" class="form-label">Phone:</label>
-      <input type="tel" id="phone" v-model="reservation.phone" class="form-control" required />
+    <div class="button-container">
+      <button type="submit" class="P">Reserve</button>
     </div>
-
-    <!-- Date -->
-    <div class="J">
-      <label for="date" class="form-label">Date:</label>
-      <input 
-        type="date" 
-        id="date" 
-        v-model="reservation.date" 
-        class="form-control" 
-        required 
-        @change="fetchTotalReservations" 
-      />
-    </div>
-
-    <!-- Start Time -->
-    <div class="J">
-      <label for="start-time" class="form-label">Start Time:</label>
-      <input type="time" id="start-time" v-model="reservation.start_time" class="form-control" required />
-    </div>
-
-    <!-- End Time -->
-    <div class="J">
-      <label for="end-time" class="form-label">End Time:</label>
-      <input type="time" id="end-time" v-model="reservation.end_time" class="form-control" required />
-    </div>
-
-    <!-- Guests -->
-    <div class="J">
-      <label for="guests" class="form-label">Guests:</label>
-      <input 
-        type="number" 
-        id="guests" 
-        v-model="reservation.guests" 
-        class="form-control" 
-        min="1" 
-        required 
-      />
-    </div>
-
-    <!-- Menu Reservation -->
-<div class="J">
-  <label for="menu" class="form-label">Select Menu:</label>
-  <select2
-    :options="formattedMenuOptions"
-    v-model="selectedMenu"
-    class="form-control"
-    required
-    placeholder="Please select a menu"
-  />
-  <div class="input-group mt-2">
-    <input
-      type="number"
-      v-model.number="selectedQuantity"
-      min="1"
-      class="form-control"
-      placeholder="Quantity"
-      style="width: 80px"
-    />
-    <button type="button" @click="addMenu" class="btn btn-secondary">
-      Add Menu
-    </button>
-  </div>
-</div>
-
-<!-- Display selected menus and allow quantity input -->
-<div v-if="reservation.menus.length > 0" class="mt-3">
-  <h4>Selected Menus</h4>
-  <ul class="list-group">
-    <li v-for="(menu, index) in reservation.menus" :key="menu.id" class="list-group-item d-flex justify-content-between align-items-center">
-      <span>
-        {{ menu.name }} - Rp {{ formatRupiah(menu.price) }} x {{ menu.quantity }}
-      </span>
-      <button type="button" @click="removeMenu(index)" class="btn btn-danger btn-sm">
-        Remove
-      </button>
-    </li>
-  </ul>
-</div>
-
-
-    <button type="submit" class="P">Reserve</button>
   </form>
 
   <div v-if="reservationSuccess" class="L">
@@ -570,6 +582,7 @@
     Reservation limit for this day is {{ maxGuestsPerDay }} guests. You have {{ totalItems }} guests already reserved.
   </div>
 </div>
+
 
 
     </div>
@@ -700,54 +713,190 @@ const checkReservationLimit = () => {
 };
 
 // Fungsi untuk mengirim reservasi ke backend
+const showAlert = (title, html, icon, confirmButtonColor) => {
+  return Swal.fire({
+    title,
+    html,
+    icon,
+    confirmButtonText: 'OK',
+    confirmButtonColor,
+  });
+};
+
 const submitReservation = async () => {
-  // Validasi jika jumlah tamu melebihi batas per hari
+  // Validate if the number of guests exceeds the daily limit
   if (!checkReservationLimit()) {
-    // Tampilkan pesan menggunakan SweetAlert2
-    Swal.fire({
-      title: 'Reservation Limit Exceeded',
-      html: `
+    // Show error message using SweetAlert2
+    await showAlert(
+      'Reservation Limit Exceeded',
+      `
         <p>We are sorry, but the reservation limit for this day has been reached.</p>
         <p>Current guests: <strong>${totalItems.value}</strong></p>
         <p>Available seats: <strong>${maxGuestsPerDay - totalItems.value}</strong></p>
         <p>Please reduce the number of guests or select another day.</p>
       `,
-      icon: 'error',
-      confirmButtonText: 'OK',
-      confirmButtonColor: '#d33',
-    });
+      'error',
+      '#d33'
+    );
     return;
   }
 
   try {
-    // Mengirim POST request untuk membuat reservasi
+    // Send POST request to create reservation
     const response = await axios.post('http://localhost:8000/api/reservations', reservation.value);
 
-    // Jika berhasil
+    // If successful
     reservationSuccess.value = true;
 
-    // Tampilkan ringkasan reservasi
+    // Show reservation summary
     const reservationDetails = `
-      <strong>Name:</strong> ${reservation.value.name}<br>
-      <strong>Phone:</strong> ${reservation.value.phone}<br>
-      <strong>Date:</strong> ${reservation.value.date}<br>
-      <strong>Start Time:</strong> ${reservation.value.start_time}<br>
-      <strong>End Time:</strong> ${reservation.value.end_time}<br>
-      <strong>Guests:</strong> ${reservation.value.guests}<br>
-      <strong>Menus:</strong><br>
-      ${reservation.value.menus.map(menu => `${menu.name} (x${menu.quantity}) - Rp ${formatRupiah(menu.price)}`).join('<br>')}
+      <div style="
+          font-family: 'Poppins', sans-serif; 
+          line-height: 1.6; 
+          display: table; 
+          width: 100%; 
+          border-collapse: collapse; 
+          margin-top: 10px; 
+          background-color: #f9f9f9; 
+          padding: 15px; 
+          border-radius: 8px; 
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        ">
+        <div style="display: table-row;">
+          <div style="
+              display: table-cell; 
+              padding: 10px; 
+              font-weight: 600; 
+              color: #333; 
+              border-bottom: 1px solid #ddd; 
+              width: 30%;
+            ">Name:</div>
+          <div style="
+              display: table-cell; 
+              padding: 10px; 
+              font-weight: 400; 
+              color: #555; 
+              border-bottom: 1px solid #ddd;
+            ">${reservation.value.name}</div>
+        </div>
+        <div style="display: table-row;">
+          <div style="
+              display: table-cell; 
+              padding: 10px; 
+              font-weight: 600; 
+              color: #333; 
+              border-bottom: 1px solid #ddd;
+            ">Phone:</div>
+          <div style="
+              display: table-cell; 
+              padding: 10px; 
+              font-weight: 400; 
+              color: #555; 
+              border-bottom: 1px solid #ddd;
+            ">${reservation.value.phone}</div>
+        </div>
+        <div style="display: table-row;">
+          <div style="
+              display: table-cell; 
+              padding: 10px; 
+              font-weight: 600; 
+              color: #333; 
+              border-bottom: 1px solid #ddd;
+            ">Date:</div>
+          <div style="
+              display: table-cell; 
+              padding: 10px; 
+              font-weight: 400; 
+              color: #555; 
+              border-bottom: 1px solid #ddd;
+            ">${reservation.value.date}</div>
+        </div>
+        <div style="display: table-row;">
+          <div style="
+              display: table-cell; 
+              padding: 10px; 
+              font-weight: 600; 
+              color: #333; 
+              border-bottom: 1px solid #ddd;
+            ">Start:</div>
+          <div style="
+              display: table-cell; 
+              padding: 10px; 
+              font-weight: 400; 
+              color: #555; 
+              border-bottom: 1px solid #ddd;
+            ">${reservation.value.start_time}</div>
+        </div>
+        <div style="display: table-row;">
+          <div style="
+              display: table-cell; 
+              padding: 10px; 
+              font-weight: 600; 
+              color: #333; 
+              border-bottom: 1px solid #ddd;
+            ">End:</div>
+          <div style="
+              display: table-cell; 
+              padding: 10px; 
+              font-weight: 400; 
+              color: #555; 
+              border-bottom: 1px solid #ddd;
+            ">${reservation.value.end_time}</div>
+        </div>
+        <div style="display: table-row;">
+          <div style="
+              display: table-cell; 
+              padding: 10px; 
+              font-weight: 600; 
+              color: #333; 
+              border-bottom: 1px solid #ddd;
+            ">Guests:</div>
+          <div style="
+              display: table-cell; 
+              padding: 10px; 
+              font-weight: 400; 
+              color: #555; 
+              border-bottom: 1px solid #ddd;
+            ">${reservation.value.guests}</div>
+        </div>
+        <div style="display: table-row;">
+          <div style="
+              display: table-cell; 
+              padding: 10px; 
+              font-weight: 600; 
+              color: #333; 
+              border-bottom: 1px solid #ddd;
+            ">Menu:</div>
+          <div style="
+              display: table-cell; 
+              padding: 10px; 
+              font-weight: 400; 
+              color: #555; 
+              border-bottom: 1px solid #ddd;
+            ">
+            ${reservation.value.menus.map(menu => `
+              - ${menu.name} (x${menu.quantity}) - Rp ${formatRupiah(menu.price)}
+            `).join('<br>')}
+          </div>
+        </div>
+      </div>
     `;
 
-    // Tampilkan pesan sukses dengan ringkasan reservasi menggunakan SweetAlert2
-    Swal.fire({
-      title: 'Reservation Successful!',
-      html: reservationDetails, // Menggunakan html untuk menampilkan detail
-      icon: 'success',
-      confirmButtonText: 'OK',
-      confirmButtonColor: '#28a745',
-    });
+    // Show success message with reservation summary using SweetAlert2
+    await showAlert(
+      'Reservation Successful!',
+      `
+        <p style="margin-top: 10px; font-size: 14px; color: #666;">
+          <strong>Reminder:</strong> Please take a screenshot of this reservation and show it to the cashier upon arrival at the restaurant. Thank You :>
+        </p>
+        ${reservationDetails}
+      `,
+      'success',
+      '#28a745'
+    );
 
-    // Reset form setelah berhasil
+
+    // Reset form after successful reservation
     reservation.value = {
       name: '',
       phone: '',
@@ -759,27 +908,29 @@ const submitReservation = async () => {
     };
 
   } catch (error) {
-    // Tangani error jika ada
+    // Handle errors if any
     if (error.response && error.response.data.status === 'error') {
-      Swal.fire({
-        title: 'Error!',
-        text: error.response.data.message, // Menampilkan pesan error dari backend
-        icon: 'error',
-        confirmButtonText: 'OK',
-        confirmButtonColor: '#dc3545',
-      });
+      await showAlert(
+        'Error!',
+        error.response.data.message, // Display error message from backend
+        'error',
+        '#dc3545'
+      );
     } else {
       console.error('Error submitting reservation:', error.response?.data || error);
-      Swal.fire({
-        title: 'Failed to make reservation',
-        text: 'Something went wrong. Please try again.',
-        icon: 'error',
-        confirmButtonText: 'OK',
-        confirmButtonColor: '#dc3545',
-      });
+      await showAlert(
+        'Failed to make reservation',
+        'Something went wrong. Please try again.',
+        'error',
+        '#dc3545'
+      );
     }
   }
 };
+
+
+
+
 
 // Memanggil fungsi untuk mendapatkan total reservasi saat halaman dimuat
 onMounted(() => {
@@ -1424,188 +1575,128 @@ p {
   transform: scale(1.05); /* Efek pembesaran */
 }
 
-/* Container styling */
+
+/* General Container Styling */
 .O {
-  max-width: 600px; /* Maksimal lebar container */
-  margin: 50px auto; /* Memusatkan container */
-  padding: 30px; /* Memberikan padding dalam container */
-  background-color: #fff; /* Latar belakang putih */
-  border-radius: 10px; /* Membulatkan sudut */
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Menambahkan bayangan untuk efek kedalaman */
-  transition: box-shadow 0.3s ease-in-out; /* Efek transisi bayangan */
-  display: flex;
-  flex-direction: column;
+  max-width: 2000px; /* Set maximum width for the form container */
+  margin: 50px auto; /* Center the container horizontally */
+  padding: 30px; /* Inner padding */
+  background-color: #fff; /* White background for the container */
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 }
 
-.O:hover {
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15); /* Mengubah bayangan saat hover */
-}
-
-/* Styling untuk judul */
+/* Title Styling */
 .Iya {
-  text-align: center;
-  font-size: 26px;
-  margin-bottom: 30px;
-  color: #333;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  text-align: center; /* Center the title */
+  font-size: 26px; /* Title font size */
+  margin-bottom: 30px; /* Space below title */
+  color: #333; /* Title color */
+  font-weight: 700; /* Bold title */
+  text-transform: uppercase; /* Uppercase title */
+  letter-spacing: 1px; /* Space between letters */
 }
 
-/* Form container styling */
+/* Form Container Styling */
 .K {
-  display: flex;
-  flex-direction: column;
+  display: flex; /* Flexbox for layout */
+  flex-direction: column; /* Vertical stacking */
 }
 
-/* Styling label dan input secara umum */
+/* Row for Columns */
+.row {
+  display: flex; /* Flexbox for side-by-side columns */
+  justify-content: space-between; /* Space between columns */
+}
+
+/* Column Styling */
+.left-column, .right-column {
+  flex: 1; /* Equal flex for both columns */
+  margin: 0 10px; /* Horizontal margin for spacing */
+}
+
+/* Form Field Styling */
 .J {
-  margin-bottom: 20px;
+  margin-bottom: 20px; /* Space between fields */
 }
 
-.J label {
-  display: block;
-  font-size: 18px;
-  font-weight: 600;
-  color: #555;
-  margin-bottom: 8px;
-  letter-spacing: 0.5px;
+/* Label Styling */
+.form-label {
+  display: block; /* Block display for labels */
+  font-size: 16px; /* Label font size */
+  font-weight: bold; /* Bold labels */
+  color: #444; /* Label color */
+  margin-bottom: 5px; /* Space between label and input */
 }
 
-.J input {
-  width: 100%; /* Lebar penuh untuk semua input */
-  padding: 12px;
-  font-size: 16px;
-  color: #333;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  outline: none;
-  box-sizing: border-box;
-  transition: border-color 0.3s ease-in-out;
+/* Input Styling */
+.form-control {
+  width: 100%; /* Full width inputs */
+  padding: 10px; /* Inner padding */
+  font-size: 15px; /* Font size */
+  color: #222; /* Dark text color */
+  border: 1px solid #bbb; /* Light border */
+  border-radius: 5px; /* Rounded corners */
+  box-sizing: border-box; /* Include padding in width */
+  transition: border-color 0.3s, box-shadow 0.3s; /* Transition effects */
 }
 
-.J input:focus {
-  border-color: #4CAF50;
-  box-shadow: 0 0 8px rgba(72, 192, 85, 0.2);
+.form-control:focus {
+  border-color: #007BFF; /* Blue border on focus */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.2); /* Glow effect */
 }
 
-.J input::placeholder {
-  color: #aaa;
-  font-size: 14px;
+/* Button Styling */
+.button-container {
+  text-align: center; /* Center the button */
+  margin-top: 20px; /* Space above the button */
 }
 
-/* Styling untuk form agar Name dan Phone, Date dan Guests bersebelahan */
-.J .row {
-  display: flex;
-  justify-content: space-between; /* Memisahkan dua kolom */
-  gap: 20px; /* Memberikan jarak antar kolom */
-}
-
-.J .row > div {
-  flex: 1; /* Membuat kolom memiliki lebar yang sama */
-}
-
-.J .row > div input {
-  width: 100%; /* Menjamin input menggunakan lebar penuh dalam kolom */
-}
-
-/* Styling untuk Start Time dan End Time agar bersebelahan */
-.J .time-container {
-  display: flex;
-  justify-content: space-between; /* Menyusun Start Time dan End Time berdampingan */
-  gap: 20px; /* Jarak antar input */
-}
-
-.J .time-container input {
-  width: 48%; /* Setengah lebar untuk masing-masing input */
-}
-
-/* Button styling */
 .P {
-  padding: 14px 20px;
-  background-color: #c8102e;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 18px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease-in-out;
-  width: 100%; /* Lebar penuh untuk tombol */
-  letter-spacing: 1px;
-  box-shadow: 0 4px 8px rgba(0, 128, 0, 0.1);
+  background-color: #007BFF; /* Button background color */
+  color: white; /* Button text color */
+  border: none; /* Remove border */
+  padding: 10px 20px; /* Inner padding */
+  border-radius: 5px; /* Rounded corners */
+  font-size: 16px; /* Font size */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s; /* Transition effect */
 }
 
 .P:hover {
-  background-color: #45a049;
-  transform: translateY(-2px);
+  background-color: #0056b3; /* Darker shade on hover */
 }
 
-.P:active {
-  background-color: #3e8e41;
-  transform: translateY(0);
+/* Selected Menus List Styling */
+.list-group {
+  margin-top: 10px; /* Space above the list */
 }
 
-.P:focus {
-  outline: none;
-  border: 1px solid #4CAF50;
-  box-shadow: 0 0 8px rgba(72, 192, 85, 0.3);
+.list-group-item {
+  display: flex; /* Flex display for list items */
+  justify-content: space-between; /* Space between text and button */
+  padding: 10px; /* Inner padding for list items */
+  border: 1px solid #ddd; /* Border for list items */
+  border-radius: 5px; /* Rounded corners */
 }
 
-/* Styling untuk pesan sukses */
-.L {
-  margin-top: 20px;
-  background-color: #d4edda;
-  color: #155724;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #c3e6cb;
-  text-align: center;
-  font-size: 18px;
-  font-weight: 500;
-  box-shadow: 0 2px 4px rgba(0, 128, 0, 0.2);
+/* Alert Message Styling */
+.alert {
+  padding: 10px; /* Inner padding */
+  margin-top: 20px; /* Space above alert */
+  border-radius: 5px; /* Rounded corners */
 }
 
-/* Responsive styling */
+/* Responsive Styling */
 @media (max-width: 768px) {
-  .O {
-    padding: 25px;
+  .row {
+    flex-direction: column; /* Stack columns on small screens */
   }
 
-  .J input {
-    font-size: 15px;
-    padding: 10px;
-  }
-
-  .P {
-    font-size: 16px;
-    padding: 12px;
-  }
-
-  .J .row, .J .time-container {
-    flex-direction: column; /* Menyusun kolom secara vertikal di layar kecil */
-  }
-
-  .J .row > div {
-    width: 100%; /* Full width untuk masing-masing kolom */
-    margin-bottom: 10px;
+  .left-column, .right-column {
+    margin: 0; /* Remove margin for full width */
+    width: 100%; /* Full width in small screens */
   }
 }
-
-@media (max-width: 480px) {
-  .O {
-    padding: 20px;
-  }
-
-  .J input {
-    font-size: 14px;
-    padding: 8px;
-  }
-
-  .P {
-    font-size: 14px;
-    padding: 10px;
-  }
-}
-
 
 </style>
