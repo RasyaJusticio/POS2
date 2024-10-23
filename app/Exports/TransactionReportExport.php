@@ -20,7 +20,7 @@ class TransactionReportExport implements FromCollection, WithHeadings, WithStyle
      */
     public function collection()
     {
-        return Pembelian::select('id', 'uuid', 'items', 'total_price', 'status', 'created_at')->get();
+        return Pembelian::select('id', 'uuid', 'customer_name', 'items', 'total_price', 'status', 'created_at')->get();
     }
 
     /**
@@ -29,7 +29,7 @@ class TransactionReportExport implements FromCollection, WithHeadings, WithStyle
     public function headings(): array
     {
         return [
-            'No', 'ID Pembelian', 'Pesanan', 'Total', 'Status Pembayaran', 'Tanggal Pesanan'
+            'No', 'ID Pembelian', 'Nama', 'Pesanan', 'Total', 'Status Pembayaran', 'Tanggal Pesanan'
         ];
     }
 

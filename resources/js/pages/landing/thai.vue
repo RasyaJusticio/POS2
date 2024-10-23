@@ -63,7 +63,7 @@
   <!-- Shopping Cart -->
   <aside v-if="isCartVisible" class="pos-cart">
     <button class="close-cart" @click="closeCart">x</button>
-    <h2 class="cart-title">Shopping Cart</h2>
+    <h2 class="cart-title">Shopping Cart</h2>=
     <div class="customer-name-container">
       <label for="customerName">Nama</label>
       <input type="text" v-model="customerName" id="customerName" placeholder="masukkan nama anda" />

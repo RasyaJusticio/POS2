@@ -163,8 +163,9 @@ class PembelianController extends Controller
     {
         $data = Pembelian::select('id', 'uuid', 'items', 'total_price', 'status', 'created_at')
             ->when($request->search, function (Builder $query, string $search) {
-                $query->where('uuid', 'like', "%$search%")
-                    ->orWhere('items', 'like', "%$search%")
+                $query->where('uuid', 'like', value: "%$search%")
+                    ->orWhere('customer_name', 'like', value: "%$search%")
+                    ->orWhere('items', 'like', value: "%$search%")
                     ->orWhere('total_price', 'like', "%$search%")
                     ->orWhere('status', 'like', "%$search%")
                     ->orWhereDate('created_at', '=', $search); // Atur pencarian tanggal sesuai kebutuhan
