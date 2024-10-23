@@ -215,9 +215,18 @@ const filteredItems = computed(() => {
 
 
 function submit(items: any) {
+  if (!customerName.value) {
+    Swal.fire({
+      title: 'Nama Pelanggan Harus Diisi!',
+      text: 'Silakan masukkan nama pelanggan sebelum melanjutkan.',
+      icon: 'error',
+      confirmButtonText: 'OK',
+    });
+    return; // Jika nama kosong, hentikan proses submit
+  }
+
   const formDataToSubmit = new FormData();
   formDataToSubmit.append('total_price', valueTotal.value);
-  formDataToSubmit.append('customer_name', customerName.value);
   items.map((item) => {
     formDataToSubmit.append('products_id[]', item.id);
     formDataToSubmit.append('product_price[]', item.price);
@@ -296,7 +305,7 @@ const addToCart = (item) => {
   }
 };
 
-// Remove item from cart
+// Remove item from car
 const removeFromCart = (cartItem) => {
   cart.value = cart.value.filter(item => item.id !== cartItem.id);
 };
@@ -496,7 +505,7 @@ const closeCart = () => {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  font-size: 1rem;
+  font-size: ;
 }
 
 .cart-list {

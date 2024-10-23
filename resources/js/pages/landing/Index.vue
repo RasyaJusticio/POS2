@@ -533,11 +533,11 @@
             :options="formattedMenuOptions"
             v-model="selectedMenu"
             class="form-control"
-            required
             placeholder="Please select a menu"
           />
         </div>
 
+        <!-- Input for quantity and add menu button -->
         <div class="input-group mt-2">
           <input
             type="number"
@@ -566,6 +566,13 @@
             </li>
           </ul>
         </div>
+
+        <!-- Display error message if no menus have been added -->
+        <div v-if="showMenuError" class="text-danger mt-2">
+          Please add at least one menu before submitting the reservation.
+        </div>
+
+
       </div>
     </div>
 
@@ -596,6 +603,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 // Define types for Product and SelectedMenu
 interface Product {
@@ -609,6 +617,7 @@ interface SelectedMenu extends Product {
 }
 
 // State for selected menu and quantity
+const showMenuError = ref(false); // Untuk menampilkan error jika menu belum dipilih
 const selectedMenu = ref<Product | null>(null);
 const selectedQuantity = ref<number>(1);  // Track quantity of the selected menu
 
@@ -724,6 +733,31 @@ const showAlert = (title, html, icon, confirmButtonColor) => {
 };
 
 const submitReservation = async () => {
+  // Validasi apakah nama dan telepon telah diisi
+  if (!reservation.value.name || !reservation.value.phone) {
+    await Swal.fire({
+      title: 'Incomplete Information',
+      text: 'Please fill in both your name and phone number before submitting the reservation.',
+      icon: 'warning',
+      confirmButtonText: 'OK',
+      confirmButtonColor: '#d33',
+    });
+    return; // Hentikan fungsi jika validasi gagal
+  }
+
+  // Validasi apakah minimal satu menu telah dipilih
+  if (reservation.value.menus.length === 0) {
+    await Swal.fire({
+      title: 'Cant Reserved Because No One Menu Selected',
+      text: 'Please add at least one menu to your reservation before submitting.',
+      icon: 'info',
+      confirmButtonText: 'OK',
+      confirmButtonColor: '#d33',
+    });
+    return; // Hentikan fungsi jika validasi gagal
+  }
+
+
   // Validate if the number of guests exceeds the daily limit
   if (!checkReservationLimit()) {
     // Show error message using SweetAlert2
