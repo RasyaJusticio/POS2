@@ -305,7 +305,7 @@ const addToCart = (item) => {
   }
 };
 
-// Remove item from cart
+// Remove item from car
 const removeFromCart = (cartItem) => {
   cart.value = cart.value.filter(item => item.id !== cartItem.id);
 };
@@ -505,7 +505,7 @@ const closeCart = () => {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  font-size: 1rem;
+  font-size: ;
 }
 
 .cart-list {

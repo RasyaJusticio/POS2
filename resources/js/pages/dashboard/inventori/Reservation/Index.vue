@@ -26,7 +26,6 @@
 
     <!-- Filter, Sort and Total section -->
     <div class="card-body">
-      <!-- Hanya bagian ini yang diubah untuk menggunakan datepicker -->
       <div class="row">
         <div class="col-md-4 mb-4">
           <label class="form-label fw-bold fs-6 required">
@@ -41,11 +40,12 @@
           <Datepicker v-model="endDate" class="form-control" />
         </div>
         <div class="col-md-4 mb-4 d-flex align-items-end">
-          <button class="btn btn-primary" @click="filterByDate">
+          <button class="btn btn-primary" type="button" @click="filterByDate">
             Filter
           </button>
         </div>
       </div>
+
 
       <!-- Sort by Date -->
       <div class="col-md-4">

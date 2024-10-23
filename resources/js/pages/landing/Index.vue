@@ -466,6 +466,7 @@
       
         <div class="O">
   <h2 class="Iya">Make a Reservation</h2>
+
   <form @submit.prevent="submitReservation" class="K">
     <div class="row">
       <!-- Left Column -->
@@ -492,7 +493,8 @@
           @change="fetchTotalReservations" 
           class="form-control" 
         />
-      </div>
+        </div>
+
         <div class="time-container">
           <!-- Start Time -->
           <div class="Ji">
@@ -530,11 +532,11 @@
             :options="formattedMenuOptions"
             v-model="selectedMenu"
             class="form-control"
-            required
             placeholder="Please select a menu"
           />
         </div>
 
+        <!-- Input for quantity and add menu button -->
         <div class="input-group mt-2">
           <input
             type="number"
@@ -548,14 +550,35 @@
             Add Menu
           </button>
         </div>
+
+        <!-- Display selected menus and allow quantity input -->
+        <div v-if="reservation.menus.length > 0" class="mt-3">
+          <h4>Selected Menus</h4>
+          <ul class="list-group">
+            <li v-for="(menu, index) in reservation.menus" :key="menu.id" class="list-group-item d-flex justify-content-between align-items-center">
+              <span>
+                {{ menu.name }} - Rp {{ formatRupiah(menu.price) }} x {{ menu.quantity }}
+              </span>
+              <button type="button" @click="removeMenu(index)" class="btn btn-danger btn-sm">
+                Remove
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Display error message if no menus have been added -->
+        <div v-if="showMenuError" class="text-danger mt-2">
+          Please add at least one menu before submitting the reservation.
+        </div>
+
+
       </div>
     </div>
-    <button type="submit" class="P">Reserve</button>
-  </form>
 
-  <div v-if="reservationSuccess" class="L">
-    <!-- Success message -->
-  </div>
+    <div class="button-container">
+      <button type="submit" class="P">Reserve</button>
+    </div>
+  </form>
 
   <div v-if="reservationSuccess" class="L">
     Reservation made successfully!
@@ -579,7 +602,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
-import Datepicker from 'vue3-datepicker';
+import Swal from 'sweetalert2';
+import Datepicker from "vue3-datepicker"; // Import vue3-datepicker
 
 
 // Define types for Product and SelectedMenu
@@ -594,6 +618,7 @@ interface SelectedMenu extends Product {
 }
 
 // State for selected menu and quantity
+const showMenuError = ref(false); // Untuk menampilkan error jika menu belum dipilih
 const selectedMenu = ref<Product | null>(null);
 const selectedQuantity = ref<number>(1);  // Track quantity of the selected menu
 
@@ -709,6 +734,31 @@ const showAlert = (title, html, icon, confirmButtonColor) => {
 };
 
 const submitReservation = async () => {
+  // Validasi apakah nama dan telepon telah diisi
+  if (!reservation.value.name || !reservation.value.phone) {
+    await Swal.fire({
+      title: 'Incomplete Information',
+      text: 'Please fill in both your name and phone number before submitting the reservation.',
+      icon: 'warning',
+      confirmButtonText: 'OK',
+      confirmButtonColor: '#d33',
+    });
+    return; // Hentikan fungsi jika validasi gagal
+  }
+
+  // Validasi apakah minimal satu menu telah dipilih
+  if (reservation.value.menus.length === 0) {
+    await Swal.fire({
+      title: 'Cant Reserved Because No One Menu Selected',
+      text: 'Please add at least one menu to your reservation before submitting.',
+      icon: 'info',
+      confirmButtonText: 'OK',
+      confirmButtonColor: '#d33',
+    });
+    return; // Hentikan fungsi jika validasi gagal
+  }
+
+
   // Validate if the number of guests exceeds the daily limit
   if (!checkReservationLimit()) {
     // Show error message using SweetAlert2
@@ -914,7 +964,13 @@ const submitReservation = async () => {
 };
 
 
-
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Menambahkan 1 karena bulan dimulai dari 0
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`; // Format YYYY-MM-DD
+};
 
 
 // Memanggil fungsi untuk mendapatkan total reservasi saat halaman dimuat
@@ -1664,6 +1720,8 @@ p {
   border: 1px solid #ddd; /* Border for list items */
   border-radius: 5px; /* Rounded corners */
 }
+
+
 
 /* Alert Message Styling */
 .alert {
