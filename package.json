@@ -6,7 +6,7 @@
         "build": "vite build"
     },
     "dependencies": {
-        "@ckeditor/ckeditor5-build-classic": "^40.2.0",
+        "@ckeditor/ckeditor5-build-classic": "^43.2.0",
         "@ckeditor/ckeditor5-vue": "^5.1.0",
         "@fortawesome/fontawesome-free": "^6.1.2",
         "@fullcalendar/core": "^6.1.8",

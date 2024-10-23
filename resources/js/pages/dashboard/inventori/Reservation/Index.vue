@@ -121,7 +121,7 @@
             <td>{{ reservation.id }}</td>
             <td>{{ reservation.name }}</td>
             <td>{{ reservation.phone }}</td>
-            <td>{{ reservation.date }}</td>
+            <td>{{ formatDate(reservation.date) }}</td>
             <td>{{ reservation.start_time }}</td>
             <td>{{ reservation.end_time }}</td>
             <td>{{ reservation.guests }}</td>
@@ -147,6 +147,15 @@ const sortOrder = ref('asc'); // Sorting order
 const sortStatus = ref(''); 
 const totalReservations = ref(0);
 const totalGuests = ref(0);
+
+
+// Function to format the date to 'DD Month YYYY'
+const formatDate = (dateString: string) => {
+  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+  const date = new Date(dateString);
+  return date.toLocaleDateString('id-ID', options); // Using 'id-ID' for Indonesian format
+};
+
 
 // Fetch reservations only once when the component mounts
 const fetchReservations = async () => {
@@ -239,6 +248,13 @@ const printReservations = () => {
     return;
   }
 
+  // Fungsi untuk memformat tanggal dari 'YYYY-MM-DD' ke 'DD MMMM YYYY'
+  const formatDate = (dateStr) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const dateObj = new Date(dateStr);
+    return dateObj.toLocaleDateString('id-ID', options); // Format sesuai dengan lokal 'id-ID'
+  };
+
   // Path ke gambar logo, pastikan logo bisa diakses
   const logoPath = "{{ asset('media/avatars/spice.png') }}";
 
@@ -278,32 +294,38 @@ const printReservations = () => {
     </div>
 
     <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Name</th>
-          <th>Phone</th>
-          <th>Date</th>
-          <th>Start Time</th>
-          <th>End Time</th>
-          <th>Guests</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${filteredReservations.value.map(reservation => `
-          <tr>
-            <td>${reservation.id}</td>
-            <td>${reservation.name}</td>
-            <td>${reservation.phone}</td>
-            <td>${reservation.date}</td>
-            <td>${reservation.start_time}</td>
-            <td>${reservation.end_time}</td>
-            <td>${reservation.guests}</td>
-            <td>${getReservationStatus(reservation)}</td>
-          </tr>
-        `).join('')}
-      </tbody>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Date</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Guests</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${filteredReservations.value.map(reservation => `
+                <tr>
+                    <td>${reservation.id}</td>
+                    <td>${reservation.name}</td>
+                    <td>${reservation.phone}</td>
+                    <td>${formatDate(reservation.date)}</td> <!-- Format tanggal di sini -->
+                    <td>${reservation.start_time}</td>
+                    <td>${reservation.end_time}</td>
+                    <td>${reservation.guests}</td>
+                    <td>${getReservationStatus(reservation)}</td>
+                </tr>
+            `).join('')}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="5" style="text-align: left;">Total Reservations: ${totalReservations.value}</td>
+                <td colspan="3" style="text-align: left;">Total Guests: ${totalGuests.value}</td>
+            </tr>
+        </tfoot>
     </table>
   `;
 
@@ -315,8 +337,29 @@ const printReservations = () => {
   printWindow?.close();
 };
 
-const exportReservations = () => {
-  console.log("Export to Excel");
+
+
+
+
+// Function to export reservations to Excel (dummy function)
+const exportReservations = async () => {
+  try {
+    const response = await axios({
+      url: 'http://localhost:8000/api/reservations/export', // API endpoint
+      method: 'GET',
+      responseType: 'blob' // Penting untuk men-download file
+    });
+
+    // Buat URL sementara untuk file
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'DATA RESERVASI SIAM.xlsx'); // Nama file yang di-download
+    document.body.appendChild(link);
+    link.click(); // Klik otomatis untuk men-download
+  } catch (error) {
+    console.error('Error exporting reservations:', error);
+  }
 };
 
 // When the component mounts, fetch reservations
