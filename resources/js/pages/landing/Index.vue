@@ -567,6 +567,11 @@
           </ul>
         </div>
 
+        <div>
+      <strong>Total Price: {{ formatRupiah(totalPrice) }}</strong>
+    </div>
+
+
         <!-- Display error message if no menus have been added -->
         <div v-if="showMenuError" class="text-danger mt-2">
           Please add at least one menu before submitting the reservation.
@@ -604,6 +609,7 @@
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+
 
 // Define types for Product and SelectedMenu
 interface Product {
@@ -687,6 +693,14 @@ const addMenu = () => {
     }
   }
 };
+
+
+// Computed property for total price
+const totalPrice = computed(() => {
+  return reservation.value.menus.reduce((total, menu) => {
+    return total + (menu.price * menu.quantity);
+  }, 0);
+});
 
 // Remove a menu from the selected list
 const removeMenu = (index: number) => {
@@ -1026,6 +1040,11 @@ onMounted(() => {
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
+.total-price {
+  margin-top: 20px;
+  font-size: 1.2em;
+  text-align: center;
+}
 
 .hero-banner video {
   width: 100%;
