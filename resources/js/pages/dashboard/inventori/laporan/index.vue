@@ -10,22 +10,40 @@ const column = createColumnHelper<Pembelian>();
 const paginateRef = ref<any>(null);
 const transactions = ref<Pembelian[]>([]); // Menyimpan data transaksi
 const selectedTransaction = ref<Pembelian | null>(null);
+const selectedDate = ref<string>('');
 
 const startDate = ref<string>('');
 const endDate = ref<string>('');
+// Fungsi filter transaksi berdasarkan tanggal yang dipilih
+
+const checkNameBeforeSubmit = () => {
+    if (!selectedTransaction.value?.customer_name) {
+        alert("Nama pembeli tidak boleh kosong. Silakan isi nama sebelum melanjutkan.");
+        return false; // Menghentikan proses jika nama kosong
+    }
+    return true; // Lanjutkan jika nama sudah terisi
+};
+
 
 const filterByDate = async () => {
+    if (!selectedDate.value) {
+        transactions.value = []; // Kosongkan data jika tidak ada tanggal dipilih
+        return;
+    }
+
     try {
         const response = await axios.post('/inventori/laporan', {
-            start_date: startdate.value,
-            end_date: endDate.value,
+            date: selectedDate.value, // Kirimkan tanggal yang dipilih ke server
         });
-        transactions.value = response .data;
-        paginateRef.value.refetch();
+        transactions.value = response.data; // Update data transaksi berdasarkan respons
     } catch (error) {
         console.error('Error fetching transactions', error);
+        transactions.value = []; // Kosongkan data jika ada error
     }
 };
+
+// Panggil filterByDate ketika komponen dimuat untuk mendapatkan data awal (opsional)
+filterByDate();
 
 const { delete: deletePembelian } = useDelete({
     onSuccess: () => paginateRef.value.refetch(),
@@ -282,19 +300,18 @@ const refresh = () => paginateRef.value.refetch();
       </div>
   
       <div class="card-body">
-        <!-- Filter by Date -->
         <div class="col-md-4 mb-4">
-          <label class="form-label fw-bold fs-6 required" for="reservation-date">
-            <i class="la la-calendar"></i> Filter by Date
-          </label>
-          <input
-            type="date"
-            id="reservation-date"
-            v-model="selectedDate"
-            @change="filterByDate"
-            class="form-control form-control-lg form-control-solid"
-          />
-        </div>
+        <label class="form-label fw-bold fs-6 required" for="reservation-date">
+          <i class="la la-calendar"></i> Pilih Tanggal
+        </label>
+        <input
+          type="date"
+          id="reservation-date"
+          v-model="selectedDate"
+          @change="filterByDate"
+          class="form-control form-control-lg form-control-solid"
+        />
+      </div>
   
         <paginate
           ref="paginateRef"

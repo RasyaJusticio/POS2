@@ -110,6 +110,8 @@
             <th>Start Time</th>
             <th>End Time</th>
             <th>Guests</th>
+            <th>Orders</th>
+            <th>Total</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -122,6 +124,16 @@
             <td>{{ reservation.start_time }}</td>
             <td>{{ reservation.end_time }}</td>
             <td>{{ reservation.guests }}</td>
+            <td>
+                <div>
+                    <ul class="list-unstyled">
+                        <li v-for="(item, index) in reservation.menus.split('\n')" :key="index" class="mb-2">
+                            {{ item }}
+                        </li>
+                    </ul>
+                </div>
+            </td>
+            <td>{{ formatRupiah(reservation.total_price) }}</td>
             <td>{{ getReservationStatus(reservation) }}</td>
           </tr>
         </tbody>

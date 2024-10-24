@@ -113,12 +113,25 @@ class PembelianController extends Controller
     }
 
     public function index(Request $request)
-    {
-        // Ambil semua pembelian
-        $pembelians = Pembelian::paginate(10);
+{
+    // Inisialisasi query untuk mendapatkan pembelian
+    $query = Pembelian::query();
 
-        return response()->json($pembelians);
+    // Cek apakah ada input tanggal
+    if ($request->has('date') && $request->input('date')) {
+        // Jika ada tanggal, filter berdasarkan tanggal tersebut
+        $query->whereDate('created_at', $request->input('date'));
     }
+
+    // Urutkan berdasarkan tanggal terbaru
+    $query->orderBy('created_at', 'desc');
+
+    // Ambil data pembelian dengan pagination sebelum menjadi Collection
+    $pembelians = $query->paginate(10);
+
+    return response()->json($pembelians);
+}
+
 
     public function destroy($id)
     {
@@ -151,8 +164,9 @@ class PembelianController extends Controller
 {
     $data = Pembelian::select('id', 'uuid', 'customer_name', 'items', 'total_price', 'status', 'created_at') // Tambahkan kolom 'customer_name' dan 'items'
         ->when($request->search, function (Builder $query, string $search) {
-            $query->where('uuid', 'like', "%$search%")
-                ->orWhere('items', 'like', "%$search%")
+            $query->where('uuid', 'like', value: "%$search%")
+                ->orWhere('customer_name', 'like', value: "%$search%")
+                ->orWhere('items', 'like', value: "%$search%")
                 ->orWhere('total_price', 'like', "%$search%")
                 ->orWhere('status', 'like', "%$search%")
                 ->orWhereDate('created_at', '=', $search); // Atur pencarian tanggal sesuai kebutuhan

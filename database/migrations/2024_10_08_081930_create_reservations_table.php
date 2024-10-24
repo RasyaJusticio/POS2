@@ -16,6 +16,8 @@ class CreateReservationsTable extends Migration
             $table->time('start_time');
             $table->time('end_time');
             $table->integer('guests');
+            $table->string('menus');
+            $table->integer('total_price');
             $table->timestamps();
         });
     }
