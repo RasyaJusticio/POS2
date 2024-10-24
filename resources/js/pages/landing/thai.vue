@@ -66,7 +66,7 @@
     <h2 class="cart-title">Shopping Cart</h2>
     <div class="customer-name-container">
       <label for="customerName">Nama</label>
-      <input type="text" v-model="customerName" id="customerName" placeholder="masukkan nama anda" />
+      <input type="text" v-model="customerName" id="customerName" placeholder="Masukkan Nama Anda" />
     </div>
     <ul class="cart-list">
       <li v-for="cartItem in cart" :key="cartItem.id" class="cart-item">
@@ -217,8 +217,8 @@ const filteredItems = computed(() => {
 function submit(items: any) {
   if (!customerName.value) {
     Swal.fire({
-      title: 'Nama Pelanggan Harus Diisi!',
-      text: 'Silakan masukkan nama pelanggan sebelum melanjutkan.',
+      title: 'Nama Harus Diisi!',
+      text: 'Silakan masukkan nama sebelum melanjutkan.',
       icon: 'error',
       confirmButtonText: 'OK',
     });
@@ -227,6 +227,7 @@ function submit(items: any) {
 
   const formDataToSubmit = new FormData();
   formDataToSubmit.append('total_price', valueTotal.value);
+  formDataToSubmit.append('customer_name', valueTotal.value);
   items.map((item) => {
     formDataToSubmit.append('products_id[]', item.id);
     formDataToSubmit.append('product_price[]', item.price);
@@ -241,7 +242,7 @@ function submit(items: any) {
     headers: {
       "Content-Type": "multipart/form-data",
     },
-  })
+  })   
     .then((data) => {
       pembelian.value = data.data.Pembelian;
       console.log(pembelian.value);
