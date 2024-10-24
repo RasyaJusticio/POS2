@@ -110,6 +110,8 @@
             <th>Start Time</th>
             <th>End Time</th>
             <th>Guests</th>
+            <th>Orders</th>
+            <th>Total</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -122,6 +124,16 @@
             <td>{{ reservation.start_time }}</td>
             <td>{{ reservation.end_time }}</td>
             <td>{{ reservation.guests }}</td>
+            <td>
+                <div>
+                    <ul class="list-unstyled">
+                        <li v-for="(item, index) in reservation.menus.split('\n')" :key="index" class="mb-2">
+                            {{ item }}
+                        </li>
+                    </ul>
+                </div>
+            </td>
+            <td>{{ formatRupiah(reservation.total_price) }}</td>
             <td>{{ getReservationStatus(reservation) }}</td>
           </tr>
         </tbody>
@@ -143,6 +155,14 @@ const sortStatus = ref('');
 const totalReservations = ref(0);
 const totalGuests = ref(0);
 
+//format penomoran rupiah
+const formatRupiah = (amount: number) => {
+  if (isNaN(amount)) return "Rp 0";  // Prevent NaN
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+  }).format(amount);
+};
 
 // Function to format the date to 'DD Month YYYY'
 const formatDate = (dateString: string) => {
@@ -318,6 +338,8 @@ const printReservations = () => {
                 <th>Start Time</th>
                 <th>End Time</th>
                 <th>Guests</th>
+                <th>Orders</th>
+                <th>Total</th>
                 <th>Status</th>
             </tr>
         </thead>
@@ -331,6 +353,8 @@ const printReservations = () => {
                     <td>${reservation.start_time}</td>
                     <td>${reservation.end_time}</td>
                     <td>${reservation.guests}</td>
+                    <td>${reservation.menus}</td>
+                    <td>${reservation.total_price}</td>
                     <td>${getReservationStatus(reservation)}</td>
                 </tr>
             `).join('')}

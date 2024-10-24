@@ -20,7 +20,8 @@ class Reservation extends Model
         'start_time',
         'end_time',
         'guests',
-        'menus'
+        'menus',
+        'total_price'
     ];
 
     // Tentukan kolom yang akan diubah menjadi format timestamp otomatis

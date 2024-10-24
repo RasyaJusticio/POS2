@@ -32,6 +32,7 @@ public function store(Request $request)
         'menus' => 'required|array',  // Memastikan menus adalah array
         'menus.*.id' => 'required|integer|exists:products,id',  // Validasi ID menu
         'menus.*.quantity' => 'required|integer|min:1',  // Kuantitas menu harus berupa integer
+        'total_price' => 'required|integer',
     ]);
 
     if ($validator->fails()) {
@@ -82,6 +83,7 @@ public function store(Request $request)
         'end_time' => $request->end_time,
         'guests' => $request->guests,
         'menus' => $orderedMenus,  // Simpan menu yang dipesan dalam bentuk string
+        'total_price' => $request->total_price,
     ]);
 
     return response()->json([

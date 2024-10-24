@@ -227,6 +227,7 @@ function submit(items: any) {
 
   const formDataToSubmit = new FormData();
   formDataToSubmit.append('total_price', valueTotal.value);
+  formDataToSubmit.append('customer_name', customerName.value);
   items.map((item) => {
     formDataToSubmit.append('products_id[]', item.id);
     formDataToSubmit.append('product_price[]', item.price);
