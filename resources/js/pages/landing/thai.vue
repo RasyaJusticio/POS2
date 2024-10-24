@@ -215,18 +215,9 @@ const filteredItems = computed(() => {
 
 
 function submit(items: any) {
-  if (!customerName.value) {
-    Swal.fire({
-      title: 'Nama Pelanggan Harus Diisi!',
-      text: 'Silakan masukkan nama pelanggan sebelum melanjutkan.',
-      icon: 'error',
-      confirmButtonText: 'OK',
-    });
-    return; // Jika nama kosong, hentikan proses submit
-  }
-
   const formDataToSubmit = new FormData();
   formDataToSubmit.append('total_price', valueTotal.value);
+  formDataToSubmit.append('customer_name', customerName.value);
   items.map((item) => {
     formDataToSubmit.append('products_id[]', item.id);
     formDataToSubmit.append('product_price[]', item.price);
@@ -263,9 +254,9 @@ function submit(items: any) {
     })
     .catch((err: any) => {
       Swal.fire({
-        title: 'Error!',
-        text: err.response.data.message,
-        icon: 'error',
+        title: 'Cant Checkout Because Name Field Dont Fillable!',
+        text: 'Please Fill Your Name Before Checkout',
+        icon: 'info',
         confirmButtonText: 'OK',
       });
     });
