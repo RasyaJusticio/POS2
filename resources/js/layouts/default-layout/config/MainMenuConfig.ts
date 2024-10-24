@@ -75,7 +75,7 @@ const MainMenuConfig: Array<MenuItem> = [
                 sectionTitle: "Inventori",
                 route: "/inventori",
                 name: "inventori",
-                keenthemesIcon: "cube-2",
+                keenthemesIcon: "basket",
                 sub: [
                     {
                         heading: "Produk",

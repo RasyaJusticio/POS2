@@ -485,15 +485,14 @@
 
         <!-- Date -->
         <div class="J">
-          <label for="date" class="form-label">Date:</label>
-          <input 
-            type="date" 
-            id="date" 
-            v-model="reservation.date" 
-            class="form-control" 
-            required 
-            @change="fetchTotalReservations" 
-          />
+        <label for="date" class="form-label">Date:</label>
+        <Datepicker 
+          v-model="reservation.date" 
+          format="dd/MM/yyyy" 
+          required 
+          @change="fetchTotalReservations" 
+          class="form-control" 
+        />
         </div>
 
         <div class="time-container">
@@ -567,11 +566,6 @@
           </ul>
         </div>
 
-        <div>
-      <strong>Total Price: {{ formatRupiah(totalPrice) }}</strong>
-    </div>
-
-
         <!-- Display error message if no menus have been added -->
         <div v-if="showMenuError" class="text-danger mt-2">
           Please add at least one menu before submitting the reservation.
@@ -609,6 +603,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import Datepicker from "vue3-datepicker"; // Import vue3-datepicker
 
 
 // Define types for Product and SelectedMenu
@@ -984,7 +979,13 @@ const submitReservation = async () => {
 };
 
 
-
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Menambahkan 1 karena bulan dimulai dari 0
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`; // Format YYYY-MM-DD
+};
 
 
 // Memanggil fungsi untuk mendapatkan total reservasi saat halaman dimuat
@@ -1047,11 +1048,6 @@ onMounted(() => {
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
-.total-price {
-  margin-top: 20px;
-  font-size: 1.2em;
-  text-align: center;
-}
 
 .hero-banner video {
   width: 100%;
@@ -1739,6 +1735,8 @@ p {
   border: 1px solid #ddd; /* Border for list items */
   border-radius: 5px; /* Rounded corners */
 }
+
+
 
 /* Alert Message Styling */
 .alert {
