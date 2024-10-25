@@ -5,6 +5,7 @@ import { createColumnHelper } from "@tanstack/vue-table";
 import type { Pembelian } from "@/types/laporan"; // Ganti dengan path yang sesuai
 import axios from "@/libs/axios";
 import { formatRupiah } from "@/libs/utilss";
+import { jsPDF } from "jspdf"; // Import jsPDF
 
 const column = createColumnHelper<Pembelian>();
 const paginateRef = ref<any>(null);
@@ -74,7 +75,7 @@ const printTransaction = async () => {
         const transactions = response.data.data;
 
         // Memformat data transaksi menjadi HTML yang dapat dicetak
-        const printContent = `
+        const printContent =`
             <html>
             <head>
                 <title>Laporan Transaksi</title>
@@ -103,7 +104,7 @@ const printTransaction = async () => {
                         </tr>
                     </thead>
                     <tbody>
-                        ${transactions.map((transaction, index) => `
+                        ${transactions.map((transaction, index) =>`
                             <tr>
                                 <td>${index + 1}</td>
                                 <td>${transaction.id.toString().padStart(3, '0')}</td> <!-- Format ID menjadi 001, 002, dll -->
@@ -124,8 +125,6 @@ const printTransaction = async () => {
             </body>
             </html>
         `;
-
-        // Membuka jendela baru dan mencetak laporan
         const newWindow = window.open('', '_blank');
         if (newWindow) {
             newWindow.document.write(printContent);
@@ -465,5 +464,3 @@ const refresh = () => paginateRef.value.refetch();
     }
   }
   </style>
-
-  

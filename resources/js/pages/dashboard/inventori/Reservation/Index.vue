@@ -26,70 +26,73 @@
 
     <!-- Filter, Sort and Total section -->
     <div class="card-body">
-      <div class="row align-items-center mb-4">
-        <!-- Filter by Date -->
-        <div class="col-md-4">
-          <div class="fv-row">
-            <label class="form-label fw-bold fs-6 required" for="reservation-date">
-              <i class="la la-calendar"></i> Filter by Date
-            </label>
-            <input
-              type="date"
-              id="reservation-date"
-              v-model="selectedDate"
-              @change="filterByDate"
-              class="form-control form-control-lg form-control-solid"
-            />
-          </div>
+      <div class="row">
+        <div class="col-md-4 mb-4">
+          <label class="form-label fw-bold fs-6 required">
+            <i class="la la-calendar"></i> Filter By Date (Start)
+          </label>
+          <Datepicker v-model="startDate" class="form-control" />
         </div>
-
-        <!-- Sort by Date -->
-        <div class="col-md-4">
-          <div class="fv-row">
-            <label class="form-label fw-bold fs-6 required" for="sort-date">
-              <i class="la la-sort"></i> Sort by Date
-            </label>
-            <select
-              id="sort-date"
-              v-model="sortOrder"
-              @change="sortReservations"
-              class="form-control form-control-lg form-control-solid"
-            >
-              <option value="asc">Oldest First</option>
-              <option value="desc">Newest First</option>
-            </select>
-          </div>
+        <div class="col-md-4 mb-4">
+          <label class="form-label fw-bold fs-6 required">
+            <i class="la la-calendar"></i> Filter By Date (End)
+          </label>
+          <Datepicker v-model="endDate" class="form-control" />
         </div>
-
-        <!-- Sort by Status -->
-        <div class="col-md-4">
-          <div class="fv-row">
-            <label class="form-label fw-bold fs-6 required" for="sort-status">
-              <i class="la la-toggle-on"></i> Sort by Status
-            </label>
-            <select
-              id="sort-status"
-              v-model="sortStatus"
-              @change="sortReservations"
-              class="form-control form-control-lg form-control-solid"
-            >
-              <option value="">All</option>
-              <option value="active">Active</option>
-              <option value="ended">Reservation Ended</option>
-            </select>
-          </div>
+        <div class="col-md-4 mb-4 d-flex align-items-end">
+          <button class="btn btn-primary" type="button" @click="filterByDate">
+            Filter
+          </button>
         </div>
+      </div>
 
-        <!-- Total Reservations and Guests -->
-        <div class="col-md-4 text-center my-4">
-          <div class="d-flex justify-content-center">
-            <h5 class="mb-0 me-3">
-              Total Reservations: <span class="badge bg-primary fs-5 text-white">{{ totalReservations }}</span>
-            </h5>
-            <h5 class="mb-0">
-              Total Guests: <span class="badge bg-success fs-5 text-white">{{ totalGuests }}</span>
-            </h5>
-          </div>
+
+      <!-- Sort by Date -->
+      <div class="col-md-4">
+        <div class="fv-row">
+          <label class="form-label fw-bold fs-6 required" for="sort-date">
+            <i class="la la-sort"></i> Sort by Date
+          </label>
+          <select
+            id="sort-date"
+            v-model="sortOrder"
+            @change="sortReservations"
+            class="form-control form-control-lg form-control-solid"
+          >
+            <option value="asc">Oldest First</option>
+            <option value="desc">Newest First</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Sort by Status -->
+      <div class="col-md-4">
+        <div class="fv-row">
+          <label class="form-label fw-bold fs-6 required" for="sort-status">
+            <i class="la la-toggle-on"></i> Sort by Status
+          </label>
+          <select
+            id="sort-status"
+            v-model="sortStatus"
+            @change="sortReservations"
+            class="form-control form-control-lg form-control-solid"
+          >
+            <option value="">All</option>
+            <option value="active">Active</option>
+            <option value="ended">Reservation Ended</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Total Reservations and Guests -->
+      <div class="col-md-4 text-center my-4">
+        <div class="d-flex justify-content-center">
+          <h5 class="mb-0 me-3">
+            Total Reservations: <span class="badge bg-primary fs-5 text-white">{{ totalReservations }}</span>
+          </h5>
+          <h5 class="mb-0">
+            Total Guests: <span class="badge bg-success fs-5 text-white">{{ totalGuests }}</span>
+          </h5>
         </div>
       </div>
     </div>
@@ -133,11 +136,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import Datepicker from "vue3-datepicker"; // Import vue3-datepicker
 
 // State variables
 const reservations = ref<any[]>([]);
 const filteredReservations = ref<any[]>([]);
-const selectedDate = ref('');
+const startDate = ref('');
+const endDate = ref(''); // Tambahkan ref untuk endDate
 const sortOrder = ref('asc'); // Sorting order
 const sortStatus = ref(''); 
 const totalReservations = ref(0);
@@ -167,17 +172,28 @@ const fetchReservations = async () => {
 
 // Function to filter reservations by selected date
 const filterByDate = () => {
-  if (selectedDate.value) {
-    filteredReservations.value = reservations.value.filter(
-      (reservation: any) => reservation.date === selectedDate.value
-    );
+  if (startDate.value && endDate.value) {
+    console.log("Start Date:", new Date(startDate.value));
+    console.log("End Date:", new Date(endDate.value));
+
+    const start = new Date(startDate.value);
+    const end = new Date(endDate.value);
+
+    filteredReservations.value = reservations.value.filter((reservation) => {
+      const reservationDate = new Date(reservation.date);
+      console.log("Reservation Date:", reservationDate);
+      return reservationDate >= start && reservationDate <= end;
+    });
+
+    console.log("Filtered Reservations:", filteredReservations.value);
   } else {
-    filteredReservations.value = [...reservations.value]; // If no date is selected, show all
+    filteredReservations.value = [...reservations.value];
   }
-  
-  sortReservations(); // Apply sorting after filtering
-  calculateTotals();  // Calculate total reservations and guests
+
+  sortReservations();
+  calculateTotals();
 };
+
 
 const sortReservations = () => {
   // Filter by status first if a status is selected
@@ -259,54 +275,21 @@ const printReservations = () => {
         width: 100%;
         border-collapse: collapse;
         margin-top: 20px;
-        background-color: #fff;
-        border: 1px solid #ddd;
       }
-      th, td {
-        padding: 12px;
-        border-bottom: 1px solid #ddd;
-        text-align: center;
+      table, th, td {
+        border: 1px solid #333;
+        padding: 10px;
       }
       th {
-        background-color: #4A90E2;
-        color: white;
-        font-weight: 600;
-      }
-      td {
-        background-color: #fff;
-        color: #333;
-      }
-      tr:nth-child(even) td {
-        background-color: #f3f7fa;
-      }
-      tr:hover td {
-        background-color: #e8f0fe;
-      }
-      table th:first-child, table td:first-child {
-        border-radius: 8px 0 0 8px;
-      }
-      table th:last-child, table td:last-child {
-        border-radius: 0 8px 8px 0;
-      }
-      tfoot td {
-        font-weight: bold;
-        background-color: #f9f9f9;
-        color: #4A90E2;
-        text-align: right;
-        padding: 15px;
-        border-top: 2px solid #ddd;
-      }
-      .logo {
-        float: right;
-        width: 100px;
-        height: auto;
-        margin-bottom: 10px;
+        background-color: #f2f2f2;
+        text-align: left;
       }
     </style>
 
-    <!-- Logo di sisi kanan -->
-    <img src="${logoPath}" alt="Logo" class="logo" />
-    <h1>Reservations List</h1>
+    <div style="text-align: center;">
+      <img src="${logoPath}" alt="Logo" style="width: 100px; height: auto;">
+      <h1>Data Reservation Siam</h1>
+    </div>
 
     <table>
         <thead>
@@ -344,15 +327,12 @@ const printReservations = () => {
     </table>
   `;
 
-  const newWindow = window.open('', '_blank');
-  if (newWindow) {
-    newWindow.document.write(printContent);
-    newWindow.document.close();
-    newWindow.print();
-    newWindow.close();
-  } else {
-    console.error("Failed to open a new window.");
-  }
+  const printWindow = window.open('', '_blank');
+  printWindow?.document.write(printContent);
+  printWindow?.document.close();
+  printWindow?.focus();
+  printWindow?.print();
+  printWindow?.close();
 };
 
 
@@ -380,78 +360,9 @@ const exportReservations = async () => {
   }
 };
 
-// Call fetchReservations when the component is mounted
-onMounted(fetchReservations);
+// When the component mounts, fetch reservations
+onMounted(() => {
+  fetchReservations();
+});
+
 </script>
-
-<style scoped>
-.form-label {
-  margin-bottom: 0.5rem; /* Spacing between label and input */
-}
-
-.form-control {
-  margin-bottom: 1rem; /* Spacing between form controls */
-}
-
-.card-body {
-  padding: 1.5rem; /* Add padding to improve spacing */
-}
-
-.card-header {
-  padding: 1rem 1.5rem; /* Align with card-body padding */
-  display: flex; /* Align header items horizontally */
-  justify-content: space-between; /* Space between title and buttons */
-}
-
-.card-header h2 {
-  font-size: 1.75rem; /* Slightly larger heading */
-  font-weight: bold;
-}
-
-button {
-  font-size: 1.1rem; /* Smaller font for buttons */
-  padding: 0.5rem 1rem; /* Consistent button padding */
-}
-
-.btn i {
-  font-size: 2rem; /* Ukuran ikon lebih besar */
-}
-
-.btn-success {
-  background-color: #28a745;
-}
-
-.table-hover tbody tr:hover {
-  background-color: #f2f2f2; /* Light gray hover effect */
-}
-
-.table th, .table td {
-  text-align: center; /* Center align the table data */
-  vertical-align: middle; /* Vertical center align */
-}
-
-.table th {
-  background-color: #343a40;
-  color: white; /* Dark header with white text */
-}
-
-.table-bordered {
-  border: 1px solid #dee2e6; /* Border around the table */
-}
-
-.badge {
-  font-size: 1rem;
-}
-
-@media (max-width: 768px) {
-  .card-header h2 {
-    font-size: 1.5rem; /* Smaller heading on small screens */
-  }
-  button {
-    font-size: 0.75rem; /* Adjust button size for smaller screens */
-  }
-  .table th, .table td {
-    font-size: 0.875rem; /* Reduce table font size */
-  }
-}
-</style>

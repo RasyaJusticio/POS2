@@ -485,15 +485,14 @@
 
         <!-- Date -->
         <div class="J">
-          <label for="date" class="form-label">Date:</label>
-          <input 
-            type="date" 
-            id="date" 
-            v-model="reservation.date" 
-            class="form-control" 
-            required 
-            @change="fetchTotalReservations" 
-          />
+        <label for="date" class="form-label">Date:</label>
+        <Datepicker 
+          v-model="reservation.date" 
+          format="dd/MM/yyyy" 
+          required 
+          @change="fetchTotalReservations" 
+          class="form-control" 
+        />
         </div>
 
         <div class="time-container">
@@ -604,6 +603,8 @@
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+
+
 
 // Define types for Product and SelectedMenu
 interface Product {
@@ -963,7 +964,13 @@ const submitReservation = async () => {
 };
 
 
-
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Menambahkan 1 karena bulan dimulai dari 0
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`; // Format YYYY-MM-DD
+};
 
 
 // Memanggil fungsi untuk mendapatkan total reservasi saat halaman dimuat
@@ -1713,6 +1720,8 @@ p {
   border: 1px solid #ddd; /* Border for list items */
   border-radius: 5px; /* Rounded corners */
 }
+
+
 
 /* Alert Message Styling */
 .alert {

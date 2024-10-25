@@ -165,7 +165,7 @@ class PembelianController extends Controller
 }
 
 
-    public function generatePDF($uuid)
+public function generatePDF($uuid)
 {
     // Cari pembelian berdasarkan UUID
     $pembelian = Pembelian::with('item')->where('uuid', $uuid)->first();
@@ -175,16 +175,22 @@ class PembelianController extends Controller
     }
 
     try {
-        // Kirim data ke view untuk pembuatan PDF
-        $pdf = PDF::loadView('pdf.pembelian', [
+        // Pre-render the view content to minimize view rendering time in the PDF generation process
+        $view = view('pdf.pembelian', [
             'pembelian' => $pembelian,
-            'quantity' => $pembelian->item->count()
-        ]);
+            'quantity' => $pembelian->item->count(),
+        ])->render();
 
-        // Download PDF dengan nama file yang diinginkan
+        // Load the view into the PDF generator
+        $pdf = PDF::loadHTML($view);
+
+        // Optimize PDF generation (you can tweak the options)
+        $pdf->setPaper('A4')->setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif']);
+
+        // Download PDF with the desired file name
         return $pdf->download('struk_pembelian_' . $pembelian->uuid . '.pdf');
     } catch (\Exception $e) {
-        // Log error untuk debugging
+        // Log error for debugging
         \Log::error('Error generating PDF: ' . $e->getMessage());
         return response()->json(['error' => 'Terjadi kesalahan saat menghasilkan PDF: ' . $e->getMessage()], 500);
     }
