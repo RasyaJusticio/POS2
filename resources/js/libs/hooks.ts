@@ -216,6 +216,7 @@ export const useDownloadPdf = (callback?: ICallback, swalMixin?: any) => {
                                 data: body,
                             })
                                 .then((res) => {
+                                    console.log(res)
                                     var headers = res.headers;
                                     var blob = new Blob([res.data], {
                                         type: "application/pdf",
@@ -227,8 +228,8 @@ export const useDownloadPdf = (callback?: ICallback, swalMixin?: any) => {
                                     link.download = headers[
                                         "content-disposition"
                                     ]
-                                        .split('filename="')[1]
-                                        .split('"')[0];
+                                        ?.split('filename="')[1]
+                                        ?.split('"')[0] || "download.pdf";
                                     link.click();
 
                                     window.respon = {
@@ -237,6 +238,7 @@ export const useDownloadPdf = (callback?: ICallback, swalMixin?: any) => {
                                     };
                                 })
                                 .catch((error) => {
+                                    console.error(error)
                                     window.respon = JSON.parse(
                                         String.fromCharCode.apply(
                                             null,

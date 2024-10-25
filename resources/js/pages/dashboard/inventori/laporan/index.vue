@@ -10,10 +10,11 @@ const column = createColumnHelper<Pembelian>();
 const paginateRef = ref<any>(null);
 const transactions = ref<Pembelian[]>([]); // Menyimpan data transaksi
 const selectedTransaction = ref<Pembelian | null>(null);
+const selectedDate = ref<string>('');
 
 const startDate = ref<string>('');
 const endDate = ref<string>('');
-
+// Fungsi filter transaksi berdasarkan tanggal yang dipilih
 
 const checkNameBeforeSubmit = () => {
     if (!selectedTransaction.value?.customer_name) {
@@ -25,17 +26,24 @@ const checkNameBeforeSubmit = () => {
 
 
 const filterByDate = async () => {
+    if (!selectedDate.value) {
+        transactions.value = []; // Kosongkan data jika tidak ada tanggal dipilih
+        return;
+    }
+
     try {
         const response = await axios.post('/inventori/laporan', {
-            start_date: startdate.value,
-            end_date: endDate.value,
+            date: selectedDate.value, // Kirimkan tanggal yang dipilih ke server
         });
-        transactions.value = response .data;
-        paginateRef.value.refetch();
+        transactions.value = response.data; // Update data transaksi berdasarkan respons
     } catch (error) {
         console.error('Error fetching transactions', error);
+        transactions.value = []; // Kosongkan data jika ada error
     }
 };
+
+// Panggil filterByDate ketika komponen dimuat untuk mendapatkan data awal (opsional)
+filterByDate();
 
 const { delete: deletePembelian } = useDelete({
     onSuccess: () => paginateRef.value.refetch(),
@@ -51,41 +59,52 @@ onMounted(async () => {
     }
 });
 
-
-// Function to format date to 'DD Month YYYY'
-const formatTanggal = (dateString) => {
-    const months = [
-        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-    ];
-    
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const monthIndex = date.getMonth();
-    const year = date.getFullYear();
-    
-    return `${day} ${months[monthIndex]} ${year}`;
-};
-
 // Fungsi untuk mencetak laporan transaksi
 const printTransaction = async () => {
     try {
         const response = await axios.post('/inventori/laporan');
         const transactions = response.data.data;
 
-        // Memformat data transaksi menjadi HTML yang dapat dicetak
+        // Memformat data transaksi
         const printContent = `
             <html>
             <head>
                 <title>Laporan Transaksi</title>
                 <style>
-                    body { font-family: Arial, sans-serif; margin: 20px; }
-                    h1 { text-align: center; color: #0070C0; }
-                    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-                    th, td { border: 1px solid black; padding: 10px; text-align: center; font-size: 14px; }
-                    th { background-color: #0070C0; color: white; }
-                    tr:nth-child(even) { background-color: #f2f2f2; }
-                    tfoot { font-weight: bold; background-color: #0070C0; color: white; }
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 20px;
+                    }
+                    h1 {
+                        text-align: center;
+                        color: #0070C0;
+                    }
+                    table {
+                        border-collapse: collapse;
+                        width: 100%;
+                        margin-top: 20px;
+                    }
+                    th, td {
+                        border: 1px solid black;
+                        padding: 10px;
+                        text-align: center;
+                        font-size: 14px;
+                    }
+                    th {
+                        background-color: #0070C0;
+                        color: white;
+                    }
+                    tr:nth-child(even) {
+                        background-color: #f2f2f2;
+                    }
+                    tr:hover {
+                        background-color: #ddd;
+                    }
+                    tfoot {
+                        font-weight: bold;
+                        background-color: #0070C0;
+                        color: white;
+                    }
                 </style>
             </head>
             <body>
@@ -95,10 +114,8 @@ const printTransaction = async () => {
                         <tr>
                             <th>No</th>
                             <th>ID Pembelian</th>
-                            <th>Nama</th>
-                            <th>Pesanan</th>
-                            <th>Total</th>
                             <th>Status Pembayaran</th>
+                            <th>Total</th>
                             <th>Tanggal Pesanan</th>
                         </tr>
                     </thead>
@@ -106,18 +123,15 @@ const printTransaction = async () => {
                         ${transactions.map((transaction, index) => `
                             <tr>
                                 <td>${index + 1}</td>
-                                <td>${transaction.id.toString().padStart(3, '0')}</td> <!-- Format ID menjadi 001, 002, dll -->
-                                <td>${transaction.customer_name}</td>
-                                <td>${transaction.items.replace(/\n/g, "<br>")}</td>
-                                <td>${formatRupiah(transaction.total_price)}</td>
+                                <td>${transaction.pembelian_id}</td>
                                 <td>${transaction.status}</td>
-                                <td>${formatTanggal(transaction.created_at)}</td>
+                                <td>${formatRupiah(transaction.total_price)}</td>
                             </tr>
                         `).join('')}
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colspan="7">Total Transaksi: ${transactions.length}</td>
+                            <td colspan="5">Total Transaksi: ${transactions.length}</td>
                         </tr>
                     </tfoot>
                 </table>
@@ -125,22 +139,20 @@ const printTransaction = async () => {
             </html>
         `;
 
-        // Membuka jendela baru dan mencetak laporan
         const newWindow = window.open('', '_blank');
         if (newWindow) {
             newWindow.document.write(printContent);
             newWindow.document.close();
-            newWindow.focus();
             newWindow.print();
             newWindow.close();
         } else {
-            console.error("Gagal membuka jendela baru untuk mencetak.");
+            console.error("Gagal membuka jendela baru.");
         }
+
     } catch (error) {
         console.error("Error fetching transactions for printing:", error);
     }
 };
-
 
 
 // Fungsi untuk mengekspor laporan transaksi ke Excel
@@ -153,16 +165,14 @@ const exportTransaction = async () => {
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'DATA TRANSAKSI SIAM.xlsx');
+        link.setAttribute('download', 'DATA TRANSAKSI SIAM   .xlsx');
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     } catch (error) {
-        console.error("Error downloading the Excel file:", error.response ? error.response.data : error.message);
+        console.error("Error downloading the Excel file:", error);
     }
 };
-
-
 
 
 // Mendapatkan data transaksi saat komponen dimuat
@@ -204,14 +214,14 @@ const columns = [
         header: "Nama",
     }),
     column.accessor("items", {
-        header: "Pesanan",
+        header: "Produk yang Dibeli",
         cell: (cell) => {
             // Pisahkan setiap produk dengan <br /> untuk membuat jarak vertikal
             const itemsList = cell.getValue().split("\n").map(item => `<div>${item}</div>`).join('');
             return h('div', { innerHTML: itemsList }); // Gunakan innerHTML untuk render div dengan newline
         }
     }),
-    column.accessor("total_price", {
+       column.accessor("total_price", {
         header: "Total",
         cell: (cell) => formatRupiah(cell.getValue()),
     }),
@@ -219,12 +229,11 @@ const columns = [
         header: "Status Pembayaran",
     }),
     column.accessor("created_at", {
-    header: "Tanggal Pesanan",
-    cell: (cell) => {
-        return formatTanggal(cell.getValue()); // Use the formatTanggal function
-    },
-}),
-  
+        header: "Tanggal Pesanan",
+        cell: (cell) => {
+            return new Date(cell.getValue()).toLocaleDateString("id-ID");
+        },
+    }),
        column.accessor("created", {
         header: "Pesanan Dibuat",
         cell: (cell) => cell.getValue() ? "On Process" : "Procces",
@@ -276,13 +285,13 @@ const refresh = () => paginateRef.value.refetch();
   
         <!-- Button for printing the reservations list -->
         <button
-        type="button"
-        class="btn btn-sm btn-secondary ms-auto"
-        @click="printTransaction"
-      >
-        Print
-        <i class="la la-print"></i>
-      </button>
+          type="button"
+          class="btn btn-sm btn-secondary ms-auto"
+          @click="printTransaction"
+        >
+          Print
+          <i class="la la-print"></i>
+        </button>
   
         <!-- Button for exporting the reservations list to Excel -->
         <button
@@ -296,19 +305,18 @@ const refresh = () => paginateRef.value.refetch();
       </div>
   
       <div class="card-body">
-        <!-- Filter by Date -->
         <div class="col-md-4 mb-4">
-          <label class="form-label fw-bold fs-6 required" for="reservation-date">
-            <i class="la la-calendar"></i> Filter by Date
-          </label>
-          <input
-            type="date"
-            id="reservation-date"
-            v-model="selectedDate"
-            @change="filterByDate"
-            class="form-control form-control-lg form-control-solid"
-          />
-        </div>
+        <label class="form-label fw-bold fs-6 required" for="reservation-date">
+          <i class="la la-calendar"></i> Pilih Tanggal
+        </label>
+        <input
+          type="date"
+          id="reservation-date"
+          v-model="selectedDate"
+          @change="filterByDate"
+          class="form-control form-control-lg form-control-solid"
+        />
+      </div>
   
         <paginate
           ref="paginateRef"
@@ -335,7 +343,6 @@ const refresh = () => paginateRef.value.refetch();
           <p><strong>Nama:</strong> {{ selectedTransaction?.customer_name }}</p>
           <p><strong>Pesanan:</strong> {{ selectedTransaction?.items }}</p>
           <p><strong>Total Harga:</strong> {{ formatRupiah(selectedTransaction?.total_price) }}</p>
-          <p><strong>Tanggal Transaksi:</strong> {{ formatTanggal(selectedTransaction?.created_at) }}</p> <!-- Updated line -->
           <p><strong>Status Pembayaran:</strong> {{ selectedTransaction?.status }}</p>
           <p><strong>Tanggal Transaksi:</strong> {{ new Date(selectedTransaction?.created_at).toLocaleDateString("id-ID") }}</p>
           <p><strong>Status Pesanan Dibuat:</strong> {{ selectedTransaction?.created ? 'On Process' : 'Procces' }}</p>
