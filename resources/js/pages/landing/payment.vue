@@ -58,7 +58,8 @@ import { ref, computed, onMounted } from 'vue';
 import QRCode from 'qrcode-generator';
 import jsPDF from 'jspdf';
 import axios from 'axios';
-
+import { useDownloadPdf } from '@/libs/hooks';
+import { toast } from 'vue3-toastify';
 
 
 const uuid = ref(); // UUID pembelian yang diambil dari transaksi
@@ -73,28 +74,31 @@ const totalAmount = ref(0);
 const snapToken = '{{ $snapToken }}';
 const blueColor = '#0000FF';  // Atau warna biru hex atau nama warna
 
+const { download: downloadPdf } = useDownloadPdf({
+  onSuccess: () => {
+    toast.success('Success download')
+  }
+})
 
 const handleGeneratePDF = async () => {
   console.log(route.params); // Tambahkan log ini
   if (uuid.value) {
     try {
       // Panggil API backend untuk menghasilkan PDF
-      const response = await axios.get(`/pembelian/${uuid.value}/pdf`, {
-        responseType: 'blob', // Agar response dianggap sebagai file
-      });
+      downloadPdf(`/pembelian/${uuid.value}/pdf`)
 
       // Buat URL dari file PDF
-      const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+      // const fileURL = window.URL.createObjectURL(new Blob([response.data]));
       
-      // Buat link untuk download
-      const fileLink = document.createElement('a');
-      fileLink.href = fileURL;
-      fileLink.setAttribute('download', `struk_pembelian_${uuid}.pdf`);
+      // // Buat link untuk download
+      // const fileLink = document.createElement('a');
+      // fileLink.href = fileURL;
+      // fileLink.setAttribute('download', `struk_pembelian_${uuid}.pdf`);
 
-      // Klik link secara otomatis untuk download
-      document.body.appendChild(fileLink);
-      fileLink.click();
-      document.body.removeChild(fileLink);
+      // // Klik link secara otomatis untuk download
+      // document.body.appendChild(fileLink);
+      // fileLink.click();
+      // document.body.removeChild(fileLink);
     } catch (error) {
       console.error('Gagal mengambil PDF:', error);
     }

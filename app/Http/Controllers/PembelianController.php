@@ -195,8 +195,11 @@ class PembelianController extends Controller
             'quantity' => $pembelian->item->count()
         ]);
 
-        // Download PDF dengan nama file yang diinginkan
-        return $pdf->download('struk_pembelian_' . $pembelian->uuid . '.pdf');
+        $pdf->setPaper('F4');
+        $pdf->output();
+
+        return $pdf->stream("Invoice{$uuid}". '.pdf');
+
     } catch (\Exception $e) {
         // Log error untuk debugging
         \Log::error('Error generating PDF: ' . $e->getMessage());

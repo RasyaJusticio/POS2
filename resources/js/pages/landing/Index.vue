@@ -501,20 +501,20 @@
 
 
 
-        <div class="time-container">
-          <!-- Start Time -->
-          <div class="Ji">
-            <label for="start-time" class="form-label">Start Time:</label>
-            <input type="time" id="start-time" v-model="reservation.start_time" class="form-control" required />
-          </div>
+          <div class="time-container">
+            <!-- Start Time -->
+            <div class="Ji">
+              <label for="start-time" class="form-label">Start Time:</label>
+              <input type="time" id="start-time" v-model="reservation.start_time" class="form-control" required />
+            </div>
 
-          <!-- End Time -->
-          <div class="Ji">
-            <label for="end-time" class="form-label">End Time:</label>
-            <input type="time" id="end-time" v-model="reservation.end_time" class="form-control" required />
+            <!-- End Time -->
+            <div class="Ji">
+              <label for="end-time" class="form-label">End Time:</label>
+              <input type="time" id="end-time" v-model="reservation.end_time" class="form-control" required />
+            </div>
           </div>
         </div>
-      </div>
 
       <!-- Right Column -->
       <div class="right-column">
