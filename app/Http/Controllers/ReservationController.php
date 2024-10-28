@@ -6,6 +6,7 @@ use App\Models\Reservation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB; // Import DB for raw queries
+use App\Models\Product;
 use App\Exports\ReservationsExport;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -17,64 +18,82 @@ class ReservationController extends Controller
     }   
 
     // Menyimpan data reservasi
-    public function store(Request $request)
-    {
-        // Validasi input
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:15',
-            'date' => 'required|date',
-            'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
-            'guests' => 'required|integer|min:1',
-        ]);
+    // Menyimpan data reservasi
+public function store(Request $request)
+{
+    // Validasi input
+    $validator = Validator::make($request->all(), [
+        'name' => 'required|string|max:255',
+        'phone' => 'required|string|max:15',
+        'date' => 'required|date',
+        'start_time' => 'required|date_format:H:i',
+        'end_time' => 'required|date_format:H:i|after:start_time',
+        'guests' => 'required|integer|min:1',
+        'menus' => 'required|array',  // Memastikan menus adalah array
+        'menus.*.id' => 'required|integer|exists:products,id',  // Validasi ID menu
+        'menus.*.quantity' => 'required|integer|min:1',  // Kuantitas menu harus berupa integer
+        'total_price' => 'required|integer',
+    ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        // Mengecek jumlah tamu yang sudah dipesan pada hari tertentu
-        $totalGuestsToday = Reservation::where('date', $request->date)->sum('guests');
-        $maxGuests = 50;  // Batas tamu per hari
-
-        if ($totalGuestsToday + $request->guests > $maxGuests) {
-            // Menghitung kursi yang tersedia
-            $availableSeats = $maxGuests - $totalGuestsToday;
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Sorry, the reservation limit for today has been reached. We cannot accommodate more guests for this date. Please consider choosing a different date',
-                'details' => [
-                    'current_guests' => $totalGuestsToday,
-                    'available_seats' => $availableSeats,
-                    'limit' => $maxGuests,
-                    'suggestion' => 'Unfortunately, we cannot accommodate more guests for this date. Please consider choosing a different date or contact us for assistance.',
-                ]
-            ], 400);
-        }
-        
-
-        // Simpan data reservasi
-        $reservation = Reservation::create([
-            'name' => $request->name,
-            'phone' => $request->phone,
-            'date' => $request->date,
-            'start_time' => $request->start_time,
-            'end_time' => $request->end_time,
-            'guests' => $request->guests,
-        ]);
-
+    if ($validator->fails()) {
         return response()->json([
-            'status' => 'success',
-            'message' => 'Reservation made successfully!',
-            'data' => $reservation
-        ], 201);
-
-        
+            'status' => 'error',
+            'message' => 'Validation failed',
+            'errors' => $validator->errors()
+        ], 422);
     }
+
+    // Mengecek jumlah tamu yang sudah dipesan pada hari tertentu
+    $totalGuestsToday = Reservation::where('date', $request->date)->sum('guests');
+    $maxGuests = 50;  // Batas tamu per hari
+
+    if ($totalGuestsToday + $request->guests > $maxGuests) {
+        $availableSeats = $maxGuests - $totalGuestsToday;
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Sorry, the reservation limit for today has been reached. We cannot accommodate more guests for this date. Please consider choosing a different date',
+            'details' => [
+                'current_guests' => $totalGuestsToday,
+                'available_seats' => $availableSeats,
+                'limit' => $maxGuests,
+                'suggestion' => 'Unfortunately, we cannot accommodate more guests for this date. Please consider choosing a different date or contact us for assistance.',
+            ]
+        ], 400);
+    }
+
+    // Inisialisasi string untuk menyimpan menu yang dipesan
+    $orderedMenus = '';
+    foreach ($request->menus as $menuItem) {
+        $menu = Product::find($menuItem['id']);  // Cari menu berdasarkan ID
+        if ($menu) {
+            // Gabungkan nama menu dan kuantitas menjadi string dengan pemisahan baris
+            $orderedMenus .= $menu->name . ' x' . $menuItem['quantity'] . "\n";  // Setiap item menu pada baris baru
+        }
+    }
+
+    // Hapus baris baru terakhir dari string (opsional)
+    $orderedMenus = rtrim($orderedMenus, "\n");
+
+    // Simpan data reservasi
+    $reservation = Reservation::create([
+        'name' => $request->name,
+        'phone' => $request->phone,
+        'date' => $request->date,
+        'start_time' => $request->start_time,
+        'end_time' => $request->end_time,
+        'guests' => $request->guests,
+        'menus' => $orderedMenus,  // Simpan menu yang dipesan dalam bentuk string
+        'total_price' => $request->total_price,
+    ]);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Reservation made successfully!',
+        'data' => $reservation
+    ], 201);
+}
+
+
 
     public function getDashboardStats()
     {

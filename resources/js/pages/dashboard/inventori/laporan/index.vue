@@ -11,9 +11,11 @@ const column = createColumnHelper<Pembelian>();
 const paginateRef = ref<any>(null);
 const transactions = ref<Pembelian[]>([]); // Menyimpan data transaksi
 const selectedTransaction = ref<Pembelian | null>(null);
+const selectedDate = ref<string>('');
 
 const startDate = ref<string>('');
 const endDate = ref<string>('');
+// Fungsi filter transaksi berdasarkan tanggal yang dipilih
 
 
 const checkNameBeforeSubmit = () => {
@@ -26,17 +28,24 @@ const checkNameBeforeSubmit = () => {
 
 
 const filterByDate = async () => {
+    if (!selectedDate.value) {
+        transactions.value = []; // Kosongkan data jika tidak ada tanggal dipilih
+        return;
+    }
+
     try {
         const response = await axios.post('/inventori/laporan', {
-            start_date: startdate.value,
-            end_date: endDate.value,
+            date: selectedDate.value, // Kirimkan tanggal yang dipilih ke server
         });
-        transactions.value = response .data;
-        paginateRef.value.refetch();
+        transactions.value = response.data; // Update data transaksi berdasarkan respons
     } catch (error) {
         console.error('Error fetching transactions', error);
+        transactions.value = []; // Kosongkan data jika ada error
     }
 };
+
+// Panggil filterByDate ketika komponen dimuat untuk mendapatkan data awal (opsional)
+filterByDate();
 
 const { delete: deletePembelian } = useDelete({
     onSuccess: () => paginateRef.value.refetch(),
@@ -203,7 +212,7 @@ const columns = [
         header: "Nama",
     }),
     column.accessor("items", {
-        header: "Pesanan",
+        header: "Produk yang Dibeli",
         cell: (cell) => {
             // Pisahkan setiap produk dengan <br /> untuk membuat jarak vertikal
             const itemsList = cell.getValue().split("\n").map(item => `<div>${item}</div>`).join('');
@@ -295,19 +304,18 @@ const refresh = () => paginateRef.value.refetch();
       </div>
   
       <div class="card-body">
-        <!-- Filter by Date -->
         <div class="col-md-4 mb-4">
-          <label class="form-label fw-bold fs-6 required" for="reservation-date">
-            <i class="la la-calendar"></i> Filter by Date
-          </label>
-          <input
-            type="date"
-            id="reservation-date"
-            v-model="selectedDate"
-            @change="filterByDate"
-            class="form-control form-control-lg form-control-solid"
-          />
-        </div>
+        <label class="form-label fw-bold fs-6 required" for="reservation-date">
+          <i class="la la-calendar"></i> Pilih Tanggal
+        </label>
+        <input
+          type="date"
+          id="reservation-date"
+          v-model="selectedDate"
+          @change="filterByDate"
+          class="form-control form-control-lg form-control-solid"
+        />
+      </div>
   
         <paginate
           ref="paginateRef"
@@ -320,31 +328,46 @@ const refresh = () => paginateRef.value.refetch();
     </div>
   
     <!-- Detail Transaksi Modal -->
-    <div v-if="selectedTransaction" class="modal-overlay">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5>Detail Transaksi</h5>
-          <button class="modal-close" @click="selectedTransaction = null">
-            &times;
-          </button>
-        </div>
-  
-        <div class="modal-body">
-          <p><strong>ID Pembelian:</strong> {{ selectedTransaction?.id }}</p>
-          <p><strong>Nama:</strong> {{ selectedTransaction?.customer_name }}</p>
-          <p><strong>Pesanan:</strong> {{ selectedTransaction?.items }}</p>
-          <p><strong>Total Harga:</strong> {{ formatRupiah(selectedTransaction?.total_price) }}</p>
-          <p><strong>Tanggal Transaksi:</strong> {{ formatTanggal(selectedTransaction?.created_at) }}</p> <!-- Updated line -->
-          <p><strong>Status Pembayaran:</strong> {{ selectedTransaction?.status }}</p>
-          <p><strong>Tanggal Transaksi:</strong> {{ new Date(selectedTransaction?.created_at).toLocaleDateString("id-ID") }}</p>
-          <p><strong>Status Pesanan Dibuat:</strong> {{ selectedTransaction?.created ? 'On Process' : 'Procces' }}</p>
-        </div>
-  
-        <button class="btn btn-secondary" @click="selectedTransaction = null">
-          Tutup Detail
-        </button>
+<!-- Detail Transaksi Modal -->
+<div v-if="selectedTransaction" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5>Detail Transaksi</h5>
+      <button class="modal-close" @click="selectedTransaction = null">
+        &times;
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="modal-row">
+        <p><strong>ID Pembelian:</strong> {{ selectedTransaction?.id }}</p>
+      </div>
+      <div class="modal-row">
+        <p><strong>Nama:</strong> {{ selectedTransaction?.customer_name }}</p>
+      </div>
+      <div class="modal-row">
+        <p><strong>Pesanan:</strong> {{ selectedTransaction?.items }}</p>
+      </div>
+      <div class="modal-row">
+        <p><strong>Total Harga:</strong> {{ formatRupiah(selectedTransaction?.total_price) }}</p>
+      </div>
+      <div class="modal-row">
+        <p><strong>Tanggal Transaksi:</strong> {{ formatTanggal(selectedTransaction?.created_at) }}</p>
+      </div>
+      <div class="modal-row">
+        <p><strong>Status Pembayaran:</strong> {{ selectedTransaction?.status }}</p>
+      </div>
+      <div class="modal-row">
+        <p><strong>Status Pesanan Dibuat:</strong> {{ selectedTransaction?.created ? 'On Process' : 'Process' }}</p>
       </div>
     </div>
+
+    <button class="modal-close-btn" @click="selectedTransaction = null">
+      Tutup Detail
+    </button>
+  </div>
+</div>
+
   </template>
   
   
@@ -372,44 +395,201 @@ const refresh = () => paginateRef.value.refetch();
   }
   
   /* MODAL STYLING */
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+  /* Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.4s ease;
+}
+
+/* Modal Content */
+.modal-content {
+  background: #ffffff;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 500px;
+  padding: 30px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.modal-header h5 {
+  margin: 0;
+  font-size: 1.8em; /* Increased font size */
+  font-weight: 600;
+  color: #333;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.8em; /* Increased font size */
+  cursor: pointer;
+  color: #999;
+  transition: color 0.3s;
+}
+
+.modal-close:hover {
+  color: #444;
+}
+
+.modal-body {
+  line-height: 1.8em;
+  font-size: 1.2em; /* Increased font size */
+  color: #555;
+}
+
+.modal-row {
+  margin-bottom: 15px;
+}
+
+.modal-row p {
+  margin: 0;
+  color: #333;
+  font-size: 1.2em; /* Increased font size */
+}
+
+.modal-row strong {
+  color: #444;
+  font-size: 1.1em; /* Increased font size */
+}
+
+/* Order List Styling */
+.order-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 15px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.order-item {
+  background: #f3f4f7;
+  padding: 15px 18px; /* Adjusted padding */
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+  transition: background 0.2s;
+}
+
+.order-item:hover {
+  background: #e8ebf1;
+}
+
+.item-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 1.1em; /* Increased font size */
+}
+
+.item-quantity {
+  font-size: 1em; /* Increased font size */
+  color: #888;
+  margin-left: 15px;
+}
+
+.item-price {
+  font-weight: bold;
+  color: #007bff;
+  font-size: 1.2em; /* Increased font size */
+}
+
+/* Modal Close Button */
+.modal-close-btn {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  font-size: 1.2em; /* Increased font size */
+  color: #fff;
+  background: #007bff;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.3s;
+}
+
+.modal-close-btn:hover {
+  background: #0056b3;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    background: rgba(0, 0, 0, 0);
   }
-  
+  to {
+    background: rgba(0, 0, 0, 0.6);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive Styles */
+@media (max-width: 480px) {
   .modal-content {
-    background: white;
+    width: 95%;
     padding: 20px;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 600px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
   }
-  
-  .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+
+  .modal-header h5 {
+    font-size: 1.5em;
   }
-  
-  .modal-close {
-    cursor: pointer;
-    font-size: 1.5rem;
-    background: none;
-    border: none;
+
+  .order-item {
+    padding: 12px 15px;
   }
-  
-  .modal-body {
-    margin-top: 20px;
+
+  .item-name {
+    font-size: 1em;
   }
+
+  .item-quantity {
+    font-size: 0.95em;
+  }
+
+  .item-price {
+    font-size: 1.1em;
+  }
+
+  .modal-close-btn {
+    padding: 14px;
+    font-size: 1.1em;
+  }
+}
+
+
   
   /* TABLE STYLING */
   table {

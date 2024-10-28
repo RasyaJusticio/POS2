@@ -113,12 +113,25 @@ class PembelianController extends Controller
     }
 
     public function index(Request $request)
-    {
-        // Ambil semua pembelian
-        $pembelians = Pembelian::paginate(10);
+{
+    // Inisialisasi query untuk mendapatkan pembelian
+    $query = Pembelian::query();
 
-        return response()->json($pembelians);
+    // Cek apakah ada input tanggal
+    if ($request->has('date') && $request->input('date')) {
+        // Jika ada tanggal, filter berdasarkan tanggal tersebut
+        $query->whereDate('created_at', $request->input('date'));
     }
+
+    // Urutkan berdasarkan tanggal terbaru
+    $query->orderBy('created_at', 'desc');
+
+    // Ambil data pembelian dengan pagination sebelum menjadi Collection
+    $pembelians = $query->paginate(10);
+
+    return response()->json($pembelians);
+}
+
 
     public function destroy($id)
     {
@@ -151,8 +164,9 @@ class PembelianController extends Controller
 {
     $data = Pembelian::select('id', 'uuid', 'customer_name', 'items', 'total_price', 'status', 'created_at') // Tambahkan kolom 'customer_name' dan 'items'
         ->when($request->search, function (Builder $query, string $search) {
-            $query->where('uuid', 'like', "%$search%")
-                ->orWhere('items', 'like', "%$search%")
+            $query->where('uuid', 'like', value: "%$search%")
+                ->orWhere('customer_name', 'like', value: "%$search%")
+                ->orWhere('items', 'like', value: "%$search%")
                 ->orWhere('total_price', 'like', "%$search%")
                 ->orWhere('status', 'like', "%$search%")
                 ->orWhereDate('created_at', '=', $search); // Atur pencarian tanggal sesuai kebutuhan
@@ -175,22 +189,19 @@ public function generatePDF($uuid)
     }
 
     try {
-        // Pre-render the view content to minimize view rendering time in the PDF generation process
-        $view = view('pdf.pembelian', [
+        // Kirim data ke view untuk pembuatan PDF
+        $pdf = PDF::loadView('pdf.pembelian', [
             'pembelian' => $pembelian,
-            'quantity' => $pembelian->item->count(),
-        ])->render();
+            'quantity' => $pembelian->item->count()
+        ]);
 
-        // Load the view into the PDF generator
-        $pdf = PDF::loadHTML($view);
+        $pdf->setPaper('F4');
+        $pdf->output();
 
-        // Optimize PDF generation (you can tweak the options)
-        $pdf->setPaper('A4')->setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif']);
+        return $pdf->stream("Invoice{$uuid}". '.pdf');
 
-        // Download PDF with the desired file name
-        return $pdf->download('struk_pembelian_' . $pembelian->uuid . '.pdf');
     } catch (\Exception $e) {
-        // Log error for debugging
+        // Log error untuk debugging
         \Log::error('Error generating PDF: ' . $e->getMessage());
         return response()->json(['error' => 'Terjadi kesalahan saat menghasilkan PDF: ' . $e->getMessage()], 500);
     }

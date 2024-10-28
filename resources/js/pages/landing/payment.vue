@@ -7,7 +7,7 @@
     <h1 class="title" :style="{ color: '#091057' }"></h1>
     <img src="@/assets/images/spice.png" alt="Logo" class="logo" /> <!-- Tambahkan Logo di sini -->
 
-    <router-link to="/landing/PAGE">
+    <router-link to="/landing/page">
               <button class="btn btn-lg btn-primary" style="font-weight: bold;">BACK</button>
             </router-link>
 
@@ -58,7 +58,8 @@ import { ref, computed, onMounted } from 'vue';
 import QRCode from 'qrcode-generator';
 import jsPDF from 'jspdf';
 import axios from 'axios';
-
+import { useDownloadPdf } from '@/libs/hooks';
+import { toast } from 'vue3-toastify';
 
 
 const uuid = ref(); // UUID pembelian yang diambil dari transaksi
@@ -73,28 +74,31 @@ const totalAmount = ref(0);
 const snapToken = '{{ $snapToken }}';
 const blueColor = '#0000FF';  // Atau warna biru hex atau nama warna
 
+const { download: downloadPdf } = useDownloadPdf({
+  onSuccess: () => {
+    toast.success('Success download')
+  }
+})
 
 const handleGeneratePDF = async () => {
   console.log(route.params); // Tambahkan log ini
   if (uuid.value) {
     try {
       // Panggil API backend untuk menghasilkan PDF
-      const response = await axios.get(`/pembelian/${uuid.value}/pdf`, {
-        responseType: 'blob', // Agar response dianggap sebagai file
-      });
+      downloadPdf(`/pembelian/${uuid.value}/pdf`)
 
       // Buat URL dari file PDF
-      const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+      // const fileURL = window.URL.createObjectURL(new Blob([response.data]));
       
-      // Buat link untuk download
-      const fileLink = document.createElement('a');
-      fileLink.href = fileURL;
-      fileLink.setAttribute('download', `struk_pembelian_${uuid}.pdf`);
+      // // Buat link untuk download
+      // const fileLink = document.createElement('a');
+      // fileLink.href = fileURL;
+      // fileLink.setAttribute('download', struk_pembelian_${uuid}.pdf);
 
-      // Klik link secara otomatis untuk download
-      document.body.appendChild(fileLink);
-      fileLink.click();
-      document.body.removeChild(fileLink);
+      // // Klik link secara otomatis untuk download
+      // document.body.appendChild(fileLink);
+      // fileLink.click();
+      // document.body.removeChild(fileLink);
     } catch (error) {
       console.error('Gagal mengambil PDF:', error);
     }
@@ -108,7 +112,7 @@ const handleGeneratePDF = async () => {
 // const generatePDF = async (uuid: string) => {
 //   try {
 //     // Panggil API untuk mendapatkan data pembelian
-//     const response = await axios.get(`/api/pembelian/${uuid}`);
+//     const response = await axios.get(/api/pembelian/${uuid});
 
 //     if (response.data.success) {
 //       const pembelian = response.data.data;
@@ -122,8 +126,8 @@ const handleGeneratePDF = async () => {
 
 //       // Informasi dasar
 //       doc.setFontSize(12);
-//       doc.text(`ID Pembelian: ${pembelian.uuid}`, 10, 20);
-//       doc.text(`Tanggal: ${new Date(pembelian.created_at).toLocaleDateString()}`, 10, 30);
+//       doc.text(ID Pembelian: ${pembelian.uuid}, 10, 20);
+//       doc.text(Tanggal: ${new Date(pembelian.created_at).toLocaleDateString()}, 10, 30);
 
 //       // Tambahkan tabel produk
 //       let startY = 40;
@@ -142,14 +146,14 @@ const handleGeneratePDF = async () => {
 //       // Tambahkan total harga
 //       startY += 20;
 //       doc.setFontSize(14);
-//       doc.text(`Total Harga: Rp ${pembelian.total_price}`, 10, startY);
+//       doc.text(Total Harga: Rp ${pembelian.total_price}, 10, startY);
 
 //       // Tambahkan status pembayaran
 //       startY += 10;
-//       doc.text(`Status Pembayaran: ${pembelian.status}`, 10, startY);
+//       doc.text(Status Pembayaran: ${pembelian.status}, 10, startY);
 
 //       // Download PDF
-//       doc.save(`struk_pembelian_${pembelian.uuid}.pdf`);
+//       doc.save(struk_pembelian_${pembelian.uuid}.pdf);
 //     } else {
 //       console.error('Pembelian tidak ditemukan');
 //     }
@@ -180,7 +184,7 @@ function handlePayment() {
   //   return;
   // }
 
-  // axios.post(`/orders/checkout/${uuid}`)
+  // axios.post(/orders/checkout/${uuid})
   //   .then(response => {
       // if (window.snap) {
       //   window.snap.pay(response.data.payment_url, {

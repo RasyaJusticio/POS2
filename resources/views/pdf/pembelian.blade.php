@@ -94,20 +94,12 @@
             <img src="{{ public_path('spice.png') }}" alt="Logo">
         </div>
         <h1>Siam Spice Co.</h1>
-        <h3>Jl. Sambikerep No. 78</h3>
-        <h3>IG : @siamspiceco_</h3>
+        <h3> Jl. Sambikerep No. 78</h3>
+        <h3> IG : @siamspiceco_</h3>
         
-        <div class="separator"></div> <!-- Garis pemisah setelah bagian 1 -->
+        <hr> <!-- Garis pemisah setelah bagian 1 -->
 
         <!-- BAGIAN 2: Informasi Customer, ID Pembelian, Tanggal, dan Jam -->
-        <div class="customer-info">
-            <span>Nama Customer:</span>
-            <span>{{ $pembelian->customer_name }}</span>
-        </div>
-        <div class="customer-info">
-            <span>ID Pembelian:</span>
-            <span>{{ $pembelian->id }}</span>
-        </div>
         <div class="customer-info">
             <span>Tanggal:</span>
             <span>{{ $pembelian->created_at->format('d-m-Y') }}</span>
@@ -116,8 +108,16 @@
             <span>Jam:</span>
             <span>{{ $pembelian->created_at->format('H:i:s') }}</span>
         </div>
-
-        <div class="separator"></div> <!-- Garis pemisah setelah bagian 2 -->
+        <div class="customer-info">
+            <span>Nama Customer:</span>
+            <span>{{ $pembelian->customer_name }}</span>
+        </div>
+        <div class="customer-info">
+            <span>ID Pembelian:</span>
+            <span>{{ $pembelian->id }}</span>
+        </div>
+        
+        <hr> <!-- Garis pemisah setelah bagian 2 -->
 
         <!-- BAGIAN 3: Daftar item pembelian -->
         <table>
@@ -137,10 +137,12 @@
             </tbody>
         </table>
 
+
         <!-- BAGIAN 4: Total harga -->
         <div class="total">
             Total: Rp {{ number_format($pembelian->total_price, 0, ',', '.') }}
         </div>
+
 
         <!-- BAGIAN 5: Footer -->
         <div class="footer">

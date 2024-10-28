@@ -557,7 +557,7 @@
           <ul class="list-group">
             <li v-for="(menu, index) in reservation.menus" :key="menu.id" class="list-group-item d-flex justify-content-between align-items-center">
               <span>
-                {{ menu.name }} - Rp {{ formatRupiah(menu.price) }} x {{ menu.quantity }}
+                {{ menu.name }} - {{ formatRupiah(menu.price) }} x {{ menu.quantity }}
               </span>
               <button type="button" @click="removeMenu(index)" class="btn btn-danger btn-sm">
                 Remove
@@ -600,10 +600,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
+// import Datepicker from "vue3-datepicker"; // Import vue3-datepicker
 
 
 // Define types for Product and SelectedMenu
@@ -630,8 +631,10 @@ const reservation = ref({
   start_time: '',
   end_time: '',
   guests: 1,
-  menus: [] as SelectedMenu[]
+  menus: [] as SelectedMenu[],
+  total_price: 0,
 });
+
 
 // List of products (menu items)
 const products = ref<Product[]>([]);
@@ -688,6 +691,15 @@ const addMenu = () => {
     }
   }
 };
+
+
+// Computed property for total price
+const totalPrice = computed(() => {
+  return reservation.value.menus.reduce((total, menu) => {
+    return total + (menu.price * menu.quantity);
+  }, 0);
+});
+
 
 // Remove a menu from the selected list
 const removeMenu = (index: number) => {
@@ -758,6 +770,8 @@ const submitReservation = async () => {
     return; // Hentikan fungsi jika validasi gagal
   }
 
+   // Mengirim total pesanan
+   reservation.value.total_price = totalPrice.value;
 
   // Validate if the number of guests exceeds the daily limit
   if (!checkReservationLimit()) {
@@ -779,6 +793,7 @@ const submitReservation = async () => {
   try {
     // Send POST request to create reservation
     const response = await axios.post('http://localhost:8000/api/reservations', reservation.value);
+
 
     // If successful
     reservationSuccess.value = true;
@@ -910,7 +925,7 @@ const submitReservation = async () => {
               border-bottom: 1px solid #ddd;
             ">
             ${reservation.value.menus.map(menu => `
-              - ${menu.name} (x${menu.quantity}) - Rp ${formatRupiah(menu.price)}
+              - ${menu.name} (x${menu.quantity}) - ${formatRupiah(menu.price)}
             `).join('<br>')}
           </div>
         </div>
@@ -939,7 +954,8 @@ const submitReservation = async () => {
       start_time: '',
       end_time: '',
       guests: 1,
-      menus: [] as SelectedMenu[]
+      menus: [] as SelectedMenu[],
+      total_price: 0,
     };
 
   } catch (error) {
@@ -1720,8 +1736,6 @@ p {
   border: 1px solid #ddd; /* Border for list items */
   border-radius: 5px; /* Rounded corners */
 }
-
-
 
 /* Alert Message Styling */
 .alert {
