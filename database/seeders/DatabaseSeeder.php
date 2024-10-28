@@ -25,8 +25,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             SettingSeeder::class,
             ItemsTableSeeder::class,
-            ReservationSeeder::class,
             ProductSeeder::class,
+            ReservationSeeder::class,
         ]);
     }
 

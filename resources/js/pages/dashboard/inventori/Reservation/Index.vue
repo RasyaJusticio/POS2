@@ -24,7 +24,8 @@
       </div>
     </div>
 
-    <!-- Filter, Sort and Total section -->
+    
+     <!-- Filter, Sort and Total section -->
     <div class="card-body">
       <div class="row align-items-center mb-4">
         <!-- Filter by Date -->
@@ -61,8 +62,8 @@
           </div>
         </div>
 
-        <!-- Sort by Status -->
-        <div class="col-md-4">
+      <!-- Sort by Status -->
+      <div class="col-md-4">
           <div class="fv-row">
             <label class="form-label fw-bold fs-6 required" for="sort-status">
               <i class="la la-toggle-on"></i> Sort by Status
@@ -79,17 +80,17 @@
             </select>
           </div>
         </div>
+      </div>  
 
-        <!-- Total Reservations and Guests -->
-        <div class="col-md-4 text-center my-4">
-          <div class="d-flex justify-content-center">
-            <h5 class="mb-0 me-3">
-              Total Reservations: <span class="badge bg-primary fs-5 text-white">{{ totalReservations }}</span>
-            </h5>
-            <h5 class="mb-0">
-              Total Guests: <span class="badge bg-success fs-5 text-white">{{ totalGuests }}</span>
-            </h5>
-          </div>
+      <!-- Total Reservations and Guests -->
+      <div class="col-md-4 text-center my-4">
+        <div class="d-flex justify-content-center">
+          <h5 class="mb-0 me-3">
+            Total Reservations: <span class="badge bg-primary fs-5 text-white">{{ totalReservations }}</span>
+          </h5>
+          <h5 class="mb-0">
+            Total Guests: <span class="badge bg-success fs-5 text-white">{{ totalGuests }}</span>
+          </h5>
         </div>
       </div>
     </div>
@@ -120,7 +121,7 @@
             <td>{{ reservation.id }}</td>
             <td>{{ reservation.name }}</td>
             <td>{{ reservation.phone }}</td>
-            <td>{{ reservation.date }}</td>
+            <td>{{ formatDate(reservation.date) }}</td>
             <td>{{ reservation.start_time }}</td>
             <td>{{ reservation.end_time }}</td>
             <td>{{ reservation.guests }}</td>
@@ -150,12 +151,12 @@ import axios from 'axios';
 // State variables
 const reservations = ref<any[]>([]);
 const filteredReservations = ref<any[]>([]);
-const paginatedReservations = ref<any[]>([]);
-const selectedDate = ref('');
+const startDate = ref('');
+const endDate = ref(''); // Tambahkan ref untuk endDate
 const sortOrder = ref('asc'); // Sorting order
-const itemsPerPage = ref(5); // Items per page
-const currentPage = ref(1); // Track current page
-const statusFilter = ref(''); // Filter by status
+const sortStatus = ref(''); 
+const totalReservations = ref(0);
+const totalGuests = ref(0);
 
 //format penomoran rupiah
 const formatRupiah = (amount: number) => {
@@ -181,7 +182,7 @@ const fetchReservations = async () => {
     reservations.value = response.data.reservations; // Save all fetched reservations
     filteredReservations.value = [...reservations.value]; // Initialize filteredReservations
     sortReservations(); // Apply default sorting
-    paginateReservations(); // Initial pagination
+    calculateTotals();  // Calculate totals on initial load
   } catch (error) {
     console.error('Error fetching reservations:', error);
   }
@@ -189,15 +190,26 @@ const fetchReservations = async () => {
 
 // Function to filter reservations by selected date
 const filterByDate = () => {
-  if (selectedDate.value) {
-    filteredReservations.value = reservations.value.filter(
-      (reservation: any) => reservation.date === selectedDate.value
-    );
+  if (startDate.value && endDate.value) {
+    console.log("Start Date:", new Date(startDate.value));
+    console.log("End Date:", new Date(endDate.value));
+
+    const start = new Date(startDate.value);
+    const end = new Date(endDate.value);
+
+    filteredReservations.value = reservations.value.filter((reservation) => {
+      const reservationDate = new Date(reservation.date);
+      console.log("Reservation Date:", reservationDate);
+      return reservationDate >= start && reservationDate <= end;
+    });
+
+    console.log("Filtered Reservations:", filteredReservations.value);
   } else {
-    filteredReservations.value = [...reservations.value]; // If no date is selected, show all
+    filteredReservations.value = [...reservations.value];
   }
-  sortReservations(); // Apply sorting after filtering
-  paginateReservations(); // Apply pagination after filtering
+
+  sortReservations();
+  calculateTotals();
 };
 
 
@@ -235,7 +247,6 @@ const isReservationEnded = (reservation: any) => {
   const endTime = new Date(`${reservation.date} ${reservation.end_time}`);
   return now > endTime;
 };
-
 
 // Function to return CSS class based on reservation status
 const getReservationClass = (reservation: any) => {
@@ -379,75 +390,3 @@ onMounted(() => {
 });
 
 </script>
-
-<style scoped>
-.form-label {
-  margin-bottom: 0.5rem; /* Spacing between label and input */
-}
-
-.form-control {
-  margin-bottom: 1rem; /* Spacing between form controls */
-}
-
-.card-body {
-  padding: 1.5rem; /* Add padding to improve spacing */
-}
-
-.card-header {
-  padding: 1rem 1.5rem; /* Align with card-body padding */
-  display: flex; /* Align header items horizontally */
-  justify-content: space-between; /* Space between title and buttons */
-}
-
-.card-header h2 {
-  font-size: 1.75rem; /* Slightly larger heading */
-  font-weight: bold;
-}
-
-button {
-  font-size: 1.1rem; /* Smaller font for buttons */
-  padding: 0.5rem 1rem; /* Consistent button padding */
-}
-
-.btn i {
-  font-size: 2rem; /* Ukuran ikon lebih besar */
-}
-
-.btn-success {
-  background-color: #28a745;
-}
-
-.table-hover tbody tr:hover {
-  background-color: #f2f2f2; /* Light gray hover effect */
-}
-
-.table th, .table td {
-  text-align: center; /* Center align the table data */
-  vertical-align: middle; /* Vertical center align */
-}
-
-.table th {
-  background-color: #343a40;
-  color: white; /* Dark header with white text */
-}
-
-.table-bordered {
-  border: 1px solid #dee2e6; /* Border around the table */
-}
-
-.badge {
-  font-size: 1rem;
-}
-
-@media (max-width: 768px) {
-  .card-header h2 {
-    font-size: 1.5rem; /* Smaller heading on small screens */
-  }
-  button {
-    font-size: 0.75rem; /* Adjust button size for smaller screens */
-  }
-  .table th, .table td {
-    font-size: 0.875rem; /* Reduce table font size */
-  }
-}
-</style>

@@ -1,71 +1,114 @@
 <script setup lang="ts">
-import { h, ref, onMounted } from "vue";
+import { h, ref, onMounted, watch } from "vue";
 import { useDelete } from "@/libs/hooks";
 import { createColumnHelper } from "@tanstack/vue-table";
-import type { Pembelian } from "@/types/laporan"; // Ganti dengan path yang sesuai
+import type { Pembelian } from "@/types/laporan";
 import axios from "@/libs/axios";
 import { formatRupiah } from "@/libs/utilss";
 
+
 const column = createColumnHelper<Pembelian>();
 const paginateRef = ref<any>(null);
-const transactions = ref<Pembelian[]>([]); // Menyimpan data transaksi
+const transactions = ref<Pembelian[]>([]);
 const selectedTransaction = ref<Pembelian | null>(null);
-const selectedDate = ref<string>('');
 
+// Date filter refs
 const startDate = ref<string>('');
 const endDate = ref<string>('');
-// Fungsi filter transaksi berdasarkan tanggal yang dipilih
+const isLoading = ref<boolean>(false);
+const noDataMessage = ref<string>('');
+
+// Watch for changes in date range
+watch([startDate, endDate], async ([newStartDate, newEndDate]) => {
+  if (newStartDate && newEndDate) {
+    await filterByDateRange();
+  }
+});
+
+const filterByDateRange = async () => {
+  if (!startDate.value || !endDate.value) {
+    noDataMessage.value = 'Silakan pilih rentang tanggal';
+    return;
+  }
+
+  // Validate date range
+  if (new Date(startDate.value) > new Date(endDate.value)) {
+    noDataMessage.value = 'Tanggal awal tidak boleh lebih besar dari tanggal akhir';
+    return;
+  }
+
+  isLoading.value = true;
+  noDataMessage.value = '';
+
+  try {
+    const response = await axios.post('/inventori/laporan', {
+      start_date: startDate.value,
+      end_date: endDate.value
+    });
+
+    if (response.data && response.data.length > 0) {
+      transactions.value = response.data;
+      noDataMessage.value = '';
+    } else {
+      transactions.value = [];
+      noDataMessage.value = 'Tidak ada transaksi pada rentang tanggal yang dipilih';
+    }
+  } catch (error) {
+    console.error('Error fetching transactions:', error);
+    noDataMessage.value = 'Terjadi kesalahan saat mengambil data';
+    transactions.value = [];
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Reset filter function
+const resetFilter = () => {
+  startDate.value = '';
+  endDate.value = '';
+  transactions.value = [];
+  noDataMessage.value = '';
+  fetchInitialData(); // Fetch initial data after reset
+};
 
 const checkNameBeforeSubmit = () => {
     if (!selectedTransaction.value?.customer_name) {
         alert("Nama pembeli tidak boleh kosong. Silakan isi nama sebelum melanjutkan.");
-        return false; // Menghentikan proses jika nama kosong
+        return false;
     }
-    return true; // Lanjutkan jika nama sudah terisi
+    return true;
 };
-
-
-const filterByDate = async () => {
-    if (!selectedDate.value) {
-        transactions.value = []; // Kosongkan data jika tidak ada tanggal dipilih
-        return;
-    }
-
-    try {
-        const response = await axios.post('/inventori/laporan', {
-            date: selectedDate.value, // Kirimkan tanggal yang dipilih ke server
-        });
-        transactions.value = response.data; // Update data transaksi berdasarkan respons
-    } catch (error) {
-        console.error('Error fetching transactions', error);
-        transactions.value = []; // Kosongkan data jika ada error
-    }
-};
-
-// Panggil filterByDate ketika komponen dimuat untuk mendapatkan data awal (opsional)
-filterByDate();
 
 const { delete: deletePembelian } = useDelete({
     onSuccess: () => paginateRef.value.refetch(),
-})
-
-// Mendapatkan data transaksi saat komponen dimuat
-onMounted(async () => {
-    try {
-        const response = await axios.post('/inventori/laporan');
-        transactions.value = response.data; 
-    } catch (error) {
-        console.error('Error fetching transactions:', error);
-    }
 });
 
-// Fungsi untuk mencetak laporan transaksi
-const printTransaction = async () => {
+// Initial data fetch
+const fetchInitialData = async () => {
     try {
         const response = await axios.post('/inventori/laporan');
-        const transactions = response.data.data;
+        transactions.value = response.data;
+    } catch (error) {
+        console.error('Error fetching initial transactions:', error);
+        noDataMessage.value = 'Terjadi kesalahan saat mengambil data awal';
+    }
+};
 
-        // Memformat data transaksi
+// Print transaction function
+const printTransaction = async () => {
+    try {
+        let response;
+        if (startDate.value && endDate.value) {
+            response = await axios.post('/inventori/laporan', {
+                start_date: startDate.value,
+                end_date: endDate.value
+            });
+        } else {
+            response = await axios.post('/inventori/laporan');
+        }
+        
+        const transactions = response.data;
+
         const printContent = `
             <html>
             <head>
@@ -78,6 +121,11 @@ const printTransaction = async () => {
                     h1 {
                         text-align: center;
                         color: #0070C0;
+                    }
+                    .date-range {
+                        text-align: center;
+                        margin-bottom: 20px;
+                        font-size: 14px;
                     }
                     table {
                         border-collapse: collapse;
@@ -109,11 +157,18 @@ const printTransaction = async () => {
             </head>
             <body>
                 <h1>Laporan Transaksi</h1>
+                ${startDate.value && endDate.value ? `
+                    <div class="date-range">
+                        Periode: ${new Date(startDate.value).toLocaleDateString('id-ID')} - 
+                        ${new Date(endDate.value).toLocaleDateString('id-ID')}
+                    </div>
+                ` : ''}
                 <table>
                     <thead>
                         <tr>
                             <th>No</th>
                             <th>ID Pembelian</th>
+                            <th>Nama Pembeli</th>
                             <th>Status Pembayaran</th>
                             <th>Total</th>
                             <th>Tanggal Pesanan</th>
@@ -124,14 +179,17 @@ const printTransaction = async () => {
                             <tr>
                                 <td>${index + 1}</td>
                                 <td>${transaction.pembelian_id}</td>
+                                <td>${transaction.customer_name}</td>
                                 <td>${transaction.status}</td>
                                 <td>${formatRupiah(transaction.total_price)}</td>
+                                <td>${new Date(transaction.created_at).toLocaleDateString('id-ID')}</td>
                             </tr>
                         `).join('')}
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colspan="5">Total Transaksi: ${transactions.length}</td>
+                            <td colspan="4">Total Transaksi:</td>
+                            <td colspan="2">${transactions.length}</td>
                         </tr>
                     </tfoot>
                 </table>
@@ -154,18 +212,20 @@ const printTransaction = async () => {
     }
 };
 
-
-// Fungsi untuk mengekspor laporan transaksi ke Excel
+// Export transaction function
 const exportTransaction = async () => {
     try {
-        const response = await axios.get('/inventori/laporan/export', {
+        const queryParams = startDate.value && endDate.value ? 
+            `?start_date=${startDate.value}&end_date=${endDate.value}` : '';
+            
+        const response = await axios.get(`/inventori/laporan/export${queryParams}`, {
             responseType: 'blob',
         });
 
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'DATA TRANSAKSI SIAM   .xlsx');
+        link.setAttribute('download', 'DATA TRANSAKSI SIAM.xlsx');
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -174,21 +234,8 @@ const exportTransaction = async () => {
     }
 };
 
-
-// Mendapatkan data transaksi saat komponen dimuat
-onMounted(async () => {
-    try {
-        const response = await axios.post('/inventori/laporan');
-        transactions.value = response.data;
-        paginateRef.value.refetch(); 
-    } catch (error) {
-        console.error('Error fetching transactions:', error);
-    }
-});
-
 const markAsProcessed = async (transaction: Pembelian) => {
-    // Simpan status pesanan ke backend
-    transaction.created = true; // Mark as processed
+    transaction.created = true;
     try {
         await axios.put(`/inventori/laporan/${transaction.id}`, {
             created: transaction.created,
@@ -203,20 +250,24 @@ const columns = [
     column.display({
         header: "No",
         cell: (cell) => {
-            return cell.row.index + 1; // Menggunakan indeks baris sebagai nomor urut
+            return cell.row.index + 1;
         },
     }),
     column.accessor("id", {
         header: "ID Pembelian",
-        cell: (cell) => cell.getValue().toString().padStart(3, '0'), // Memastikan minimal 3 digit dengan padding '0'
+        cell: (cell) => cell.getValue().toString().padStart(3, '0'),
     }),
     column.accessor("customer_name", {
         header: "Nama",
     }),
     column.accessor("items", {
         header: "Produk yang Dibeli",
+        cell: (cell) => {
+            const itemsList = cell.getValue().split("\n").map(item => `<div>${item}</div>`).join('');
+            return h('div', { innerHTML: itemsList });
+        }
     }),
-       column.accessor("total_price", {
+    column.accessor("total_price", {
         header: "Total",
         cell: (cell) => formatRupiah(cell.getValue()),
     }),
@@ -229,7 +280,7 @@ const columns = [
             return new Date(cell.getValue()).toLocaleDateString("id-ID");
         },
     }),
-       column.accessor("created", {
+    column.accessor("created", {
         header: "Pesanan Dibuat",
         cell: (cell) => cell.getValue() ? "On Process" : "Procces",
     }),
@@ -245,16 +296,6 @@ const columns = [
                     },
                     h("i", { class: "la la-eye fs-2" })
                 ),
-                // h(
-                //     "button",
-                //     {
-                //         class: "btn btn-sm btn-icon btn-success",
-                //         disabled: cell.row.original.created, // Disable if already processed
-                //         onClick: () => markAsProcessed(cell.row.original),
-                //     },
-                //     h("i", { class: "fa fa-check fs-2" }) // Font Awesome check icon
-                    
-                // ),
                 h(
                     "button",
                     {
@@ -268,91 +309,135 @@ const columns = [
     }),
 ];
 
-
-const refresh = () => paginateRef.value.refetch();
+// Fetch initial data when component is mounted
+onMounted(fetchInitialData);
 </script>
-
 
 <template>
     <div class="card mb-4">
-      <div class="card-header d-flex align-items-center">
-        <h2 class="mb-0">Laporan Transaksi</h2>
-  
-        <!-- Button for printing the reservations list -->
-        <button
-          type="button"
-          class="btn btn-sm btn-secondary ms-auto"
-          @click="printTransaction"
-        >
-          Print
-          <i class="la la-print"></i>
-        </button>
-  
-        <!-- Button for exporting the reservations list to Excel -->
-        <button
-          type="button"
-          class="btn btn-sm btn-secondary ms-2"
-          @click="exportTransaction"
-        >
-          Export Excel
-          <i class="la la-file-excel"></i>
-        </button>
-      </div>
-  
-      <div class="card-body">
-        <div class="col-md-4 mb-4">
-        <label class="form-label fw-bold fs-6 required" for="reservation-date">
-          <i class="la la-calendar"></i> Pilih Tanggal
-        </label>
-        <input
-          type="date"
-          id="reservation-date"
-          v-model="selectedDate"
-          @change="filterByDate"
-          class="form-control form-control-lg form-control-solid"
-        />
-      </div>
-  
-        <paginate
-          ref="paginateRef"
-          id="table-transactions"
-          url="/inventori/laporan"
-          :columns="columns"
-          :data="transactions"
-        ></paginate>
-      </div>
+        <div class="card-header d-flex align-items-center">
+            <h2 class="mb-0">Laporan Transaksi</h2>
+
+            <button
+                type="button"
+                class="btn btn-sm btn-secondary ms-auto"
+                @click="printTransaction"
+                :disabled="isLoading"
+            >
+                <i class="la la-print"></i>
+                Print
+            </button>
+
+            <button
+                type="button"
+                class="btn btn-sm btn-secondary ms-2"
+                @click="exportTransaction"
+                :disabled="isLoading"
+            >
+                <i class="la la-file-excel"></i>
+                Export Excel
+            </button>
+        </div>
+
+        <div class="card-body">
+            <!-- Date Range Filter -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold fs-6 required">
+                        <i class="la la-calendar"></i> Tanggal Awal
+                    </label>
+                    <input
+                        type="date"
+                        v-model="startDate"
+                        class="form-control form-control-lg form-control-solid"
+                        :max="endDate || undefined"
+                        :disabled="isLoading"
+                    />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold fs-6 required">
+                        <i class="la la-calendar"></i> Tanggal Akhir
+                    </label>
+                    <input
+                        type="date"
+                        v-model="endDate"
+                        class="form-control form-control-lg form-control-solid"
+                        :min="startDate || undefined"
+                        :disabled="isLoading"
+                    />
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button
+                        class="btn btn-primary me-2"
+                        @click="filterByDateRange"
+                        :disabled="!startDate || !endDate || isLoading"
+                    >
+                        <i class="la la-search"></i>
+                        {{ isLoading ? 'Mencari...' : 'Cari' }}
+                    </button>
+                    <button
+                        class="btn btn-secondary"
+                        @click="resetFilter"
+                        :disabled="isLoading"
+                    >
+                        <i class="la la-refresh"></i>
+                        Reset
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading and No Data Messages -->
+            <div v-if="isLoading" class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+
+            <div v-else-if="noDataMessage" class="alert alert-info text-center">
+                {{ noDataMessage }}
+            </div>
+
+            <!-- Data Table -->
+            <div v-else>
+                <paginate
+                    ref="paginateRef"
+                    id="table-transactions"
+                    url="/inventori/laporan"
+                    :columns="columns"
+                    :data="transactions"
+                ></paginate>
+            </div>
+        </div>
     </div>
-  
-    <!-- Detail Transaksi Modal -->
+
+    <!-- Detail Transaction Modal -->
     <div v-if="selectedTransaction" class="modal-overlay">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5>Detail Transaksi</h5>
-          <button class="modal-close" @click="selectedTransaction = null">
-            &times;
-          </button>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5>Detail Transaksi</h5>
+                <button class="modal-close" @click="selectedTransaction = null">
+                    &times;
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <p><strong>ID Pembelian:</strong> {{ selectedTransaction?.id }}</p>
+                <p><strong>Nama:</strong> {{ selectedTransaction?.customer_name }}</p>
+                <p><strong>Pesanan:</strong> {{ selectedTransaction?.items }}</p>
+                <p><strong>Total Harga:</strong> {{ formatRupiah(selectedTransaction?.total_price) }}</p>
+                <p><strong>Status Pembayaran:</strong> {{ selectedTransaction?.status }}</p>
+                <p><strong>Tanggal Transaksi:</strong> {{ new Date(selectedTransaction?.created_at).toLocaleDateString("id-ID") }}</p>
+                <p><strong>Status Pesanan Dibuat:</strong> {{ selectedTransaction?.created ? 'On Process' : 'Procces' }}</p>
+            </div>
+
+            <button class="btn btn-secondary" @click="selectedTransaction = null">
+                Tutup Detail
+            </button>
         </div>
-  
-        <div class="modal-body">
-          <p><strong>ID Pembelian:</strong> {{ selectedTransaction?.id }}</p>
-          <p><strong>Nama:</strong> {{ selectedTransaction?.customer_name }}</p>
-          <p><strong>Pesanan:</strong> {{ selectedTransaction?.items }}</p>
-          <p><strong>Total Harga:</strong> {{ formatRupiah(selectedTransaction?.total_price) }}</p>
-          <p><strong>Status Pembayaran:</strong> {{ selectedTransaction?.status }}</p>
-          <p><strong>Tanggal Transaksi:</strong> {{ new Date(selectedTransaction?.created_at).toLocaleDateString("id-ID") }}</p>
-          <p><strong>Status Pesanan Dibuat:</strong> {{ selectedTransaction?.created ? 'On Process' : 'Procces' }}</p>
-        </div>
-  
-        <button class="btn btn-secondary" @click="selectedTransaction = null">
-          Tutup Detail
-        </button>
-      </div>
     </div>
-  </template>
-  
-  
-  
-  <style scoped>
+</template>
+
+<style scoped>
   /* CARD STYLING */
   .card {
     border-radius: 10px;
