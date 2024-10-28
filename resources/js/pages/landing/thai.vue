@@ -106,7 +106,6 @@
                 placeholder="masukkan nama anda"
            />
         </div>
-    </aside>
         <ul class="cart-list">
             <li v-for="cartItem in cart" :key="cartItem.id" class="cart-item">
                 <div class="cart-item-details">

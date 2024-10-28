@@ -215,6 +215,11 @@ const columns = [
     }),
     column.accessor("items", {
         header: "Produk yang Dibeli",
+        cell: (cell) => {
+            // Pisahkan setiap produk dengan <br /> untuk membuat jarak vertikal
+            const itemsList = cell.getValue().split("\n").map(item => `<div>${item}</div>`).join('');
+            return h('div', { innerHTML: itemsList }); // Gunakan innerHTML untuk render div dengan newline
+        }
     }),
        column.accessor("total_price", {
         header: "Total",

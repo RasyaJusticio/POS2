@@ -24,65 +24,63 @@
       </div>
     </div>
 
-    <!-- Filter, Sort and Total section -->
+    
+     <!-- Filter, Sort and Total section -->
     <div class="card-body">
-      <div class="row">
-        <div class="col-md-4 mb-4">
-          <label class="form-label fw-bold fs-6 required">
-            <i class="la la-calendar"></i> Filter By Date (Start)
-          </label>
-          <Datepicker v-model="startDate" class="form-control" />
+      <div class="row align-items-center mb-4">
+        <!-- Filter by Date -->
+        <div class="col-md-4">
+          <div class="fv-row">
+            <label class="form-label fw-bold fs-6 required" for="reservation-date">
+              <i class="la la-calendar"></i> Filter by Date
+            </label>
+            <input
+              type="date"
+              id="reservation-date"
+              v-model="selectedDate"
+              @change="filterByDate"
+              class="form-control form-control-lg form-control-solid"
+            />
+          </div>
         </div>
-        <div class="col-md-4 mb-4">
-          <label class="form-label fw-bold fs-6 required">
-            <i class="la la-calendar"></i> Filter By Date (End)
-          </label>
-          <Datepicker v-model="endDate" class="form-control" />
-        </div>
-        <div class="col-md-4 mb-4 d-flex align-items-end">
-          <button class="btn btn-primary" type="button" @click="filterByDate">
-            Filter
-          </button>
-        </div>
-      </div>
 
-
-      <!-- Sort by Date -->
-      <div class="col-md-4">
-        <div class="fv-row">
-          <label class="form-label fw-bold fs-6 required" for="sort-date">
-            <i class="la la-sort"></i> Sort by Date
-          </label>
-          <select
-            id="sort-date"
-            v-model="sortOrder"
-            @change="sortReservations"
-            class="form-control form-control-lg form-control-solid"
-          >
-            <option value="asc">Oldest First</option>
-            <option value="desc">Newest First</option>
-          </select>
+        <!-- Sort by Date -->
+        <div class="col-md-4">
+          <div class="fv-row">
+            <label class="form-label fw-bold fs-6 required" for="sort-date">
+              <i class="la la-sort"></i> Sort by Date
+            </label>
+            <select
+              id="sort-date"
+              v-model="sortOrder"
+              @change="sortReservations"
+              class="form-control form-control-lg form-control-solid"
+            >
+              <option value="asc">Oldest First</option>
+              <option value="desc">Newest First</option>
+            </select>
+          </div>
         </div>
-      </div>
 
       <!-- Sort by Status -->
       <div class="col-md-4">
-        <div class="fv-row">
-          <label class="form-label fw-bold fs-6 required" for="sort-status">
-            <i class="la la-toggle-on"></i> Sort by Status
-          </label>
-          <select
-            id="sort-status"
-            v-model="sortStatus"
-            @change="sortReservations"
-            class="form-control form-control-lg form-control-solid"
-          >
-            <option value="">All</option>
-            <option value="active">Active</option>
-            <option value="ended">Reservation Ended</option>
-          </select>
+          <div class="fv-row">
+            <label class="form-label fw-bold fs-6 required" for="sort-status">
+              <i class="la la-toggle-on"></i> Sort by Status
+            </label>
+            <select
+              id="sort-status"
+              v-model="sortStatus"
+              @change="sortReservations"
+              class="form-control form-control-lg form-control-solid"
+            >
+              <option value="">All</option>
+              <option value="active">Active</option>
+              <option value="ended">Reservation Ended</option>
+            </select>
+          </div>
         </div>
-      </div>
+      </div>  
 
       <!-- Total Reservations and Guests -->
       <div class="col-md-4 text-center my-4">
