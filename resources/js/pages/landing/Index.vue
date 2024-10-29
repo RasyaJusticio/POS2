@@ -443,7 +443,7 @@
             <a href="https://www.instagram.com/noflabs?igsh=MW52OTBuNHg4OHR4ZQ==" target="_blank" class="btn btn-outline-success1 mx-2">
                 <i class="fab fa-instagram"></i> Instagram
             </a>
-            <a href="https://wa.me/qr/STA2YM5YISFCF1 " target="_blank" class="btn btn-outline-success2 mx-2">
+            <a href="https://wa.me/+6287872047279?text=p%20balap " target="_blank" class="btn btn-outline-success2 mx-2">
                 <i class="fab fa-whatsapp "></i> WhatsApp
             </a>
             <a href="https://facebook.com/yourrestaurant" target="_blank" class="btn btn-outline-success3 mx-2">
@@ -484,31 +484,37 @@
         </div>
 
         <!-- Date -->
-        <div class="J">
-        <label for="date" class="form-label">Date:</label>
-        <Datepicker 
-          v-model="reservation.date" 
-          format="dd/MM/yyyy" 
-          required 
-          @change="fetchTotalReservations" 
-          class="form-control" 
+        <<div class="col-md-6">
+    <div class="fv-row mb-7">
+        <label class="form-label fw-bold fs-6 required">Tanggal</label>
+        <Flatpickr
+            class="form-control form-control-lg form-control-solid"
+            v-model="reservation.date"
+            :config="{ dateFormat: 'Y-m-d' }"
+            @change="fetchTotalReservations"
         />
+        <div class="fv-help-block">
+            <ErrorMessage name="date" />
         </div>
+    </div>
+</div>
 
-        <div class="time-container">
-          <!-- Start Time -->
-          <div class="Ji">
-            <label for="start-time" class="form-label">Start Time:</label>
-            <input type="time" id="start-time" v-model="reservation.start_time" class="form-control" required />
-          </div>
 
-          <!-- End Time -->
-          <div class="Ji">
-            <label for="end-time" class="form-label">End Time:</label>
-            <input type="time" id="end-time" v-model="reservation.end_time" class="form-control" required />
+
+          <div class="time-container">
+            <!-- Start Time -->
+            <div class="Ji">
+              <label for="start-time" class="form-label">Start Time:</label>
+              <input type="time" id="start-time" v-model="reservation.start_time" class="form-control" required />
+            </div>
+
+            <!-- End Time -->
+            <div class="Ji">
+              <label for="end-time" class="form-label">End Time:</label>
+              <input type="time" id="end-time" v-model="reservation.end_time" class="form-control" required />
+            </div>
           </div>
         </div>
-      </div>
 
       <!-- Right Column -->
       <div class="right-column">
@@ -557,7 +563,7 @@
           <ul class="list-group">
             <li v-for="(menu, index) in reservation.menus" :key="menu.id" class="list-group-item d-flex justify-content-between align-items-center">
               <span>
-                {{ menu.name }} - {{ formatRupiah(menu.price) }} x {{ menu.quantity }}
+                {{ menu.name }} - Rp {{ formatRupiah(menu.price) }} x {{ menu.quantity }}
               </span>
               <button type="button" @click="removeMenu(index)" class="btn btn-danger btn-sm">
                 Remove
@@ -565,6 +571,11 @@
             </li>
           </ul>
         </div>
+
+        <div>
+      <strong>Total Price: {{ formatRupiah(totalPrice) }}</strong>
+    </div>
+
 
         <!-- Display error message if no menus have been added -->
         <div v-if="showMenuError" class="text-danger mt-2">
@@ -600,11 +611,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+<<<<<<< HEAD
 
 // import Datepicker from "vue3-datepicker"; // Import vue3-datepicker
+=======
+import Flatpickr from "vue-flatpickr-component";
+import "flatpickr/dist/flatpickr.css";
+import Datepicker from 'vue3-datepicker'
+
+>>>>>>> eaf7d5673f0403326eeffdefd14c5397fcdb3831
 
 
 // Define types for Product and SelectedMenu
@@ -632,9 +650,8 @@ const reservation = ref({
   end_time: '',
   guests: 1,
   menus: [] as SelectedMenu[],
-  total_price: 0,
+  total_price: 0
 });
-
 
 // List of products (menu items)
 const products = ref<Product[]>([]);
@@ -699,7 +716,6 @@ const totalPrice = computed(() => {
     return total + (menu.price * menu.quantity);
   }, 0);
 });
-
 
 // Remove a menu from the selected list
 const removeMenu = (index: number) => {
@@ -770,8 +786,8 @@ const submitReservation = async () => {
     return; // Hentikan fungsi jika validasi gagal
   }
 
-   // Mengirim total pesanan
-   reservation.value.total_price = totalPrice.value;
+  // Mengirim total pesanan
+  reservation.value.total_price = totalPrice.value;
 
   // Validate if the number of guests exceeds the daily limit
   if (!checkReservationLimit()) {
@@ -793,7 +809,6 @@ const submitReservation = async () => {
   try {
     // Send POST request to create reservation
     const response = await axios.post('http://localhost:8000/api/reservations', reservation.value);
-
 
     // If successful
     reservationSuccess.value = true;
@@ -925,7 +940,7 @@ const submitReservation = async () => {
               border-bottom: 1px solid #ddd;
             ">
             ${reservation.value.menus.map(menu => `
-              - ${menu.name} (x${menu.quantity}) - ${formatRupiah(menu.price)}
+              - ${menu.name} (x${menu.quantity}) - Rp ${formatRupiah(menu.price)}
             `).join('<br>')}
           </div>
         </div>
@@ -955,7 +970,7 @@ const submitReservation = async () => {
       end_time: '',
       guests: 1,
       menus: [] as SelectedMenu[],
-      total_price: 0,
+      total_price: 0 
     };
 
   } catch (error) {
@@ -980,13 +995,7 @@ const submitReservation = async () => {
 };
 
 
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Menambahkan 1 karena bulan dimulai dari 0
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`; // Format YYYY-MM-DD
-};
+
 
 
 // Memanggil fungsi untuk mendapatkan total reservasi saat halaman dimuat
@@ -1049,6 +1058,11 @@ onMounted(() => {
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
+.total-price {
+  margin-top: 20px;
+  font-size: 1.2em;
+  text-align: center;
+}
 
 .hero-banner video {
   width: 100%;
