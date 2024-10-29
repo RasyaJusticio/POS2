@@ -565,7 +565,6 @@
               <span>
                 {{ menu.name }} - Rp {{ formatRupiah(menu.price) }} x {{ menu.quantity }}
               </span>
-              <!-- Kontrol Kuantitas -->
               <div class="quantity-controls">
                 <button
                   @click="updateMenuQuantity(menu, -1)"
