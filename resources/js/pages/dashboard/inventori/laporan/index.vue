@@ -5,6 +5,7 @@ import { createColumnHelper } from "@tanstack/vue-table";
 import type { Pembelian } from "@/types/laporan"; // Ganti dengan path yang sesuai
 import axios from "@/libs/axios";
 import { formatRupiah } from "@/libs/utilss";
+import DatePicker from 'vue3-datepicker';
 
 const column = createColumnHelper<Pembelian>();
 const paginateRef = ref<any>(null);
@@ -12,19 +13,8 @@ const transactions = ref<Pembelian[]>([]); // Menyimpan data transaksi
 const selectedTransaction = ref<Pembelian | null>(null);
 const selectedDate = ref<string>('');
 
-const startDate = ref<string>('');
-const endDate = ref<string>('');
+
 // Fungsi filter transaksi berdasarkan tanggal yang dipilih
-
-const checkNameBeforeSubmit = () => {
-    if (!selectedTransaction.value?.customer_name) {
-        alert("Nama pembeli tidak boleh kosong. Silakan isi nama sebelum melanjutkan.");
-        return false; // Menghentikan proses jika nama kosong
-    }
-    return true; // Lanjutkan jika nama sudah terisi
-};
-
-
 const filterByDate = async () => {
     if (!selectedDate.value) {
         transactions.value = []; // Kosongkan data jika tidak ada tanggal dipilih
@@ -32,10 +22,18 @@ const filterByDate = async () => {
     }
 
     try {
+        const formattedDate = new Date(selectedDate.value).toISOString().split('T')[0]; // Format ke YYYY-MM-DD
         const response = await axios.post('/inventori/laporan', {
-            date: selectedDate.value, // Kirimkan tanggal yang dipilih ke server
+            date: formattedDate, // Kirimkan tanggal yang dipilih ke server
         });
-        transactions.value = response.data; // Update data transaksi berdasarkan respons
+        
+        // Pastikan respons berisi data yang diharapkan
+        if (response.data && Array.isArray(response.data)) {
+            transactions.value = response.data; // Update data transaksi berdasarkan respons
+        } else {
+            console.error('Data tidak valid:', response.data);
+            transactions.value = []; // Kosongkan data jika ada error
+        }
     } catch (error) {
         console.error('Error fetching transactions', error);
         transactions.value = []; // Kosongkan data jika ada error
@@ -141,7 +139,7 @@ const printTransaction = async () => {
 
         const newWindow = window.open('', '_blank');
         if (newWindow) {
-            newWindow.document.write(printContent);
+ newWindow.document.write(printContent);
             newWindow.document.close();
             newWindow.print();
             newWindow.close();
@@ -165,7 +163,7 @@ const exportTransaction = async () => {
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'DATA TRANSAKSI SIAM   .xlsx');
+        link.setAttribute('download', 'DATA TRANSAKSI SIAM.xlsx');
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -221,7 +219,7 @@ const columns = [
             return h('div', { innerHTML: itemsList }); // Gunakan innerHTML untuk render div dengan newline
         }
     }),
-       column.accessor("total_price", {
+    column.accessor("total_price", {
         header: "Total",
         cell: (cell) => formatRupiah(cell.getValue()),
     }),
@@ -234,7 +232,7 @@ const columns = [
             return new Date(cell.getValue()).toLocaleDateString("id-ID");
         },
     }),
-       column.accessor("created", {
+    column.accessor("created", {
         header: "Pesanan Dibuat",
         cell: (cell) => cell.getValue() ? "On Process" : "Procces",
     }),
@@ -273,10 +271,8 @@ const columns = [
     }),
 ];
 
-
 const refresh = () => paginateRef.value.refetch();
 </script>
-
 
 <template>
     <div class="card mb-4">
@@ -304,19 +300,19 @@ const refresh = () => paginateRef.value.refetch();
         </button>
       </div>
   
+      <!-- filter by date -->
       <div class="card-body">
-        <div class="col-md-4 mb-4">
-        <label class="form-label fw-bold fs-6 required" for="reservation-date">
-          <i class="la la-calendar"></i> Pilih Tanggal
-        </label>
-        <input
-          type="date"
-          id="reservation-date"
-          v-model="selectedDate"
-          @change="filterByDate"
-          class="form-control form-control-lg form-control-solid"
-        />
-      </div>
+    <div class="col-md-4 mb-4">
+      <label class="form-label fw-bold fs-6 required" for="reservation-date">
+        <i class="la la-calendar"></i> Pilih Tanggal
+      </label>
+      <DatePicker
+        v-model="selectedDate"
+        :format="dateFormat"
+        @change="filterByDate"
+        class="form-control form-control-lg form-control-solid"
+      />
+  </div>
   
         <paginate
           ref="paginateRef"
@@ -354,10 +350,8 @@ const refresh = () => paginateRef.value.refetch();
       </div>
     </div>
   </template>
-  
-  
-  
-  <style scoped>
+
+<style scoped>
   /* CARD STYLING */
   .card {
     border-radius: 10px;
@@ -436,7 +430,7 @@ const refresh = () => paginateRef.value.refetch();
   
   th {
     background-color: #0070C0;
-    color: white;
+ color: white;
   }
   
   tr:nth-child(even) {
@@ -471,6 +465,4 @@ const refresh = () => paginateRef.value.refetch();
       max-width: 100%;
     }
   }
-  </style>
-
-  
+</style>

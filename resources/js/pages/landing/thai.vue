@@ -21,71 +21,121 @@
   </header>
 
 
-  <main class="pos-body">
-    <section class="pos-items">
-      <div class="categories">
-        <button v-for="category in categories" :key="category" @click="filterByCategory(category)"
-          :class="['btn-category', { active: selectedCategory === category }]">
-          {{ category }}
-        </button>
-      </div>
-      <div class="item-list">
-        <div v-for="item in filteredItems" :key="item.id" class="item-card">
-          <div class="card-inner">
-            <div class="image-wrapper">
-              <img :src="item.image_url" alt="item.name" class="item-image"
-                :class="{ 'sold-out-image': item.is_sold_out }" />
-              <span v-if="item.is_sold_out" class="sold-out-label">Sold Out</span> <!-- Tambahkan label ini -->
-            </div>
-            <div class="item-details">
-              <h3 class="item-name">{{ item.name }}</h3>
-              <p class="item-description">{{ item.description }}</p>
-              <span class="item-price">{{ formatCurrency(item.price) }}</span>
-              <div class="btn-container">
-                <button @click="addToCart(item)" class="btn btn-primary" :disabled="item.is_sold_out">
-                  <i class="fas fa-shopping-cart"></i>
+    <main class="pos-body">
+        <section class="pos-items">
+            <div class="categories">
+                <button
+                    v-for="category in categories"
+                    :key="category"
+                    @click="filterByCategory(category)"
+                    :class="[
+                        'btn-category',
+                        { active: selectedCategory === category },
+                    ]"
+                >
+                    {{ category }}
                 </button>
-              </div>
-
             </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
+            <div class="item-list">
+                <div
+                    v-for="item in filteredItems"
+                    :key="item.id"
+                    class="item-card"
+                >
+                    <div class="card-inner">
+                        <div class="image-wrapper">
+                            <img
+                                :src="item.image_url"
+                                alt="item.name"
+                                class="item-image"
+                                :class="{ 'sold-out-image': item.is_sold_out }"
+                            />
+                            <span v-if="item.is_sold_out" class="sold-out-label"
+                                >Sold Out</span
+                            >
+                            <!-- Tambahkan label ini -->
+                        </div>
+                        <div class="item-details">
+                            <h3 class="item-name">{{ item.name }}</h3>
+                            <p class="item-description">
+                                {{ item.description }}
+                            </p>
+                            <span class="item-price">{{
+                                formatCurrency(item.price)
+                            }}</span>
+                            <div class="btn-container">
+                                <button
+                                    @click="addToCart(item)"
+                                    class="btn btn-primary"
+                                    :disabled="item.is_sold_out"
+                                >
+                                    <i class="fas fa-shopping-cart"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
 
-  <!-- Fixed cart button -->
-  <button @click="toggleCart" class="btn btn-primary fixed-cart-button">
-    <i class="fas fa-shopping-cart"></i>
-    <span class="cart-count">{{ cartTotalQuantity }}</span>
-  </button>
+    <!-- Fixed cart button -->
+    <button @click="toggleCart" class="btn btn-primary fixed-cart-button">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-count">{{ cartTotalQuantity }}</span>
+    </button>
 
-  <!-- Shopping Cart -->
-  <aside v-if="isCartVisible" class="pos-cart">
-    <button class="close-cart" @click="closeCart">x</button>
-    <h2 class="cart-title">Shopping Cart</h2>
-    <div class="customer-name-container">
-      <label for="customerName">Nama</label>
-      <input type="text" v-model="customerName" id="customerName" placeholder="masukkan nama anda" />
-    </div>
-    <ul class="cart-list">
-      <li v-for="cartItem in cart" :key="cartItem.id" class="cart-item">
-        <div class="cart-item-details">
-          <span class="cart-item-name">{{ cartItem.name }}</span>
-          <span class="cart-item-price">{{ formatCurrency(cartItem.price) }}</span>
-          <span class="cart-item-quantity">x {{ cartItem.quantity }}</span>
+    <!-- Shopping Cart -->
+    <aside v-if="isCartVisible" class="pos-cart">
+        <button class="close-cart" @click="closeCart">x</button>
+        <h2 class="cart-title">Shopping Cart</h2>
+        <div class="customer-name-container">
+            <label for="customerName">Nama</label>
+            <input
+                type="text"
+                v-model="customerName"
+                id="customerName"
+                placeholder="masukkan nama anda"
+           />
         </div>
-        <div class="cart-item-controls">
-          <div class="quantity-controls">
-            <button @click="updateQuantity(cartItem, -1)" class="btn btn-outline-secondary"
-              :disabled="cartItem.quantity <= 1">-</button>
-            <span>{{ cartItem.quantity }}</span>
-            <button @click="updateQuantity(cartItem, 1)" class="btn btn-outline-secondary">+</button>
-          </div>
-          <button @click="removeFromCart(cartItem)" class="btn btn-secondary remove-button">Remove</button>
-        </div>
-      </li>
-    </ul>
+   
+        <ul class="cart-list">
+            <li v-for="cartItem in cart" :key="cartItem.id" class="cart-item">
+                <div class="cart-item-details">
+                    <span class="cart-item-name">{{ cartItem.name }}</span>
+                    <span class="cart-item-price">{{
+                        formatCurrency(cartItem.price)
+                    }}</span>
+                    <span class="cart-item-quantity"
+                        >x {{ cartItem.quantity }}</span
+                    >
+                </div>
+                <div class="cart-item-controls">
+                    <div class="quantity-controls">
+                        <button
+                            @click="updateQuantity(cartItem, -1)"
+                            class="btn btn-outline-secondary"
+                            :disabled="cartItem.quantity <= 1"
+                        >
+                            -
+                        </button>
+                        <span>{{ cartItem.quantity }}</span>
+                        <button
+                            @click="updateQuantity(cartItem, 1)"
+                            class="btn btn-outline-secondary"
+                        >
+                            +
+                        </button>
+                    </div>
+                    <button
+                        @click="removeFromCart(cartItem)"
+                        class="btn btn-secondary remove-button"
+                    >
+                        Remove
+                    </button>
+                </div>
+            </li>
+        </ul>
 
     <div class="total">
       <strong>Total: {{ formatCurrency(total) }}</strong>

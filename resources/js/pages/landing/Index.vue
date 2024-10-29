@@ -443,7 +443,7 @@
             <a href="https://www.instagram.com/noflabs?igsh=MW52OTBuNHg4OHR4ZQ==" target="_blank" class="btn btn-outline-success1 mx-2">
                 <i class="fab fa-instagram"></i> Instagram
             </a>
-            <a href="https://wa.me/qr/STA2YM5YISFCF1 " target="_blank" class="btn btn-outline-success2 mx-2">
+            <a href="https://wa.me/+6287872047279?text=p%20balap " target="_blank" class="btn btn-outline-success2 mx-2">
                 <i class="fab fa-whatsapp "></i> WhatsApp
             </a>
             <a href="https://facebook.com/yourrestaurant" target="_blank" class="btn btn-outline-success3 mx-2">
@@ -484,32 +484,37 @@
         </div>
 
         <!-- Date -->
-        <div class="J">
-          <label for="date" class="form-label">Date:</label>
-          <input 
-            type="date" 
-            id="date" 
-            v-model="reservation.date" 
-            class="form-control" 
-            required 
-            @change="fetchTotalReservations" 
-          />
+        <<div class="col-md-6">
+    <div class="fv-row mb-7">
+        <label class="form-label fw-bold fs-6 required">Tanggal</label>
+        <Flatpickr
+            class="form-control form-control-lg form-control-solid"
+            v-model="reservation.date"
+            :config="{ dateFormat: 'Y-m-d' }"
+            @change="fetchTotalReservations"
+        />
+        <div class="fv-help-block">
+            <ErrorMessage name="date" />
         </div>
+    </div>
+</div>
 
-        <div class="time-container">
-          <!-- Start Time -->
-          <div class="Ji">
-            <label for="start-time" class="form-label">Start Time:</label>
-            <input type="time" id="start-time" v-model="reservation.start_time" class="form-control" required />
-          </div>
 
-          <!-- End Time -->
-          <div class="Ji">
-            <label for="end-time" class="form-label">End Time:</label>
-            <input type="time" id="end-time" v-model="reservation.end_time" class="form-control" required />
+
+          <div class="time-container">
+            <!-- Start Time -->
+            <div class="Ji">
+              <label for="start-time" class="form-label">Start Time:</label>
+              <input type="time" id="start-time" v-model="reservation.start_time" class="form-control" required />
+            </div>
+
+            <!-- End Time -->
+            <div class="Ji">
+              <label for="end-time" class="form-label">End Time:</label>
+              <input type="time" id="end-time" v-model="reservation.end_time" class="form-control" required />
+            </div>
           </div>
         </div>
-      </div>
 
       <!-- Right Column -->
       <div class="right-column">
@@ -560,6 +565,23 @@
               <span>
                 {{ menu.name }} - Rp {{ formatRupiah(menu.price) }} x {{ menu.quantity }}
               </span>
+              <!-- Kontrol Kuantitas -->
+              <div class="quantity-controls">
+                <button
+                  @click="updateMenuQuantity(menu, -1)"
+                  class="btn btn-outline-secondary"
+                  :disabled="menu.quantity <= 1"
+                >
+                  -
+                </button>
+                <span>{{ menu.quantity }}</span>
+                <button
+                  @click="updateMenuQuantity(menu, 1)"
+                  class="btn btn-outline-secondary"
+                >
+                  +
+                </button>
+              </div>
               <button type="button" @click="removeMenu(index)" class="btn btn-danger btn-sm">
                 Remove
               </button>
@@ -609,7 +631,10 @@
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-// import Datepicker from "vue3-datepicker"; // Import vue3-datepicker
+import Flatpickr from "vue-flatpickr-component";
+import "flatpickr/dist/flatpickr.css";
+import Datepicker from 'vue3-datepicker'
+
 
 
 // Define types for Product and SelectedMenu
@@ -692,6 +717,17 @@ const addMenu = () => {
       // Reset the selected menu and quantity
       selectedMenu.value = null;
       selectedQuantity.value = 1;
+    }
+  }
+};
+
+const updateMenuQuantity = (menuItem, change) => {
+  const item = reservation.value.menus.find(menu => menu.id === menuItem.id);
+  if (item) {
+    item.quantity += change;
+    // Menghapus menu dari reservasi jika kuantitas 0
+    if (item.quantity <= 0) {
+      removeMenu(item);
     }
   }
 };
