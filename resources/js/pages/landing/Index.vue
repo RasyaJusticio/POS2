@@ -553,7 +553,7 @@
 
         <!-- Display selected menus and allow quantity input -->
         <div v-if="reservation.menus.length > 0" class="mt-3">
-          <h4>Selected Menus</h4>
+          <h4>Select Menu</h4>
           <ul class="list-group">
             <li v-for="(menu, index) in reservation.menus" :key="menu.id" class="list-group-item d-flex justify-content-between align-items-center">
               <span>

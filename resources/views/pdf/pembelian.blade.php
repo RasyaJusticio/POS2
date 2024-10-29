@@ -78,7 +78,7 @@
             display: flex;
             justify-content: space-between;
             font-size: 12px;
-            margin: 5px 0; /* Adjusted for better spacing */
+            margin: 5px 0;
         }
         .separator {
             border-top: 1px dashed #000;
@@ -97,7 +97,7 @@
         <h3> Jl. Sambikerep No. 78</h3>
         <h3> IG : @siamspiceco_</h3>
         
-        <hr> <!-- Garis pemisah setelah bagian 1 -->
+        <hr>
 
         <!-- BAGIAN 2: Informasi Customer, ID Pembelian, Tanggal, dan Jam -->
         <div class="customer-info">
@@ -106,10 +106,10 @@
         </div>
         <div class="customer-info">
             <span>Jam:</span>
-            <span>{{ $pembelian->created_at->format('H:i:s') }}</span>
+            <span id="current-time"></span> 
         </div>
         <div class="customer-info">
-            <span>Nama Customer:</span>
+            <span>Nama :</span>
             <span>{{ $pembelian->customer_name }}</span>
         </div>
         <div class="customer-info">
@@ -117,7 +117,7 @@
             <span>{{ $pembelian->id }}</span>
         </div>
         
-        <hr> <!-- Garis pemisah setelah bagian 2 -->
+        <hr>
 
         <!-- BAGIAN 3: Daftar item pembelian -->
         <table>
@@ -137,18 +137,28 @@
             </tbody>
         </table>
 
-
         <!-- BAGIAN 4: Total harga -->
         <div class="total">
             Total: Rp {{ number_format($pembelian->total_price, 0, ',', '.') }}
         </div>
-
 
         <!-- BAGIAN 5: Footer -->
         <div class="footer">
             Terima Kasih atas Kunjungan Anda!
         </div>
     </div>
+
+    <!-- JavaScript to set the current time -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get the current time
+            const now = new Date();
+            const currentTime = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+    
+            // Insert the current time into the placeholder
+            document.getElementById('current-time').textContent = currentTime;
+        });
+    </script>
 
 </body>
 </html>
