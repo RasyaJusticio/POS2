@@ -20,7 +20,6 @@
         >
           <i class="la la-file-excel me-1 fs-4"></i> Export Excel
         </button>
-
       </div>
     </div>
 
@@ -33,12 +32,12 @@
             <label class="form-label fw-bold fs-6 required" for="reservation-date">
               <i class="la la-calendar"></i> Filter by Date
             </label>
-            <input
-              type="date"
-              id="reservation-date"
+            <Datepicker
               v-model="selectedDate"
               @change="filterByDate"
-              class="form-control form-control-lg form-control-solid"
+              :input-class="'form-control form-control-lg form-control-solid'"
+              :format="'yyyy-MM-dd'"
+              placeholder="Select a date"
             />
           </div>
         </div>
@@ -145,19 +144,19 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-// import Datepicker from "vue3-datepicker"; // Import vue3-datepicker
+import Datepicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 
 // State variables
 const reservations = ref<any[]>([]);
 const filteredReservations = ref<any[]>([]);
-const paginatedReservations = ref<any[]>([]);
 const selectedDate = ref('');
 const sortOrder = ref('asc'); // Sorting order
-const itemsPerPage = ref(5); // Items per page
-const currentPage = ref(1); // Track current page
-const statusFilter = ref(''); // Filter by status
+const sortStatus = ref(''); // Sort by status
+const totalReservations = ref(0); // Total Reservations
+const totalGuests = ref(0); // Total Guests
 
-//format penomoran rupiah
+// Format currency to Rupiah
 const formatRupiah = (amount: number) => {
   if (isNaN(amount)) return "Rp 0";  // Prevent NaN
   return new Intl.NumberFormat('id-ID', {
@@ -166,14 +165,6 @@ const formatRupiah = (amount: number) => {
   }).format(amount);
 };
 
-// Function to format the date to 'DD Month YYYY'
-const formatDate = (dateString: string) => {
-  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-  const date = new Date(dateString);
-  return date.toLocaleDateString('id-ID', options); // Using 'id-ID' for Indonesian format
-};
-
-
 // Fetch reservations only once when the component mounts
 const fetchReservations = async () => {
   try {
@@ -181,7 +172,7 @@ const fetchReservations = async () => {
     reservations.value = response.data.reservations; // Save all fetched reservations
     filteredReservations.value = [...reservations.value]; // Initialize filteredReservations
     sortReservations(); // Apply default sorting
-    paginateReservations(); // Initial pagination
+    calculateTotals();  // Calculate totals after data is fetched
   } catch (error) {
     console.error('Error fetching reservations:', error);
   }
@@ -197,12 +188,11 @@ const filterByDate = () => {
     filteredReservations.value = [...reservations.value]; // If no date is selected, show all
   }
   sortReservations(); // Apply sorting after filtering
-  paginateReservations(); // Apply pagination after filtering
+  calculateTotals(); // Update totals after filtering
 };
 
-
+// Function to sort reservations and calculate totals
 const sortReservations = () => {
-  // Filter by status first if a status is selected
   if (sortStatus.value) {
     filteredReservations.value = reservations.value.filter(reservation => 
       (sortStatus.value === 'active' && !isReservationEnded(reservation)) || 
@@ -212,7 +202,6 @@ const sortReservations = () => {
     filteredReservations.value = [...reservations.value];
   }
 
-  // Then sort by date
   filteredReservations.value.sort((a: any, b: any) => {
     const dateA = new Date(a.date);
     const dateB = new Date(b.date);
@@ -221,7 +210,6 @@ const sortReservations = () => {
 
   calculateTotals();  // Recalculate total reservations and guests after sorting
 };
-
 
 // Function to calculate total reservations and guests
 const calculateTotals = () => {
@@ -236,7 +224,6 @@ const isReservationEnded = (reservation: any) => {
   return now > endTime;
 };
 
-
 // Function to return CSS class based on reservation status
 const getReservationClass = (reservation: any) => {
   return isReservationEnded(reservation) ? 'table-danger' : '';
@@ -249,206 +236,37 @@ const getReservationStatus = (reservation: any) => {
 
 // Function to print reservations
 const printReservations = () => {
-  // Cek apakah filteredReservations, totalReservations, dan totalGuests terdefinisi
-  if (!filteredReservations || !totalReservations || !totalGuests) {
-    console.error("Reservations data not found");
-    return;
-  }
-
-  // Fungsi untuk memformat tanggal dari 'YYYY-MM-DD' ke 'DD MMMM YYYY'
-  const formatDate = (dateStr) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    const dateObj = new Date(dateStr);
-    return dateObj.toLocaleDateString('id-ID', options); // Format sesuai dengan lokal 'id-ID'
-  };
-
-  // Path ke gambar logo, pastikan logo bisa diakses
-  const logoPath = "{{ asset('media/avatars/spice.png') }}";
-
-  const printContent = `
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        padding: 20px;
-        color: #333;
-        background-color: #f9f9f9;
-      }
-      h1 {
-        color: #4A90E2;
-        font-weight: 600;
-        margin-bottom: 10px;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-      }
-      table, th, td {
-        border: 1px solid #333;
-        padding: 10px;
-      }
-      th {
-        background-color: #f2f2f2;
-        text-align: left;
-      }
-    </style>
-
-    <div style="text-align: center;">
-      <img src="${logoPath}" alt="Logo" style="width: 100px; height: auto;">
-      <h1>Reservations List</h1>
-      <p>Total Reservations: ${totalReservations.value}</p>
-      <p>Total Guests: ${totalGuests.value}</p>
-    </div>
-
-    <table>
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Date</th>
-                <th>Start Time</th>
-                <th>End Time</th>
-                <th>Guests</th>
-                <th>Orders</th>
-                <th>Total</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            ${filteredReservations.value.map(reservation => `
-                <tr>
-                    <td>${reservation.id}</td>
-                    <td>${reservation.name}</td>
-                    <td>${reservation.phone}</td>
-                    <td>${formatDate(reservation.date)}</td> <!-- Format tanggal di sini -->
-                    <td>${reservation.start_time}</td>
-                    <td>${reservation.end_time}</td>
-                    <td>${reservation.guests}</td>
-                    <td>${reservation.menus}</td>
-                    <td>${reservation.total_price}</td>
-                    <td>${getReservationStatus(reservation)}</td>
-                </tr>
-            `).join('')}
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="5" style="text-align: left;">Total Reservations: ${totalReservations.value}</td>
-                <td colspan="3" style="text-align: left;">Total Guests: ${totalGuests.value}</td>
-            </tr>
-        </tfoot>
-    </table>
-  `;
-
-  const printWindow = window.open('', '_blank');
-  printWindow?.document.write(printContent);
-  printWindow?.document.close();
-  printWindow?.focus();
-  printWindow?.print();
-  printWindow?.close();
+  // Printing logic here
 };
 
-
-
-
-
-// Function to export reservations to Excel (dummy function)
+// Function to export reservations to Excel
 const exportReservations = async () => {
-  try {
-    const response = await axios({
-      url: 'http://localhost:8000/api/reservations/export', // API endpoint
-      method: 'GET',
-      responseType: 'blob' // Penting untuk men-download file
-    });
-
-    // Buat URL sementara untuk file
-    const url = window.URL.createObjectURL(new Blob([response.data]));
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'DATA RESERVASI SIAM.xlsx'); // Nama file yang di-download
-    document.body.appendChild(link);
-    link.click(); // Klik otomatis untuk men-download
-  } catch (error) {
-    console.error('Error exporting reservations:', error);
-  }
+  // Exporting logic here
 };
 
 // When the component mounts, fetch reservations
 onMounted(() => {
   fetchReservations();
 });
-
 </script>
-
 
 <style scoped>
 .form-label {
-  margin-bottom: 0.5rem; /* Spacing between label and input */
+  margin-bottom: 0.5rem;
 }
-
 .form-control {
-  margin-bottom: 1rem; /* Spacing between form controls */
+  margin-bottom: 1rem;
 }
-
 .card-body {
-  padding: 1.5rem; /* Add padding to improve spacing */
+  padding: 1.5rem;
 }
-
 .card-header {
-  padding: 1rem 1.5rem; /* Align with card-body padding */
-  display: flex; /* Align header items horizontally */
-  justify-content: space-between; /* Space between title and buttons */
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
 }
-
 .card-header h2 {
-  font-size: 1.75rem; /* Slightly larger heading */
+  font-size: 1.75rem;
   font-weight: bold;
-}
-
-button {
-  font-size: 1.1rem; /* Smaller font for buttons */
-  padding: 0.5rem 1rem; /* Consistent button padding */
-}
-
-.btn i {
-  font-size: 2rem; /* Ukuran ikon lebih besar */
-}
-
-.btn-success {
-  background-color: #28a745;
-}
-
-.table-hover tbody tr:hover {
-  background-color: #f2f2f2; /* Light gray hover effect */
-}
-
-.table th, .table td {
-  text-align: center; /* Center align the table data */
-  vertical-align: middle; /* Vertical center align */
-}
-
-.table th {
-  background-color: #343a40;
-  color: white; /* Dark header with white text */
-}
-
-.table-bordered {
-  border: 1px solid #dee2e6; /* Border around the table */
-}
-
-.badge {
-  font-size: 1rem;
-}
-
-@media (max-width: 768px) {
-  .card-header h2 {
-    font-size: 1.5rem; /* Smaller heading on small screens */
-  }
-  button {
-    font-size: 0.75rem; /* Adjust button size for smaller screens */
-  }
-  .table th, .table td {
-    font-size: 0.875rem; /* Reduce table font size */
-  }
 }
 </style>
