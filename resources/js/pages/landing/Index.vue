@@ -565,6 +565,22 @@
               <span>
                 {{ menu.name }} - Rp {{ formatRupiah(menu.price) }} x {{ menu.quantity }}
               </span>
+              <div class="quantity-controls">
+                <button
+                  @click="updateMenuQuantity(menu, -1)"
+                  class="btn btn-outline-secondary"
+                  :disabled="menu.quantity <= 1"
+                >
+                  -
+                </button>
+                <span>{{ menu.quantity }}</span>
+                <button
+                  @click="updateMenuQuantity(menu, 1)"
+                  class="btn btn-outline-secondary"
+                >
+                  +
+                </button>
+              </div>
               <button type="button" @click="removeMenu(index)" class="btn btn-danger btn-sm">
                 Remove
               </button>
@@ -700,6 +716,17 @@ const addMenu = () => {
       // Reset the selected menu and quantity
       selectedMenu.value = null;
       selectedQuantity.value = 1;
+    }
+  }
+};
+
+const updateMenuQuantity = (menuItem, change) => {
+  const item = reservation.value.menus.find(menu => menu.id === menuItem.id);
+  if (item) {
+    item.quantity += change;
+    // Menghapus menu dari reservasi jika kuantitas 0
+    if (item.quantity <= 0) {
+      removeMenu(item);
     }
   }
 };

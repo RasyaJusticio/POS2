@@ -264,6 +264,7 @@ const filteredItems = computed(() => {
 });
 
 
+
 function submit(items: any) {
   const formDataToSubmit = new FormData();
   formDataToSubmit.append('total_price', valueTotal.value);
@@ -851,6 +852,4 @@ const closeCart = () => {
   border-radius: 5px;
   text-transform: uppercase;
 }
-
-
 </style>
