@@ -36,7 +36,7 @@
                     id="date-picker"
                     v-model="selectedDate"
                     :format="dateFormat"
-                    @update:model-value="filterByDate"
+                    @update:model-value="filterHelper.filterByDate"
                     :min-date="minDate"
                     :max-date="maxDate"
                     class="form-control form-control-lg form-control-solid"
@@ -165,6 +165,7 @@ import VuePicDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import axios from "@/libs/axios";
 import { formatRupiah } from "@/libs/utilss";
+import { FilterHelper } from "../helpers/filterHelper";
 
 interface Pembelian {
     id: number;
@@ -192,6 +193,10 @@ const maxDate = new Date();
 // Column helper
 const column = createColumnHelper<Pembelian>();
 
+// Filter Helper
+const filterHelper = new FilterHelper("/inventori/laporan", transactions, isLoading, error);
+filterHelper.fetchMethod = 'post';
+
 // Utility functions
 const formatId = (id: number) => id.toString().padStart(3, "0");
 const formatDate = (date: string) => new Date(date).toLocaleDateString("id-ID");
@@ -205,37 +210,6 @@ const getStatusClass = (status: Pembelian["status"]) => ({
 });
 
 // API calls
-const filterByDate = async (date: Date | null) => {
-    if (!date) {
-        transactions.value = [];
-        return;
-    }
-
-    isLoading.value = true;
-    error.value = "";
-
-    try {
-        const formattedDate = date.toISOString().split("T")[0];
-        const response = await axios.post("/inventori/laporan", {
-            date: formattedDate,
-        });
-
-        if (response.data.data && Array.isArray(response.data.data)) {
-            transactions.value = response.data.data;
-        } else {
-            throw new Error("Format data tidak valid");
-        }
-    } catch (err) {
-        error.value =
-            err instanceof Error
-                ? err.message
-                : "Terjadi kesalahan saat mengambil data";
-        transactions.value = [];
-    } finally {
-        isLoading.value = false;
-    }
-};
-
 const markAsProcessed = async (transaction: Pembelian) => {
     isProcessing.value = true;
     try {

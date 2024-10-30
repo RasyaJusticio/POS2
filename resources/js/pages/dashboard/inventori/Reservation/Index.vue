@@ -25,21 +25,23 @@
 
     <!-- Filter, Sort and Total section -->
     <div class="card-body">
-      <div class="row align-items-center mb-4">
-        <!-- Filter by Date -->
-        <div class="col-md-4">
-          <div class="fv-row">
-            <label class="form-label fw-bold fs-6 required" for="reservation-date">
-              <i class="la la-calendar"></i> Filter by Date
-            </label>
-            <Datepicker
-              v-model="selectedDate"
-              @change="filterByDate"
-              :input-class="'form-control form-control-lg form-control-solid'"
-              :format="'yyyy-MM-dd'"
-              placeholder="Select a date"
-            />
-          </div>
+            <div class="col-md-4 mb-4">
+                <label
+                    class="form-label fw-bold fs-6 required"
+                    for="date-picker"
+                >
+                    <i class="la la-calendar"></i> Pilih Tanggal
+                </label>
+                <VuePicDatePicker
+                    id="date-picker"
+                    v-model="selectedDate"
+                    :format="dateFormat"
+                    @update:model-value="filterByDate"
+                    :min-date="minDate"
+                    :max-date="maxDate"
+                    class="form-control form-control-lg form-control-solid"
+                />
+            </div>
         </div>
 
         <!-- Sort by Date -->
@@ -90,8 +92,7 @@
             </h5>
           </div>
         </div>
-      </div>
-    </div>
+   
 
     <!-- Reservations Table -->
     <div class="card-body">
@@ -144,8 +145,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import Datepicker from '@vuepic/vue-datepicker';
-import '@vuepic/vue-datepicker/dist/main.css';
+import VuePicDatePicker from "@vuepic/vue-datepicker";
+import "@vuepic/vue-datepicker/dist/main.css";
+import { FilterHelper } from '../helpers/filterHelper';
 
 // State variables
 const reservations = ref<any[]>([]);
@@ -155,6 +157,12 @@ const sortOrder = ref('asc'); // Sorting order
 const sortStatus = ref(''); // Sort by status
 const totalReservations = ref(0); // Total Reservations
 const totalGuests = ref(0); // Total Guests
+
+// Filter Helper
+const dateFormat = 'yyyy-MM-dd'
+const minDate = new Date("2020-01-01");
+const maxDate = new Date();
+const filterHelper = new FilterHelper("reservations", filteredReservations)
 
 // Format currency to Rupiah
 const formatRupiah = (amount: number) => {
@@ -169,7 +177,7 @@ const formatRupiah = (amount: number) => {
 const fetchReservations = async () => {
   try {
     const response = await axios.get('http://localhost:8000/api/reservations');
-    reservations.value = response.data.reservations; // Save all fetched reservations
+    reservations.value = response.data.data; // Save all fetched reservations
     filteredReservations.value = [...reservations.value]; // Initialize filteredReservations
     sortReservations(); // Apply default sorting
     calculateTotals();  // Calculate totals after data is fetched
@@ -179,11 +187,9 @@ const fetchReservations = async () => {
 };
 
 // Function to filter reservations by selected date
-const filterByDate = () => {
+const filterByDate = (date: Date | null) => {
   if (selectedDate.value) {
-    filteredReservations.value = reservations.value.filter(
-      (reservation: any) => reservation.date === selectedDate.value
-    );
+    filterHelper.filterByDate(date)
   } else {
     filteredReservations.value = [...reservations.value]; // If no date is selected, show all
   }

@@ -113,13 +113,17 @@ public function store(Request $request)
     
 
     // Mendapatkan semua data reservasi
-     public function index()
+     public function index(Request $request)
     {
         // Mengambil semua data reservasi dari database
-        $reservations = Reservation::all();
+        $reservations = Reservation::query()
+            ->when($request->query('date'), function ($query, string $date) {
+                $query->whereDate('date', $date);
+            })
+            ->get();
 
         // Mengembalikan data dalam format JSON
-        return response()->json(['reservations' => $reservations]);
+        return response()->json(['data' => $reservations]);
     }
 
     public function countReservations()
