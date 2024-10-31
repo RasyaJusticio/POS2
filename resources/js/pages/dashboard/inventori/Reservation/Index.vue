@@ -20,27 +20,29 @@
         >
           <i class="la la-file-excel me-1 fs-4"></i> Export Excel
         </button>
-
       </div>
     </div>
 
-    <!-- Filter, Sort and Total section -->
+    
+     <!-- Filter, Sort and Total section -->
     <div class="card-body">
-      <div class="row align-items-center mb-4">
-        <!-- Filter by Date -->
-        <div class="col-md-4">
-          <div class="fv-row">
-            <label class="form-label fw-bold fs-6 required" for="reservation-date">
-              <i class="la la-calendar"></i> Filter by Date
-            </label>
-            <input
-              type="date"
-              id="reservation-date"
-              v-model="selectedDate"
-              @change="filterByDate"
-              class="form-control form-control-lg form-control-solid"
-            />
-          </div>
+            <div class="col-md-4 mb-4">
+                <label
+                    class="form-label fw-bold fs-6 required"
+                    for="date-picker"
+                >
+                    <i class="la la-calendar"></i> Pilih Tanggal
+                </label>
+                <VuePicDatePicker
+                    id="date-picker"
+                    v-model="selectedDate"
+                    :format="dateFormat"
+                    @update:model-value="filterByDate"
+                    :min-date="minDate"
+                    :max-date="maxDate"
+                    class="form-control form-control-lg form-control-solid"
+                />
+            </div>
         </div>
 
         <!-- Sort by Date -->
@@ -91,8 +93,7 @@
             </h5>
           </div>
         </div>
-      </div>
-    </div>
+   
 
     <!-- Reservations Table -->
     <div class="card-body">
@@ -145,19 +146,26 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-// import Datepicker from "vue3-datepicker"; // Import vue3-datepicker
+import VuePicDatePicker from "@vuepic/vue-datepicker";
+import "@vuepic/vue-datepicker/dist/main.css";
+import { FilterHelper } from '../helpers/filterHelper';
 
 // State variables
 const reservations = ref<any[]>([]);
 const filteredReservations = ref<any[]>([]);
-const paginatedReservations = ref<any[]>([]);
 const selectedDate = ref('');
 const sortOrder = ref('asc'); // Sorting order
-const itemsPerPage = ref(5); // Items per page
-const currentPage = ref(1); // Track current page
-const statusFilter = ref(''); // Filter by status
+const sortStatus = ref(''); // Sort by status
+const totalReservations = ref(0); // Total Reservations
+const totalGuests = ref(0); // Total Guests
 
-//format penomoran rupiah
+// Filter Helper
+const dateFormat = 'yyyy-MM-dd'
+const minDate = new Date("2020-01-01");
+const maxDate = new Date();
+const filterHelper = new FilterHelper("reservations", filteredReservations)
+
+// Format currency to Rupiah
 const formatRupiah = (amount: number) => {
   if (isNaN(amount)) return "Rp 0";  // Prevent NaN
   return new Intl.NumberFormat('id-ID', {
@@ -166,43 +174,32 @@ const formatRupiah = (amount: number) => {
   }).format(amount);
 };
 
-// Function to format the date to 'DD Month YYYY'
-const formatDate = (dateString: string) => {
-  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-  const date = new Date(dateString);
-  return date.toLocaleDateString('id-ID', options); // Using 'id-ID' for Indonesian format
-};
-
-
 // Fetch reservations only once when the component mounts
 const fetchReservations = async () => {
   try {
     const response = await axios.get('http://localhost:8000/api/reservations');
-    reservations.value = response.data.reservations; // Save all fetched reservations
+    reservations.value = response.data.data; // Save all fetched reservations
     filteredReservations.value = [...reservations.value]; // Initialize filteredReservations
     sortReservations(); // Apply default sorting
-    paginateReservations(); // Initial pagination
+    calculateTotals();  // Calculate totals after data is fetched
   } catch (error) {
     console.error('Error fetching reservations:', error);
   }
 };
 
 // Function to filter reservations by selected date
-const filterByDate = () => {
+const filterByDate = (date: Date | null) => {
   if (selectedDate.value) {
-    filteredReservations.value = reservations.value.filter(
-      (reservation: any) => reservation.date === selectedDate.value
-    );
+    filterHelper.filterByDate(date)
   } else {
     filteredReservations.value = [...reservations.value]; // If no date is selected, show all
   }
   sortReservations(); // Apply sorting after filtering
-  paginateReservations(); // Apply pagination after filtering
+  calculateTotals(); // Update totals after filtering
 };
 
-
+// Function to sort reservations and calculate totals
 const sortReservations = () => {
-  // Filter by status first if a status is selected
   if (sortStatus.value) {
     filteredReservations.value = reservations.value.filter(reservation => 
       (sortStatus.value === 'active' && !isReservationEnded(reservation)) || 
@@ -212,7 +209,6 @@ const sortReservations = () => {
     filteredReservations.value = [...reservations.value];
   }
 
-  // Then sort by date
   filteredReservations.value.sort((a: any, b: any) => {
     const dateA = new Date(a.date);
     const dateB = new Date(b.date);
@@ -221,7 +217,6 @@ const sortReservations = () => {
 
   calculateTotals();  // Recalculate total reservations and guests after sorting
 };
-
 
 // Function to calculate total reservations and guests
 const calculateTotals = () => {
@@ -235,7 +230,6 @@ const isReservationEnded = (reservation: any) => {
   const endTime = new Date(`${reservation.date} ${reservation.end_time}`);
   return now > endTime;
 };
-
 
 // Function to return CSS class based on reservation status
 const getReservationClass = (reservation: any) => {
@@ -295,7 +289,9 @@ const printReservations = () => {
 
     <div style="text-align: center;">
       <img src="${logoPath}" alt="Logo" style="width: 100px; height: auto;">
-      <h1>Data Reservation Siam</h1>
+      <h1>Reservations List</h1>
+      <p>Total Reservations: ${totalReservations.value}</p>
+      <p>Total Guests: ${totalGuests.value}</p>
     </div>
 
     <table>
@@ -352,101 +348,32 @@ const printReservations = () => {
 
 // Function to export reservations to Excel (dummy function)
 const exportReservations = async () => {
-  try {
-    const response = await axios({
-      url: 'http://localhost:8000/api/reservations/export', // API endpoint
-      method: 'GET',
-      responseType: 'blob' // Penting untuk men-download file
-    });
-
-    // Buat URL sementara untuk file
-    const url = window.URL.createObjectURL(new Blob([response.data]));
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'DATA RESERVASI SIAM.xlsx'); // Nama file yang di-download
-    document.body.appendChild(link);
-    link.click(); // Klik otomatis untuk men-download
-  } catch (error) {
-    console.error('Error exporting reservations:', error);
-  }
+  // Exporting logic here
 };
 
 // When the component mounts, fetch reservations
 onMounted(() => {
   fetchReservations();
 });
-
 </script>
-
 
 <style scoped>
 .form-label {
-  margin-bottom: 0.5rem; /* Spacing between label and input */
+  margin-bottom: 0.5rem;
 }
-
 .form-control {
-  margin-bottom: 1rem; /* Spacing between form controls */
+  margin-bottom: 1rem;
 }
-
 .card-body {
-  padding: 1.5rem; /* Add padding to improve spacing */
+  padding: 1.5rem;
 }
-
 .card-header {
-  padding: 1rem 1.5rem; /* Align with card-body padding */
-  display: flex; /* Align header items horizontally */
-  justify-content: space-between; /* Space between title and buttons */
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
 }
-
 .card-header h2 {
-  font-size: 1.75rem; /* Slightly larger heading */
+  font-size: 1.75rem;
   font-weight: bold;
-}
-
-button {
-  font-size: 1.1rem; /* Smaller font for buttons */
-  padding: 0.5rem 1rem; /* Consistent button padding */
-}
-
-.btn i {
-  font-size: 2rem; /* Ukuran ikon lebih besar */
-}
-
-.btn-success {
-  background-color: #28a745;
-}
-
-.table-hover tbody tr:hover {
-  background-color: #f2f2f2; /* Light gray hover effect */
-}
-
-.table th, .table td {
-  text-align: center; /* Center align the table data */
-  vertical-align: middle; /* Vertical center align */
-}
-
-.table th {
-  background-color: #343a40;
-  color: white; /* Dark header with white text */
-}
-
-.table-bordered {
-  border: 1px solid #dee2e6; /* Border around the table */
-}
-
-.badge {
-  font-size: 1rem;
-}
-
-@media (max-width: 768px) {
-  .card-header h2 {
-    font-size: 1.5rem; /* Smaller heading on small screens */
-  }
-  button {
-    font-size: 0.75rem; /* Adjust button size for smaller screens */
-  }
-  .table th, .table td {
-    font-size: 0.875rem; /* Reduce table font size */
-  }
 }
 </style>

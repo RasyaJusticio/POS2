@@ -1,30 +1,189 @@
+<template>
+    <div class="card mb-4">
+        <div class="card-header d-flex align-items-center">
+            <h2 class="mb-0">Laporan Transaksi</h2>
+            <div class="ms-auto d-flex gap-2">
+                <button
+                    type="button"
+                    class="btn btn-sm btn-secondary d-flex align-items-center gap-2"
+                    @click="printTransaction"
+                    :disabled="!transactions.length"
+                >
+                    <i class="la la-print"></i>
+                    Print
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-sm btn-secondary d-flex align-items-center gap-2"
+                    @click="exportTransaction"
+                    :disabled="!transactions.length"
+                >
+                    <i class="la la-file-excel"></i>
+                    Export Excel
+                </button>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="col-md-4 mb-4">
+                <label
+                    class="form-label fw-bold fs-6 required"
+                    for="date-picker"
+                >
+                    <i class="la la-calendar"></i> Pilih Tanggal
+                </label>
+                <VuePicDatePicker
+                    id="date-picker"
+                    v-model="selectedDate"
+                    :format="dateFormat"
+                    @update:model-value="filterHelper.filterByDate"
+                    :min-date="minDate"
+                    :max-date="maxDate"
+                    class="form-control form-control-lg form-control-solid"
+                />
+            </div>
+
+            <div v-if="isLoading" class="d-flex justify-content-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+
+            <div v-else-if="error" class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+
+            <div
+                v-else-if="!transactions.length && selectedDate"
+                class="alert alert-info"
+                role="alert"
+            >
+                Tidak ada transaksi pada tanggal yang dipilih
+            </div>
+
+            <paginate
+                v-else
+                ref="paginateRef"
+                id="table-transactions"
+                url="/inventori/laporan"
+                :columns="columns"
+                :data="transactions"
+            />
+        </div>
+    </div>
+
+    <!-- Transaction Detail Modal -->
+    <TransitionRoot appear :show="!!selectedTransaction" as="template">
+        <Dialog as="div" class="modal-overlay" @close="closeModal">
+            <div class="modal-content">
+                <DialogTitle as="div" class="modal-header">
+                    <h5>Detail Transaksi</h5>
+                    <button class="modal-close" @click="closeModal">
+                        &times;
+                    </button>
+                </DialogTitle>
+
+                <div class="modal-body" v-if="selectedTransaction">
+                    <dl class="transaction-details">
+                        <div class="detail-item">
+                            <dt>ID Pembelian:</dt>
+                            <dd>{{ formatId(selectedTransaction.id) }}</dd>
+                        </div>
+                        <div class="detail-item">
+                            <dt>Nama:</dt>
+                            <dd>{{ selectedTransaction.customer_name }}</dd>
+                        </div>
+                        <div class="detail-item">
+                            <dt>Pesanan:</dt>
+                            <dd>
+                                <ul class="items-list">
+                                    <li
+                                        v-for="item in parseItems(
+                                            selectedTransaction.items
+                                        )"
+                                        :key="item"
+                                    >
+                                        {{ item }}
+                                    </li>
+                                </ul>
+                            </dd>
+                        </div>
+                        <div class="detail-item">
+                            <dt>Total Harga:</dt>
+                            <dd>
+                                {{
+                                    formatRupiah(
+                                        selectedTransaction.total_price
+                                    )
+                                }}
+                            </dd>
+                        </div>
+                        <div class="detail-item">
+                            <dt>Status Pembayaran:</dt>
+                            <dd>
+                                <span
+                                    :class="
+                                        getStatusClass(
+                                            selectedTransaction.status
+                                        )
+                                    "
+                                >
+                                    {{ selectedTransaction.status }}
+                                </span>
+                            </dd>
+                        </div>
+                        <div class="detail-item">
+                            <dt>Tanggal Transaksi:</dt>
+                            <dd>
+                                {{ formatDate(selectedTransaction.created_at) }}
+                            </dd>
+                        </div>
+                    </dl>
+
+                    <button
+                        @click="markAsProcessed(selectedTransaction)"
+                        class="btn btn-primary mt-4 w-100"
+                        :disabled="isProcessing"
+                    >
+                        {{
+                            isProcessing
+                                ? "Memproses..."
+                                : "Tandai Sudah Diproses"
+                        }}
+                    </button>
+                </div>
+            </div>
+        </Dialog>
+    </TransitionRoot>
+</template>
+
 <script setup lang="ts">
 import { h, ref, onMounted } from "vue";
-import { useDelete } from "@/libs/hooks";
+import { Dialog, DialogTitle, TransitionRoot } from "@headlessui/vue";
 import { createColumnHelper } from "@tanstack/vue-table";
-import type { Pembelian } from "@/types/laporan"; // Ganti dengan path yang sesuai
+import VuePicDatePicker from "@vuepic/vue-datepicker";
+import "@vuepic/vue-datepicker/dist/main.css";
 import axios from "@/libs/axios";
 import { formatRupiah } from "@/libs/utilss";
-import DatePicker from 'vue3-datepicker';
+import { FilterHelper } from "../helpers/filterHelper";
 
-const column = createColumnHelper<Pembelian>();
-const paginateRef = ref<any>(null);
-const transactions = ref<Pembelian[]>([]); // Menyimpan data transaksi
+interface Pembelian {
+    id: number;
+    customer_name: string;
+    items: string;
+    total_price: number;
+    status: "Pending" | "Paid" | "Cancelled";
+    created_at: string;
+    created: boolean;
+}
+
+// State management
+const transactions = ref<Pembelian[]>([]);
 const selectedTransaction = ref<Pembelian | null>(null);
 const selectedDate = ref<string>('');
 
 
 // Fungsi filter transaksi berdasarkan tanggal yang dipilih
-
-const checkNameBeforeSubmit = () => {
-    if (!selectedTransaction.value?.customer_name) {
-        alert("Nama pembeli tidak boleh kosong. Silakan isi nama sebelum melanjutkan.");
-        return false; // Menghentikan proses jika nama kosong
-    }
-    return true; // Lanjutkan jika nama sudah terisi
-};
-
-
 const filterByDate = async () => {
     if (!selectedDate.value) {
         transactions.value = []; // Kosongkan data jika tidak ada tanggal dipilih
@@ -67,41 +226,52 @@ onMounted(async () => {
     }
 });
 
-
-// Function to format date to 'DD Month YYYY'
-const formatTanggal = (dateString) => {
-    const months = [
-        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-    ];
-    
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const monthIndex = date.getMonth();
-    const year = date.getFullYear();
-    
-    return `${day} ${months[monthIndex]} ${year}`;
-};
-
 // Fungsi untuk mencetak laporan transaksi
 const printTransaction = async () => {
     try {
         const response = await axios.post('/inventori/laporan');
         const transactions = response.data.data;
 
-        // Memformat data transaksi menjadi HTML yang dapat dicetak
-        const printContent =`
+        // Memformat data transaksi
+        const printContent = `
             <html>
             <head>
                 <title>Laporan Transaksi</title>
                 <style>
-                    body { font-family: Arial, sans-serif; margin: 20px; }
-                    h1 { text-align: center; color: #0070C0; }
-                    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-                    th, td { border: 1px solid black; padding: 10px; text-align: center; font-size: 14px; }
-                    th { background-color: #0070C0; color: white; }
-                    tr:nth-child(even) { background-color: #f2f2f2; }
-                    tfoot { font-weight: bold; background-color: #0070C0; color: white; }
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 20px;
+                    }
+                    h1 {
+                        text-align: center;
+                        color: #0070C0;
+                    }
+                    table {
+                        border-collapse: collapse;
+                        width: 100%;
+                        margin-top: 20px;
+                    }
+                    th, td {
+                        border: 1px solid black;
+                        padding: 10px;
+                        text-align: center;
+                        font-size: 14px;
+                    }
+                    th {
+                        background-color: #0070C0;
+                        color: white;
+                    }
+                    tr:nth-child(even) {
+                        background-color: #f2f2f2;
+                    }
+                    tr:hover {
+                        background-color: #ddd;
+                    }
+                    tfoot {
+                        font-weight: bold;
+                        background-color: #0070C0;
+                        color: white;
+                    }
                 </style>
             </head>
             <body>
@@ -111,50 +281,45 @@ const printTransaction = async () => {
                         <tr>
                             <th>No</th>
                             <th>ID Pembelian</th>
-                            <th>Nama</th>
-                            <th>Pesanan</th>
-                            <th>Total</th>
                             <th>Status Pembayaran</th>
+                            <th>Total</th>
                             <th>Tanggal Pesanan</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${transactions.map((transaction, index) =>`
+                        ${transactions.map((transaction, index) => `
                             <tr>
                                 <td>${index + 1}</td>
-                                <td>${transaction.id.toString().padStart(3, '0')}</td> <!-- Format ID menjadi 001, 002, dll -->
-                                <td>${transaction.customer_name}</td>
-                                <td>${transaction.items.replace(/\n/g, "<br>")}</td>
-                                <td>${formatRupiah(transaction.total_price)}</td>
+                                <td>${transaction.pembelian_id}</td>
                                 <td>${transaction.status}</td>
-                                <td>${formatTanggal(transaction.created_at)}</td>
+                                <td>${formatRupiah(transaction.total_price)}</td>
                             </tr>
                         `).join('')}
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colspan="7">Total Transaksi: ${transactions.length}</td>
+                            <td colspan="5">Total Transaksi: ${transactions.length}</td>
                         </tr>
                     </tfoot>
                 </table>
             </body>
             </html>
         `;
+
         const newWindow = window.open('', '_blank');
         if (newWindow) {
  newWindow.document.write(printContent);
             newWindow.document.close();
-            newWindow.focus();
             newWindow.print();
             newWindow.close();
         } else {
-            console.error("Gagal membuka jendela baru untuk mencetak.");
+            console.error("Gagal membuka jendela baru.");
         }
+
     } catch (error) {
         console.error("Error fetching transactions for printing:", error);
     }
 };
-
 
 
 // Fungsi untuk mengekspor laporan transaksi ke Excel
@@ -172,11 +337,9 @@ const exportTransaction = async () => {
         link.click();
         document.body.removeChild(link);
     } catch (error) {
-        console.error("Error downloading the Excel file:", error.response ? error.response.data : error.message);
+        console.error("Error downloading the Excel file:", error);
     }
 };
-
-
 
 
 // Mendapatkan data transaksi saat komponen dimuat
@@ -188,88 +351,88 @@ onMounted(async () => {
     } catch (error) {
         console.error('Error fetching transactions:', error);
     }
-});
+};
 
-const markAsProcessed = async (transaction: Pembelian) => {
-    // Simpan status pesanan ke backend
-    transaction.created = true; // Mark as processed
+const deletePembelian = async (url: string) => {
+    if (!confirm("Apakah Anda yakin ingin menghapus transaksi ini?")) return;
+
     try {
-        await axios.put(`/inventori/laporan/${transaction.id}`, {
-            created: transaction.created,
-        });
-        paginateRef.value.refetch();
-    } catch (error) {
-        console.error('Error updating transaction status:', error);
+        await axios.delete(url);
+        await filterByDate(selectedDate.value);
+    } catch (err) {
+        error.value = "Gagal menghapus transaksi";
     }
 };
 
+// Table columns configuration
 const columns = [
     column.display({
+        id: "number",
         header: "No",
-        cell: (cell) => {
-            return cell.row.index + 1; // Menggunakan indeks baris sebagai nomor urut
-        },
+        cell: (info) => info.row.index + 1,
     }),
     column.accessor("id", {
         header: "ID Pembelian",
-        cell: (cell) => cell.getValue().toString().padStart(3, '0'), // Memastikan minimal 3 digit dengan padding '0'
+        cell: (info) => formatId(info.getValue()),
     }),
     column.accessor("customer_name", {
         header: "Nama",
     }),
     column.accessor("items", {
         header: "Produk yang Dibeli",
-        cell: (cell) => {
-            // Pisahkan setiap produk dengan <br /> untuk membuat jarak vertikal
-            const itemsList = cell.getValue().split("\n").map(item => `<div>${item}</div>`).join('');
-            return h('div', { innerHTML: itemsList }); // Gunakan innerHTML untuk render div dengan newline
-        }
+        cell: (info) => {
+            const items = parseItems(info.getValue());
+            return h(
+                "div",
+                { class: "items-container" },
+                items.map((item) => h("div", { class: "item" }, item))
+            );
+        },
     }),
     column.accessor("total_price", {
         header: "Total",
-        cell: (cell) => formatRupiah(cell.getValue()),
+        cell: (info) => formatRupiah(info.getValue()),
     }),
     column.accessor("status", {
         header: "Status Pembayaran",
+        cell: (info) =>
+            h(
+                "span",
+                {
+                    class: getStatusClass(info.getValue()),
+                },
+                info.getValue()
+            ),
     }),
     column.accessor("created_at", {
         header: "Tanggal Pesanan",
-        cell: (cell) => {
-            return new Date(cell.getValue()).toLocaleDateString("id-ID");
-        },
+        cell: (info) => formatDate(info.getValue()),
     }),
-       column.accessor("created", {
+    column.accessor("created", {
         header: "Pesanan Dibuat",
         cell: (cell) => cell.getValue() ? "On Process" : "Procces",
     }),
     column.accessor("id", {
         header: "Aksi",
-        cell: (cell) =>
+        cell: (info) =>
             h("div", { class: "d-flex gap-2" }, [
                 h(
                     "button",
                     {
                         class: "btn btn-sm btn-icon btn-info",
-                        onClick: () => selectedTransaction.value = cell.row.original,
+                        onClick: () =>
+                            (selectedTransaction.value = info.row.original),
                     },
                     h("i", { class: "la la-eye fs-2" })
                 ),
-                // h(
-                //     "button",
-                //     {
-                //         class: "btn btn-sm btn-icon btn-success",
-                //         disabled: cell.row.original.created, // Disable if already processed
-                //         onClick: () => markAsProcessed(cell.row.original),
-                //     },
-                //     h("i", { class: "fa fa-check fs-2" }) // Font Awesome check icon
-                    
-                // ),
                 h(
                     "button",
                     {
                         class: "btn btn-sm btn-icon btn-danger",
                         onClick: () =>
-                            deletePembelian(`/inventori/laporan/${cell.getValue()}`),
+                            deletePembelian(
+                                `/inventori/laporan/${info.getValue()}`
+                            ),
                     },
                     h("i", { class: "la la-trash fs-2" })
                 ),
@@ -277,7 +440,12 @@ const columns = [
     }),
 ];
 
-const refresh = () => paginateRef.value.refetch();
+// Initialize component
+onMounted(async () => {
+    if (selectedDate.value) {
+        await filterByDate(selectedDate.value);
+    }
+});
 </script>
 
 <template>
@@ -287,13 +455,13 @@ const refresh = () => paginateRef.value.refetch();
   
         <!-- Button for printing the reservations list -->
         <button
-        type="button"
-        class="btn btn-sm btn-secondary ms-auto"
-        @click="printTransaction"
-      >
-        Print
-        <i class="la la-print"></i>
-      </button>
+          type="button"
+          class="btn btn-sm btn-secondary ms-auto"
+          @click="printTransaction"
+        >
+          Print
+          <i class="la la-print"></i>
+        </button>
   
         <!-- Button for exporting the reservations list to Excel -->
         <button
@@ -332,319 +500,147 @@ const refresh = () => paginateRef.value.refetch();
     
   
     <!-- Detail Transaksi Modal -->
-<!-- Detail Transaksi Modal -->
-<div v-if="selectedTransaction" class="modal-overlay">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5>Detail Transaksi</h5>
-      <button class="modal-close" @click="selectedTransaction = null">
-        &times;
-      </button>
-    </div>
-
-    <div class="modal-body">
-      <div class="modal-row">
-        <p><strong>ID Pembelian:</strong> {{ selectedTransaction?.id }}</p>
-      </div>
-      <div class="modal-row">
-        <p><strong>Nama:</strong> {{ selectedTransaction?.customer_name }}</p>
-      </div>
-      <div class="modal-row">
-        <p><strong>Pesanan:</strong> {{ selectedTransaction?.items }}</p>
-      </div>
-      <div class="modal-row">
-        <p><strong>Total Harga:</strong> {{ formatRupiah(selectedTransaction?.total_price) }}</p>
-      </div>
-      <div class="modal-row">
-        <p><strong>Tanggal Transaksi:</strong> {{ formatTanggal(selectedTransaction?.created_at) }}</p>
-      </div>
-      <div class="modal-row">
-        <p><strong>Status Pembayaran:</strong> {{ selectedTransaction?.status }}</p>
-      </div>
-      <div class="modal-row">
-        <p><strong>Status Pesanan Dibuat:</strong> {{ selectedTransaction?.created ? 'On Process' : 'Process' }}</p>
+    <div v-if="selectedTransaction" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5>Detail Transaksi</h5>
+          <button class="modal-close" @click="selectedTransaction = null">
+            &times;
+          </button>
+        </div>
+  
+        <div class="modal-body">
+          <p><strong>ID Pembelian:</strong> {{ selectedTransaction?.id }}</p>
+          <p><strong>Nama:</strong> {{ selectedTransaction?.customer_name }}</p>
+          <p><strong>Pesanan:</strong> {{ selectedTransaction?.items }}</p>
+          <p><strong>Total Harga:</strong> {{ formatRupiah(selectedTransaction?.total_price) }}</p>
+          <p><strong>Status Pembayaran:</strong> {{ selectedTransaction?.status }}</p>
+          <p><strong>Tanggal Transaksi:</strong> {{ new Date(selectedTransaction?.created_at).toLocaleDateString("id-ID") }}</p>
+          <p><strong>Status Pesanan Dibuat:</strong> {{ selectedTransaction?.created ? 'On Process' : 'Procces' }}</p>
+        </div>
+  
+        <button class="btn btn-secondary" @click="selectedTransaction = null">
+          Tutup Detail
+        </button>
       </div>
     </div>
-
-    <button class="modal-close-btn" @click="selectedTransaction = null">
-      Tutup Detail
-    </button>
-  </div>
-</div>
-
   </template>
 
 <style scoped>
-  /* CARD STYLING */
-  .card {
+.card {
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .card-header {
+}
+
+.card-header {
     background-color: #f8f9fa;
     border-bottom: 1px solid #dee2e6;
     padding: 16px;
-  }
-  
-  .card-body {
+}
+
+.card-body {
     padding: 16px;
-  }
-  
-  /* FORM INPUT */
-  .form-control {
+}
+
+.form-control {
     max-width: 300px;
   }
   
   /* MODAL STYLING */
-  /* Overlay */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.4s ease;
-}
-
-/* Modal Content */
-.modal-content {
-  background: #ffffff;
-  border-radius: 15px;
-  width: 90%;
-  max-width: 500px;
-  padding: 30px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  animation: slideUp 0.3s ease;
-  transition: all 0.3s ease;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #e0e0e0;
-  padding-bottom: 10px;
-  margin-bottom: 20px;
-}
-
-.modal-header h5 {
-  margin: 0;
-  font-size: 1.8em; /* Increased font size */
-  font-weight: 600;
-  color: #333;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  font-size: 1.8em; /* Increased font size */
-  cursor: pointer;
-  color: #999;
-  transition: color 0.3s;
-}
-
-.modal-close:hover {
-  color: #444;
-}
-
-.modal-body {
-  line-height: 1.8em;
-  font-size: 1.2em; /* Increased font size */
-  color: #555;
-}
-
-.modal-row {
-  margin-bottom: 15px;
-}
-
-.modal-row p {
-  margin: 0;
-  color: #333;
-  font-size: 1.2em; /* Increased font size */
-}
-
-.modal-row strong {
-  color: #444;
-  font-size: 1.1em; /* Increased font size */
-}
-
-/* Order List Styling */
-.order-list {
-  list-style-type: none;
-  padding: 0;
-  margin: 15px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.order-item {
-  background: #f3f4f7;
-  padding: 15px 18px; /* Adjusted padding */
-  border-radius: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-  transition: background 0.2s;
-}
-
-.order-item:hover {
-  background: #e8ebf1;
-}
-
-.item-name {
-  font-weight: 600;
-  color: #333;
-  font-size: 1.1em; /* Increased font size */
-}
-
-.item-quantity {
-  font-size: 1em; /* Increased font size */
-  color: #888;
-  margin-left: 15px;
-}
-
-.item-price {
-  font-weight: bold;
-  color: #007bff;
-  font-size: 1.2em; /* Increased font size */
-}
-
-/* Modal Close Button */
-.modal-close-btn {
-  display: block;
-  width: 100%;
-  padding: 15px;
-  font-size: 1.2em; /* Increased font size */
-  color: #fff;
-  background: #007bff;
-  border: none;
-  border-radius: 10px;
-  font-weight: bold;
-  cursor: pointer;
-  text-align: center;
-  transition: background 0.3s;
-}
-
-.modal-close-btn:hover {
-  background: #0056b3;
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from {
-    background: rgba(0, 0, 0, 0);
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
   }
-  to {
-    background: rgba(0, 0, 0, 0.6);
-  }
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-/* Responsive Styles */
-@media (max-width: 480px) {
+  
   .modal-content {
-    width: 95%;
+    background: white;
     padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
   }
-
-  .modal-header h5 {
-    font-size: 1.5em;
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
-
-  .order-item {
-    padding: 12px 15px;
+  
+  .modal-close {
+    cursor: pointer;
+    font-size: 1.5rem;
+    background: none;
+    border: none;
   }
-
-  .item-name {
-    font-size: 1em;
+  
+  .modal-body {
+    margin-top: 20px;
   }
-
-  .item-quantity {
-    font-size: 0.95em;
-  }
-
-  .item-price {
-    font-size: 1.1em;
-  }
-
-  .modal-close-btn {
-    padding: 14px;
-    font-size: 1.1em;
-  }
-}
-
-
   
   /* TABLE STYLING */
   table {
     border-collapse: collapse;
     width: 100%;
     margin: 0;
-    table-layout: auto; /* Ensure table adapts based on content */
-  }
-  
-  th,
-  td {
-    border: 1px solid black;
-    padding: 8px;
-    text-align: center;
-  }
-  
-  th {
-    background-color: #0070C0;
- color: white;
-  }
-  
-  tr:nth-child(even) {
-    background-color: #f2f2f2;
-  }
-  
-  tr:hover {
-    background-color: #ddd;
-  }
-  
-  tfoot {
-    font-weight: bold;
-    background-color: #0070C0;
-    color: white;
-  }
-  
-  /* BUTTON STYLING */
-  .btn {
-    transition: background-color 0.3s ease;
-  }
-  
-  .btn:hover {
-    background-color: #0062a0;
-  }
-  
-  @media (max-width: 768px) {
-    .card-body {
-      padding: 8px;
-    }
-  
-    .form-control {
-      max-width: 100%;
-    }
-  }
-  </style>
+}
 
-  
+.detail-item {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 8px;
+}
+
+.detail-item dt {
+    font-weight: 600;
+    color: #666;
+}
+
+.items-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.items-list li {
+    padding: 4px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.items-list li:last-child {
+    border-bottom: none;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.875rem;
+}
+
+.items-container {
+    text-align: left;
+}
+
+.item {
+    padding: 2px 0;
+}
+
+@media (max-width: 768px) {
+    .card-body {
+        padding: 12px;
+    }
+
+    .form-control {
+        max-width: 100%;
+    }
+  }
+</style>

@@ -565,6 +565,22 @@
               <span>
                 {{ menu.name }} - Rp {{ formatRupiah(menu.price) }} x {{ menu.quantity }}
               </span>
+              <div class="quantity-controls">
+                <button
+                  @click="updateMenuQuantity(menu, -1)"
+                  class="btn btn-outline-secondary"
+                  :disabled="menu.quantity <= 1"
+                >
+                  -
+                </button>
+                <span>{{ menu.quantity }}</span>
+                <button
+                  @click="updateMenuQuantity(menu, 1)"
+                  class="btn btn-outline-secondary"
+                >
+                  +
+                </button>
+              </div>
               <button type="button" @click="removeMenu(index)" class="btn btn-danger btn-sm">
                 Remove
               </button>
@@ -614,15 +630,12 @@
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-<<<<<<< HEAD
 
 // import Datepicker from "vue3-datepicker"; // Import vue3-datepicker
-=======
 import Flatpickr from "vue-flatpickr-component";
 import "flatpickr/dist/flatpickr.css";
 import Datepicker from 'vue3-datepicker'
 
->>>>>>> eaf7d5673f0403326eeffdefd14c5397fcdb3831
 
 
 // Define types for Product and SelectedMenu
@@ -705,6 +718,17 @@ const addMenu = () => {
       // Reset the selected menu and quantity
       selectedMenu.value = null;
       selectedQuantity.value = 1;
+    }
+  }
+};
+
+const updateMenuQuantity = (menuItem, change) => {
+  const item = reservation.value.menus.find(menu => menu.id === menuItem.id);
+  if (item) {
+    item.quantity += change;
+    // Menghapus menu dari reservasi jika kuantitas 0
+    if (item.quantity <= 0) {
+      removeMenu(item);
     }
   }
 };
