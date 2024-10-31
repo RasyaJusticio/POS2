@@ -484,9 +484,9 @@
         </div>
 
         <!-- Date -->
-        <<div class="col-md-6">
+        <!-- <div class="col-md-6"> -->
     <div class="fv-row mb-7">
-        <label class="form-label fw-bold fs-6 required">Tanggal</label>
+        <label class="form-label fw-bolder fs-4 required">Tanggal</label>
         <Flatpickr
             class="form-control form-control-lg form-control-solid"
             v-model="reservation.date"
@@ -496,9 +496,8 @@
         <div class="fv-help-block">
             <ErrorMessage name="date" />
         </div>
-    </div>
+    <!-- </div> -->
 </div>
-
 
 
           <div class="time-container">

@@ -57,6 +57,7 @@ onMounted(async () => {
     }
 });
 
+
 // Fungsi untuk mencetak laporan transaksi
 const printTransaction = async () => {
     try {
@@ -112,8 +113,10 @@ const printTransaction = async () => {
                         <tr>
                             <th>No</th>
                             <th>ID Pembelian</th>
-                            <th>Status Pembayaran</th>
+                            <th>Nama</th>
+                            <th>Pesanan</th>
                             <th>Total</th>
+                            <th>Status Pembayaran</th>
                             <th>Tanggal Pesanan</th>
                         </tr>
                     </thead>
@@ -121,9 +124,12 @@ const printTransaction = async () => {
                         ${transactions.map((transaction, index) => `
                             <tr>
                                 <td>${index + 1}</td>
-                                <td>${transaction.pembelian_id}</td>
-                                <td>${transaction.status}</td>
+                                <td>${transaction.id}</td>
+                                <th>${transaction.customer_name}</th>
+                                <td>${transaction.items}</td>
                                 <td>${formatRupiah(transaction.total_price)}</td>
+                                <td>${transaction.status}</td>
+                                <td>${transaction.created_at}</td>
                             </tr>
                         `).join('')}
                     </tbody>
