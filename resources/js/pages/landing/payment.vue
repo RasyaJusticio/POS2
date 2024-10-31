@@ -7,11 +7,11 @@
     <h1 class="title" :style="{ color: '#091057' }"></h1>
     <img src="@/assets/images/spice.png" alt="Logo" class="logo" /> <!-- Tambahkan Logo di sini -->
 
-    <router-link to="/landing/page">
-              <button class="btn btn-lg btn-primary" style="font-weight: bold;">BACK</button>
+    <router-link to="/landing/PAGE">
+              <button class="btn">BACK</button>
             </router-link>
 
-            <button @click="handleGeneratePDF" class="btn btn-lg btn-primary" style= "font-weight: bold;">Download PDF</button>
+            <button @click="handleGeneratePDF" class="btn">Download PDF</button>
 
 
     <div v-if="receiptVisible" class="receipt">
@@ -253,22 +253,47 @@ function generateQRCode() {
 }
 </script>
 
-<style>
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
-body {
-  margin: 0; /* Menghilangkan margin default */
-  font-family: 'Arial', sans-serif;
+/* Set font keseluruhan */
+body, .container, .btn {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Gaya utama untuk tombol */
+.btn {
+  padding: 20px 25px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #193553;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0px 4px 10px rgba(0, 123, 255, 0.3);
+  transition: all 0.3s ease;
+  margin: 5px;
+}
+
+/* Hover effect */
+.btn:hover {
+  background-color: #ffffff;
+  color: #cbad53;
+  box-shadow: 0px 6px 15px rgba(0, 86, 179, 0.4);
+  transform: translateY(-2px);
 }
 
 .background-video {
-  position: fixed; /* Memperbaiki posisi video */
+  position: fixed;
   top: 0;
   left: 0;
-  width: 100%; /* Mengatur lebar video */
-  height: 100%; /* Mengatur tinggi video */
-  object-fit: cover; /* Menyesuaikan ukuran video agar menutupi area */
-  z-index: -1; /* Menempatkan video di belakang konten */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
 }
+
 .payment-page {
   max-width: 600px;
   margin: auto;
@@ -280,7 +305,7 @@ body {
 
 .title {
   font-size: 28px;
-  color: #ffffff;
+  color: #091057;
   margin-bottom: 20px;
 }
 
@@ -308,35 +333,25 @@ body {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-.btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  color: #fff;
-  cursor: pointer;
-  font-size: 16px;
-}
-
 .btn-success {
   margin-top: 20px;
   background-color: #28a745;
 }
 
 .btn-black {
-  background-color: #000000; /* Warna hitam */
-  color: #ffffff; /* Warna teks putih */
-  padding: 10px 20px; /* Padding untuk tombol */
-  border: none; /* Tanpa border */
-  border-radius: 5px; /* Radius sudut */
-  cursor: pointer; /* Pointer saat hover */
-  font-size: 16px; /* Ukuran font */
-  transition: background 0.3s; /* Transisi saat hover */
+  background-color: #000000;
+  color: #ffffff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s;
 }
 
 .btn-black:hover {
-  background-color: #444444; /* Warna lebih terang saat hover */
+  background-color: #444444;
 }
-
 
 .btn-secondary {
   background-color: #000000;
@@ -344,19 +359,15 @@ body {
 
 .receipt {
   margin-top: 90px;
-  padding: 20px;
-  padding-left: 150px;
-  padding-right: 150px;
+  padding: 20px 150px;
   background: #e0f7fa;
   border-radius: 20px;
-  
-  max-width: 800px; /* Atur lebar maksimum lebih besar */
-  width: 100%; /* Agar bisa responsif di layar kecil */
-  height: auto; /* Tinggi otomatis sesuai konten */
-  overflow: auto; /* Tambahkan scroll jika konten terlalu tinggi */
-  margin: 20px auto; /* Centerkan di tengah */
+  max-width: 800px;
+  width: 100%;
+  height: auto;
+  overflow: auto;
+  margin: 20px auto;
 }
-
 
 .qr-code {
   border-radius: 30px;
@@ -413,21 +424,20 @@ body {
 }
 
 .modal-content .btn-success {
-  background-color: #000000; /* Hijau Mewah */
+  background-color: #000000;
 }
 
 .modal-content .btn-secondary {
-  background-color: #8e8e8e; /* Merah Mewah */
+  background-color: #8e8e8e;
 }
 
 .modal-content .btn-success:hover {
-  background-color: #ff0000; /* Hijau Gelap Saat Hover */
+  background-color: #006400;
 }
 
 .modal-content .btn-secondary:hover {
-  background-color: #ff0000; /* Merah Gelap Saat Hover */
+  background-color: #b30000;
 }
-
 
 .qr-code img {
   width: 200px;
@@ -435,20 +445,18 @@ body {
 }
 
 .logo {
-  max-width: 400px; /* Atur lebar maksimum logo */
-  margin: 30px auto; /* Jarak atas dan bawah */
-  display: block; /* Membuat logo menjadi blok agar bisa center */
+  max-width: 400px;
+  margin: 30px auto;
+  display: block;
 }
-
 
 .summary {
   margin-top: 20px;
 }
 
 .payment-instruction {
-  font-size: 20px; /* Ukuran font untuk instruksi */
-  color: #000000; /* Warna teks, sesuaikan dengan desain */
-  margin-top: 10px; /* Jarak atas jika diperlukan */
+  font-size: 20px;
+  color: #000000;
+  margin-top: 10px;
 }
-
 </style>

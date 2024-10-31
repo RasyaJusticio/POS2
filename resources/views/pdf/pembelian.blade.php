@@ -63,12 +63,6 @@
             border-top: 1px dashed #000;
             padding-top: 5px;
         }
-        .F {
-            margin-right: 70%;
-        }
-        .H {
-            margin-left: 50%;
-        }
         .footer {
             text-align: center;
             margin-top: 20px;
@@ -84,6 +78,12 @@
             border-top: 1px dashed #000;
             margin: 10px 0;
         }
+        .id-pembelian {
+            font-size: 50px; /* Increase font size */
+            text-align: center; /* Center the text */
+            font-weight: bold; /* Make it bold for emphasis */
+            margin: 10px 0; /* Add margin for spacing */
+        }
     </style>
 </head>
 <body>
@@ -97,24 +97,17 @@
         <h3> Jl. Sambikerep No. 78</h3>
         <h3> IG : @siamspiceco_</h3>
         
-        <hr>
-
         <!-- BAGIAN 2: Informasi Customer, ID Pembelian, Tanggal, dan Jam -->
+        <div class="customer-info id-pembelian">
+            <span>{{ $pembelian->id }}</span>
+        </div>
         <div class="customer-info">
             <span>Tanggal:</span>
             <span>{{ $pembelian->created_at->format('d-m-Y') }}</span>
         </div>
         <div class="customer-info">
-            <span>Jam:</span>
-            <span id="current-time"></span> 
-        </div>
-        <div class="customer-info">
             <span>Nama :</span>
             <span>{{ $pembelian->customer_name }}</span>
-        </div>
-        <div class="customer-info">
-            <span>ID Pembelian:</span>
-            <span>{{ $pembelian->id }}</span>
         </div>
         
         <hr>
@@ -147,18 +140,6 @@
             Terima Kasih atas Kunjungan Anda!
         </div>
     </div>
-
-    <!-- JavaScript to set the current time -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get the current time
-            const now = new Date();
-            const currentTime = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-    
-            // Insert the current time into the placeholder
-            document.getElementById('current-time').textContent = currentTime;
-        });
-    </script>
 
 </body>
 </html>

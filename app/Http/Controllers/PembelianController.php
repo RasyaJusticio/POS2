@@ -195,7 +195,7 @@ public function generatePDF($uuid)
             'quantity' => $pembelian->item->count()
         ]);
 
-        $pdf->setPaper('F4');
+        $pdf->setPaper('A5');
         $pdf->output();
 
         return $pdf->stream("Invoice{$uuid}". '.pdf');
